@@ -1263,8 +1263,7 @@ struct machine
     SDL_Texture *texture;
 };
 
-struct machine buffer;
-struct machine *machine = &buffer;
+struct machine *machine;
 
 void render()
 {
@@ -1352,12 +1351,13 @@ void get_input()
     }
 }
 
-int main(int argc, char *argv[])
+struct machine *init_machine(void)
 {
+    struct machine *machine = calloc(sizeof machine, 1);
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) != 0)
     {
         printf("Cannot initialize SDL\n");
-        return 0;
+        exit(EXIT_FAILURE);
     }
 
     atexit(SDL_Quit);
@@ -1366,10 +1366,16 @@ int main(int argc, char *argv[])
     if (SDL_CreateWindowAndRenderer(256, 256, SDL_WINDOW_OPENGL, &win, &machine->renderer))
     {
         printf("Cannot create a new window\n");
-        return 0;
+        exit(EXIT_FAILURE);
     }
 
     machine->texture = SDL_CreateTexture(machine->renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 256, 224);
+    return machine;
+}
+
+int main(int argc, char *argv[])
+{
+    machine = init_machine();
 
     init(&cpu);
 
