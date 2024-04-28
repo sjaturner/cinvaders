@@ -1150,6 +1150,48 @@ enum
     PORT_OP,
 };
 
+struct record
+{
+    uint8_t op;
+    uint16_t addr;
+    uint8_t val;
+};
+
+struct trace
+{
+    uint32_t elems;
+    struct record records[0x10];
+};
+
+struct trace trace;
+
+void dump_trace(struct trace *trace)
+{
+    for (uint32_t index = 0; index < trace->elems; ++index)
+    {
+        struct record *record = trace->records + index;
+
+        switch (record->op)
+        {
+            case GET_MEM:
+                printf("GET_MEM %04x %02x\n", record->addr, record->val);
+                break;
+            case SET_MEM:
+                printf("SET_MEM %04x %02x\n", record->addr, record->val);
+                break;
+            case PORT_IP:
+                printf("PORT_IP %04x %02x\n", record->addr, record->val);
+                break;
+            case PORT_OP:
+                printf("PORT_OP %04x %02x\n", record->addr, record->val);
+                break;
+            default:
+                assert(0);
+        }
+
+    }
+}
+
 struct cpu cpu;
 
 void dump(void)
@@ -1179,12 +1221,12 @@ static uint8_t dip0 = 0x0f;
 static uint8_t dip1 = 0x08;
 static uint8_t dip2 = 0x01;
 
-static uint16_t shift_reg;
-static int shift_off;
+static uint16_t shiftReg;
+static int shiftOff;
 
-uint8_t port_ip(struct cpu *cpu, uint16_t addr)
+uint8_t spaceInvaders_portIn(int port)
 {
-    switch (addr)
+    switch (port)
     {
         case 0:
             return dip0;
@@ -1193,47 +1235,65 @@ uint8_t port_ip(struct cpu *cpu, uint16_t addr)
         case 2:
             return dip2;
         case 3:
-            return shift_reg >> (8 - shift_off);
+            return shiftReg >> (8 - shiftOff);
         default:
-            printf("Port read %d\n", addr);
+            printf("Port read %d\n", port);
     }
 
     return 0x00;
 }
 
-void port_op(struct cpu *cpu, uint16_t addr, uint8_t val)
+uint8_t ports[0x100];
+void spaceInvaders_portOut(int port, uint8_t value)
 {
-    switch (addr)
+    ports[port & 0xff] = value;
+
+    switch (port)
     {
         case 2:
-            shift_off = val & 7;
+            shiftOff = value & 7;
             break;
         case 3:
             break;
         case 4:
-            shift_reg = (shift_reg >> 8) | ((uint16_t)val << 8);
+            shiftReg = (shiftReg >> 8) | ((uint16_t)value << 8);
             break;
         case 5:
             break;
         case 6:
             break;
         default:
-            printf("Port write %d %d\n", addr, val);
+            printf("Port write %d %d\n", port, value);
     }
 }
 
-void init(struct cpu *cpu)
+uint8_t port_ip(struct cpu *cpu, uint16_t addr)
 {
-    memset(cpu, 0, sizeof *cpu);
+    return spaceInvaders_portIn(addr);
+}
 
-    cpu->get_mem = get_mem;
-    cpu->set_mem = set_mem;
-    cpu->port_ip = port_ip;
-    cpu->port_op = port_op;
+extern uint8_t ports[0x100];
+void port_op(struct cpu *cpu, uint16_t addr, uint8_t val)
+{
+    spaceInvaders_portOut(addr, val);
+    if (ports[addr] != val)
+    {
+        printf("port_op fail at 0x%04x expected 0x%02x found 0x%02x\n", addr, val, ports[addr]);
+    }
+}
 
-    cpu->cpu_state.regs[REG_AF] = 0x0002;
-    cpu->cpu_state.regs[REG_SP] = 0xF000;
-    cpu->cpu_state.regs[REG_PC] = 0x0001;
+void init(void)
+{
+    memset(&cpu, 0, sizeof cpu);
+
+    cpu.get_mem = get_mem;
+    cpu.set_mem = set_mem;
+    cpu.port_ip = port_ip;
+    cpu.port_op = port_op;
+
+    cpu.cpu_state.regs[REG_AF] = 0x0002;
+    cpu.cpu_state.regs[REG_SP] = 0xF000;
+    cpu.cpu_state.regs[REG_PC] = 0x0001;
 }
 
 void shadow_step(void)
@@ -1253,25 +1313,34 @@ static SDL_Window *win;
 static SDL_Renderer *renderer;
 static SDL_Texture *screentex;
 static SDL_Event ev;
-static uint32_t screen_buf[256 * 224];
+static uint8_t screen_buf[256 * 224 * 4];
 
-void render()
+void die(char *err)
+{
+    printf("FATAL : %s\n", err);
+    dump();
+    exit(-1);
+}
+
+
+void spaceInvaders_vblank()
 {
     uint16_t vram_base = 0x2400;
-    uint32_t *screen_ptr = screen_buf;
+    uint32_t *screenPtr = screen_buf;
+    int i;
 
     while (vram_base < 0x4000)
     {
         uint8_t b = mem[vram_base];
 
-        *screen_ptr++ = ((b >> 0) & 1) ? 0xFFFFFFFF : 0xFF000000;
-        *screen_ptr++ = ((b >> 1) & 1) ? 0xFFFFFFFF : 0xFF000000;
-        *screen_ptr++ = ((b >> 2) & 1) ? 0xFFFFFFFF : 0xFF000000;
-        *screen_ptr++ = ((b >> 3) & 1) ? 0xFFFFFFFF : 0xFF000000;
-        *screen_ptr++ = ((b >> 4) & 1) ? 0xFFFFFFFF : 0xFF000000;
-        *screen_ptr++ = ((b >> 5) & 1) ? 0xFFFFFFFF : 0xFF000000;
-        *screen_ptr++ = ((b >> 6) & 1) ? 0xFFFFFFFF : 0xFF000000;
-        *screen_ptr++ = ((b >> 7) & 1) ? 0xFFFFFFFF : 0xFF000000;
+        *screenPtr++ = ((b >> 0) & 1) ? 0xFFFFFFFF : 0xFF000000;
+        *screenPtr++ = ((b >> 1) & 1) ? 0xFFFFFFFF : 0xFF000000;
+        *screenPtr++ = ((b >> 2) & 1) ? 0xFFFFFFFF : 0xFF000000;
+        *screenPtr++ = ((b >> 3) & 1) ? 0xFFFFFFFF : 0xFF000000;
+        *screenPtr++ = ((b >> 4) & 1) ? 0xFFFFFFFF : 0xFF000000;
+        *screenPtr++ = ((b >> 5) & 1) ? 0xFFFFFFFF : 0xFF000000;
+        *screenPtr++ = ((b >> 6) & 1) ? 0xFFFFFFFF : 0xFF000000;
+        *screenPtr++ = ((b >> 7) & 1) ? 0xFFFFFFFF : 0xFF000000;
 
         vram_base += 1;
     }
@@ -1279,7 +1348,7 @@ void render()
     SDL_UpdateTexture(screentex, NULL, screen_buf, 256 * 4);
 }
 
-void get_input()
+void spaceInvaders_update_input()
 {
     dip0 = 0x0E;
     dip1 &= 0xE0;
@@ -1358,7 +1427,7 @@ int main(int argc, char *argv[])
 
     screentex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 256, 224);
 
-    init(&cpu);
+    init();
 
     char *bank_name[] = { "invaders.h", "invaders.g", "invaders.f", "invaders.e" };
 
@@ -1384,10 +1453,10 @@ int main(int argc, char *argv[])
     {
         run(17066);
         shadow_intr(8);
-        render();
+        spaceInvaders_vblank();
         run(17066);
         shadow_intr(16);
-        get_input();
+        spaceInvaders_update_input();
         SDL_Delay(15);
 
         SDL_RenderClear(renderer);
