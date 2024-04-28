@@ -1152,6 +1152,14 @@ enum
 
 struct cpu cpu;
 
+void run(int cycles)
+{
+    while (cycles > 0)
+    {
+        cycles -= step(&cpu);
+    }
+}
+
 void dump(void)
 {
     printf("cpu.cpu_state.regs[REG_AF]:%04x\n", cpu.cpu_state.regs[REG_AF]);
@@ -1249,15 +1257,19 @@ void shadow_intr(uint16_t addr)
 #include <stdio.h>
 #include <SDL2/SDL.h>
 
-static SDL_Window *win;
-static SDL_Renderer *renderer;
-static SDL_Texture *screentex;
-static SDL_Event ev;
-static uint32_t screen_buf[256 * 224];
+struct machine 
+{
+    SDL_Renderer *renderer;
+    SDL_Texture *texture;
+};
+
+struct machine buffer;
+struct machine *machine = &buffer;
 
 void render()
 {
     uint16_t vram_base = 0x2400;
+    uint32_t screen_buf[256 * 224];
     uint32_t *screen_ptr = screen_buf;
 
     while (vram_base < 0x4000)
@@ -1276,20 +1288,28 @@ void render()
         vram_base += 1;
     }
 
-    SDL_UpdateTexture(screentex, NULL, screen_buf, 256 * 4);
+    SDL_UpdateTexture(machine->texture, NULL, screen_buf, 256 * 4);
+
+    SDL_RenderClear(machine->renderer);
+
+    SDL_Rect dest_rect = { 0, 0, 256, 224 };
+    SDL_RenderCopyEx(machine->renderer, machine->texture, NULL, &dest_rect, 270, NULL, 0);
+    SDL_RenderPresent(machine->renderer);
 }
 
 void get_input()
 {
+    static SDL_Event event = { };
+
     dip0 = 0x0E;
     dip1 &= 0xE0;
 
-    while (SDL_PollEvent(&ev))
+    while (SDL_PollEvent(&event))
     {
-        switch (ev.type)
+        switch (event.type)
         {
             case SDL_KEYUP:
-                switch (ev.key.keysym.sym)
+                switch (event.key.keysym.sym)
                 {
                     case SDLK_LEFT:
                         dip1 &= ~(1 << 5);
@@ -1302,7 +1322,7 @@ void get_input()
                 }
                 break;
             case SDL_KEYDOWN:
-                switch (ev.key.keysym.sym)
+                switch (event.key.keysym.sym)
                 {
                     case SDLK_LEFT:
                         dip1 |= (1 << 5);
@@ -1332,14 +1352,6 @@ void get_input()
     }
 }
 
-void run(int cycles)
-{
-    while (cycles > 0)
-    {
-        cycles -= step(&cpu);
-    }
-}
-
 int main(int argc, char *argv[])
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) != 0)
@@ -1350,13 +1362,14 @@ int main(int argc, char *argv[])
 
     atexit(SDL_Quit);
 
-    if (SDL_CreateWindowAndRenderer(256, 256, SDL_WINDOW_OPENGL, &win, &renderer))
+    static SDL_Window *win;
+    if (SDL_CreateWindowAndRenderer(256, 256, SDL_WINDOW_OPENGL, &win, &machine->renderer))
     {
         printf("Cannot create a new window\n");
         return 0;
     }
 
-    screentex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 256, 224);
+    machine->texture = SDL_CreateTexture(machine->renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 256, 224);
 
     init(&cpu);
 
@@ -1378,8 +1391,6 @@ int main(int argc, char *argv[])
 
     mem[0] = 0xc3;
 
-    SDL_Rect dest_rect = { 0, 0, 256, 224 };
-
     for(;;)
     {
         run(17066);
@@ -1390,9 +1401,6 @@ int main(int argc, char *argv[])
         get_input();
         SDL_Delay(15);
 
-        SDL_RenderClear(renderer);
-        SDL_RenderCopyEx(renderer, screentex, NULL, &dest_rect, 270, NULL, 0);
-        SDL_RenderPresent(renderer);
     }
 
     return 1;
