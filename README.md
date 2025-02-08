@@ -1,4 +1,4 @@
-#Introduction
+# Introduction
 
 This is an 8080 emulator, with a twist. It emulates only enough
 instructions to run Space Invaders.
@@ -7,6 +7,28 @@ It's derived from so many sources that I can only apologise if I have
 missed some. This was the main inspiration:
 
     https://github.com/LemonBoy/Space-Invaders-Emulator
+
+# Running the program
+
+For minimum grief you will need: Debian Linux and to have installed this:
+
+    sudo apt-get install libsdl2-dev 
+
+And a tool chain, which I suspect you'll already have if you've got this far:
+
+    apt-get install build-essential
+
+Then:
+
+    make main
+
+Then:
+
+    ./main
+
+I offer no guarantees, it might work. The pixel to pixel mapping is 1:1
+so you may end up with a hilariously small game area. Pretty sure you
+could fix that though :-)
 
 # Background
 
