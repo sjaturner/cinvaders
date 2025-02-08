@@ -30,6 +30,14 @@ I offer no guarantees, it might work. The pixel to pixel mapping is 1:1
 so you may end up with a hilariously small game area. Pretty sure you
 could fix that though :-)
 
+# Colours
+
+For a more authentic feel, try taping a green gel over part of the play area.
+You may be able to use sweet wrappers, if you can find the right one.
+
+I looked it up, if you use industry standard Quality Street chocolates 
+then the wrapper from "Milk Choc Block" looks close enough.
+
 # Background
 
 I started out in Rust, with the original idea of making a Web Assembly version.
