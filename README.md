@@ -3,7 +3,7 @@
 This is an 8080 emulator, with a twist. It emulates only enough
 instructions to run Space Invaders.
 
-![Invaders Startup](./invaders.gif)
+![Invaders Startup](./startup.gif)
 
 It's derived from so many sources that I can only apologise if I have
 missed some. This was the main inspiration:
