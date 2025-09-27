@@ -83,4 +83,4 @@ Also, this Z80 instruction set table is lovely:
 
 And I have this, too:
 
-    https://en.wikipedia.org/wiki/Programming_the_Z80:w
+    https://en.wikipedia.org/wiki/Programming_the_Z80

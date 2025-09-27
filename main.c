@@ -1375,6 +1375,13 @@ struct machine *init_machine(void)
 
 int main(int argc, char *argv[])
 {
+    printf("Keys:\n");
+    printf("    Left Arrow:  Left.\n");
+    printf("    Right Arrow: Right.\n");
+    printf("    z:           Fire.\n");
+    printf("    x:           Press after coin insertion to start.\n");
+    printf("    c:           Coin insertion! Press twice for two player.\n");
+
     machine = init_machine();
 
     init(&cpu);
