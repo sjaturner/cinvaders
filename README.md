@@ -32,6 +32,14 @@ I offer no guarantees, it might work. The pixel to pixel mapping is 1:1
 so you may end up with a hilariously small game area. Pretty sure you
 could fix that though :-)
 
+# Key mapping
+
+    Left Arrow:  Left.
+    Right Arrow: Right.
+    z:           Fire.
+    x:           Press after coin insertion to start.
+    c:           Coin insertion! Press twice for two player.
+
 # Colours
 
 For a more authentic feel, try taping a green gel over part of the play area.
