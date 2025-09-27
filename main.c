@@ -17,6 +17,7 @@ enum
 
 struct cpu_state
 {
+    uint16_t init[REGS];
     uint16_t regs[REGS];
     int ie;
 } __attribute__((packed));
@@ -427,12 +428,15 @@ enum
     FLAG_BIT_S = 1 << FLAG_S,
 };
 
-int reg_verbose;
+int reg_verbose = 0;
+int reg_init_check = 1;
+uint8_t reg_init_check_warned[0x10000];
 #define REG_ACCESS(HL, H, L, REG) \
 uint16_t get_ ## HL(struct cpu *cpu, uint16_t addr) \
 { \
     uint16_t ret = cpu->cpu_state.regs[REG]; \
     if (reg_verbose) printf("%s %04x\n", __func__, ret); \
+    if (reg_init_check) { if (cpu->cpu_state.init[REG] != 0xffff) { uint16_t pc = cpu->cpu_state.regs[REG_PC]; if (!reg_init_check_warned[pc]) printf("%s uninit at %04x\n", __func__, pc); reg_init_check_warned[pc] = 1; } } \
     return ret; \
 } \
 \
@@ -440,6 +444,7 @@ uint16_t get_ ## H(struct cpu *cpu, uint16_t addr) \
 { \
     uint16_t ret = cpu->cpu_state.regs[REG] >> 8 & 0xff; \
     if (reg_verbose) printf("%s %04x\n", __func__, ret); \
+    if (reg_init_check) { if ((cpu->cpu_state.init[REG] >> 8 & 0xff) != 0xff) { uint16_t pc = cpu->cpu_state.regs[REG_PC]; if (!reg_init_check_warned[pc]) printf("%s uninit at %04x\n", __func__, pc); reg_init_check_warned[pc] = 1; } } \
     return ret; \
 } \
 \
@@ -447,18 +452,21 @@ uint16_t get_ ## L(struct cpu *cpu, uint16_t addr) \
 { \
     uint16_t ret = cpu->cpu_state.regs[REG] >> 0 & 0xff; \
     if (reg_verbose) printf("%s %04x\n", __func__, ret); \
+    if (reg_init_check) { if ((cpu->cpu_state.init[REG] >> 0 & 0xff) != 0xff) { uint16_t pc = cpu->cpu_state.regs[REG_PC]; if (!reg_init_check_warned[pc]) printf("%s uninit at %04x\n", __func__, pc); reg_init_check_warned[pc] = 1; } } \
     return ret; \
 } \
 \
 void set_ ## HL(struct cpu *cpu, uint16_t addr, uint16_t val) \
 { \
     if (reg_verbose) printf("%s %04x\n", __func__, val); \
+    if (reg_init_check) { cpu->cpu_state.init[REG] = 0xffff; } \
     cpu->cpu_state.regs[REG] = val; \
 } \
 \
 void set_ ## H(struct cpu *cpu, uint16_t addr, uint16_t val) \
 { \
     if (reg_verbose) printf("%s %04x\n", __func__, val); \
+    if (reg_init_check) { cpu->cpu_state.init[REG] |= 0xff00; } \
     cpu->cpu_state.regs[REG] &= 0xff << 0; \
     cpu->cpu_state.regs[REG] |= (0xff & val) << 8; \
 } \
@@ -466,6 +474,7 @@ void set_ ## H(struct cpu *cpu, uint16_t addr, uint16_t val) \
 void set_ ## L(struct cpu *cpu, uint16_t addr, uint16_t val) \
 { \
     if (reg_verbose) printf("%s %04x\n", __func__, val); \
+    if (reg_init_check) { cpu->cpu_state.init[REG] |= 0x00ff; } \
     cpu->cpu_state.regs[REG] &= 0xff << 8; \
     cpu->cpu_state.regs[REG] |= (0xff & val) << 0; \
 }
@@ -993,8 +1002,13 @@ uint32_t step(struct cpu *cpu)
                     uint16_t sp = get_sp(cpu, 0);
                     uint16_t lo = cpu->get_mem(cpu, sp + 0);
                     uint16_t hi = cpu->get_mem(cpu, sp + 1);
-                    set_sp(cpu, 0, sp + 2);
 
+                    if (get_pc(cpu, 0) != 0x0088) /* Interrupt case. */
+                    {
+                        memset(cpu->cpu_state.init, 0, sizeof(cpu->cpu_state.init));
+                    }
+
+                    set_sp(cpu, 0, sp + 2);
                     set_pc(cpu, 0, hi << 8 | lo << 0);
                     cpu->clk += opcode->slow;
                     return opcode->slow;
