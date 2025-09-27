@@ -1332,6 +1332,9 @@ void get_input()
                     case SDLK_z:
                         dip1 |= (1 << 4);
                         break;
+                    case SDLK_q:
+                        exit(0);
+                        break;
                     default:
                         break;
                 }
@@ -1375,6 +1378,7 @@ int main(int argc, char *argv[])
     printf("    z:           Fire.\n");
     printf("    x:           Press after coin insertion to start.\n");
     printf("    c:           Coin insertion! Press twice for two player.\n");
+    printf("    q:           Quit.\n");
 
     machine = init_machine();
 
