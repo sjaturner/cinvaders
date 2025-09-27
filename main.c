@@ -143,7 +143,7 @@ enum
     COND_Z,
 };
 
-struct opcode
+const struct opcode
 {
     uint8_t size;
     uint8_t type;
@@ -569,7 +569,7 @@ void set_ptr_imm16(struct cpu *cpu, uint16_t addr, uint16_t val)
     cpu->set_mem(cpu, addr + 0, val >> 0 & 0xff);
 }
 
-struct access accesses[] = {
+const struct access accesses[] = {
     [INVALID_SUBJECT] = {},
     [IMM16] = {
             .get = get_imm16,
@@ -685,7 +685,7 @@ int cond(struct cpu *cpu, int test)
     return 0;
 }
 
-void set_flags(struct cpu *cpu, struct opcode *opcode, uint32_t res_val, int reg16)
+void set_flags(struct cpu *cpu, const struct opcode *opcode, uint32_t res_val, int reg16)
 {
     uint8_t flags = 0;
 
@@ -711,7 +711,7 @@ uint32_t step(struct cpu *cpu)
 {
     uint16_t pc = get_pc(cpu, 0);
     uint8_t op = cpu->get_mem(cpu, pc);
-    struct opcode *opcode = opcodes + op;
+    const struct opcode *opcode = opcodes + op;
 
     set_pc(cpu, 0, pc + 1);
 
@@ -1171,16 +1171,14 @@ void dump(void)
     printf("cpu.cpu_state.ie:%04x\n",           cpu.cpu_state.ie);
 }
 
-uint8_t mem[0x10000];
-
 uint8_t get_mem(struct cpu *cpu, uint16_t addr)
 {
-    return mem[addr];
+    return cpu->mem[addr];
 }
 
 void set_mem(struct cpu *cpu, uint16_t addr, uint8_t val)
 {
-    mem[addr] = val;
+    cpu->mem[addr] = val;
 }
 
 static uint8_t dip0 = 0x0f;
@@ -1230,10 +1228,11 @@ void port_op(struct cpu *cpu, uint16_t addr, uint8_t val)
     }
 }
 
-void init(struct cpu *cpu)
+void init(struct cpu *cpu, uint8_t *mem)
 {
     memset(cpu, 0, sizeof *cpu);
 
+    cpu->mem = mem;
     cpu->get_mem = get_mem;
     cpu->set_mem = set_mem;
     cpu->port_ip = port_ip;
@@ -1242,11 +1241,6 @@ void init(struct cpu *cpu)
     cpu->cpu_state.regs[REG_AF] = 0x0002;
     cpu->cpu_state.regs[REG_SP] = 0xF000;
     cpu->cpu_state.regs[REG_PC] = 0x0001;
-}
-
-void shadow_step(void)
-{
-    step(&cpu);
 }
 
 void shadow_intr(uint16_t addr)
@@ -1265,7 +1259,7 @@ struct machine
 
 struct machine *machine;
 
-void render()
+void render(uint8_t *mem)
 {
     uint16_t vram_base = 0x2400;
     uint32_t screen_buf[256 * 224];
@@ -1384,7 +1378,7 @@ int main(int argc, char *argv[])
 
     machine = init_machine();
 
-    init(&cpu);
+    init(&cpu, calloc(0x10000, 1));
 
     char *bank_name[] = { "invaders.h", "invaders.g", "invaders.f", "invaders.e" };
 
@@ -1395,20 +1389,20 @@ int main(int argc, char *argv[])
         {
             return 0;
         }
-        if (fread(mem + (i * 0x0800), 1, 0x0800, fp) != 0x0800)
+        if (fread(cpu.mem + (i * 0x0800), 1, 0x0800, fp) != 0x0800)
         {
             return 0;
         }
         fclose(fp);
     }
 
-    mem[0] = 0xc3;
+    cpu.mem[0] = 0xc3;
 
     for(;;)
     {
         run(17066);
         shadow_intr(8);
-        render();
+        render(cpu.mem);
         run(17066);
         shadow_intr(16);
         get_input();
