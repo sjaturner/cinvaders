@@ -21,6 +21,30 @@ struct cpu_state
     int ie;
 } __attribute__((packed));
 
+enum
+{
+    TRACE_REG8_A,
+    TRACE_REG8_B,
+    TRACE_REG8_C,
+    TRACE_REG8_D,
+    TRACE_REG8_E,
+    TRACE_REG8_H,
+    TRACE_REG8_L,
+    TRACE_FLAG_BIT_C,
+    TRACE_FLAG_BIT_N,
+    TRACE_FLAG_BIT_PV,
+    TRACE_FLAG_BIT_H,
+    TRACE_FLAG_BIT_Z,
+    TRACE_FLAG_BIT_S,
+    TRACES,
+};
+
+struct setat
+{
+    uint16_t inat;
+    uint16_t sub_depth;
+};
+
 struct cpu
 {
     uint8_t (*get_mem)(struct cpu * cpu, uint16_t addr);
@@ -30,6 +54,10 @@ struct cpu
     struct cpu_state cpu_state;
     uint64_t clk;
     uint8_t *mem;
+
+    uint16_t inat;
+    uint16_t sub_depth;
+    struct setat setat[TRACES];
 };
 
 uint8_t get_mem(struct cpu *cpu, uint16_t addr);
@@ -691,15 +719,15 @@ void set_flags(struct cpu *cpu, const struct opcode *opcode, uint32_t res_val, i
 
     if (reg16)
     {
-        flags |= !!(res_val & 0x10000) << FLAG_C;
-        flags |= !!(res_val & 0x08000) << FLAG_S;
-        flags |= !(res_val & 0x00ffff) << FLAG_Z;
+        flags |= !!(res_val & 0x10000) * FLAG_BIT_C;
+        flags |= !!(res_val & 0x08000) * FLAG_BIT_S;
+        flags |= !(res_val & 0x00ffff) * FLAG_BIT_Z;
     }
     else
     {
-        flags |= !!(res_val & 0x100) << FLAG_C;
-        flags |= !!(res_val & 0x080) << FLAG_S;
-        flags |= !(res_val & 0x00ff) << FLAG_Z;
+        flags |= !!(res_val & 0x100) * FLAG_BIT_C;
+        flags |= !!(res_val & 0x080) * FLAG_BIT_S;
+        flags |= !(res_val & 0x00ff) * FLAG_BIT_Z;
     }
 
     uint8_t flag_mask = (opcode->carry ? FLAG_BIT_C : 0) | (opcode->zs ? FLAG_BIT_Z | FLAG_BIT_S : 0) | FLAG_BIT_H;
@@ -713,6 +741,7 @@ uint32_t step(struct cpu *cpu)
     uint8_t op = cpu->get_mem(cpu, pc);
     const struct opcode *opcode = opcodes + op;
 
+    cpu->inat = pc;
     set_pc(cpu, 0, pc + 1);
 
     switch (opcode->type)
