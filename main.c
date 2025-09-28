@@ -21,21 +21,22 @@ struct cpu_state
     int ie;
 } __attribute__((packed));
 
+#define TRACE(T) TRACE_ ## T
 enum
 {
-    TRACE_REG8_A,
-    TRACE_REG8_B,
-    TRACE_REG8_C,
-    TRACE_REG8_D,
-    TRACE_REG8_E,
-    TRACE_REG8_H,
-    TRACE_REG8_L,
-    TRACE_FLAG_BIT_C,
-    TRACE_FLAG_BIT_N,
-    TRACE_FLAG_BIT_PV,
-    TRACE_FLAG_BIT_H,
-    TRACE_FLAG_BIT_Z,
-    TRACE_FLAG_BIT_S,
+    TRACE(REG8_A),
+    TRACE(REG8_B),
+    TRACE(REG8_C),
+    TRACE(REG8_D),
+    TRACE(REG8_E),
+    TRACE(REG8_H),
+    TRACE(REG8_L),
+    TRACE(FLAG_BIT_C),
+    TRACE(FLAG_BIT_N),
+    TRACE(FLAG_BIT_PV),
+    TRACE(FLAG_BIT_H),
+    TRACE(FLAG_BIT_Z),
+    TRACE(FLAG_BIT_S),
     TRACES,
 };
 
@@ -55,7 +56,10 @@ struct cpu
     uint64_t clk;
     uint8_t *mem;
 
+    uint16_t intr;
     uint16_t inat;
+    uint16_t next;
+    uint16_t jump;
     uint16_t sub_depth;
     struct setat setat[TRACES];
 };
@@ -64,10 +68,6 @@ uint8_t get_mem(struct cpu *cpu, uint16_t addr);
 void set_mem(struct cpu *cpu, uint16_t addr, uint8_t val);
 uint8_t port_ip(struct cpu *cpu, uint16_t addr);
 void port_op(struct cpu *cpu, uint16_t addr, uint8_t val);
-
-void reference_init(struct cpu_state *cpu_state);
-void reference_read(struct cpu_state *cpu_state);
-int reference_step(struct cpu_state *cpu_state);
 
 enum
 {
@@ -171,12 +171,18 @@ enum
     COND_Z,
 };
 
+#define STRINGIZE_IMPL(x) #x
+#define STRINGIZE(x) STRINGIZE_IMPL(x)
+
+#define INIT(A, B, C) A, B, C, STRINGIZE(A B C)
+
 const struct opcode
 {
     uint8_t size;
     uint8_t type;
     uint8_t dst;
     uint8_t alt;
+    char *dasm;
     uint8_t cond;
     uint8_t carry;
     uint8_t zs;
@@ -184,258 +190,258 @@ const struct opcode
     uint8_t fast;
 }
 opcodes[0x100] = {
-    [0x8E]  =  {1,  ADC,      REG8_A,     PTR_HL,     0,        CARRY_D,  ZS_D,  7,   7,},
-    [0x8F]  =  {1,  ADC,      REG8_A,     REG8_A,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x88]  =  {1,  ADC,      REG8_A,     REG8_B,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x89]  =  {1,  ADC,      REG8_A,     REG8_C,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x8A]  =  {1,  ADC,      REG8_A,     REG8_D,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x8B]  =  {1,  ADC,      REG8_A,     REG8_E,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x8C]  =  {1,  ADC,      REG8_A,     REG8_H,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x8D]  =  {1,  ADC,      REG8_A,     REG8_L,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0xCE]  =  {2,  ADC,      REG8_A,     IMM8,       0,        CARRY_D,  ZS_D,  7,   7,},
-    [0x86]  =  {1,  ADD,      REG8_A,     PTR_HL,     0,        CARRY_D,  ZS_D,  7,   7,},   /*  required  */
-    [0x87]  =  {1,  ADD,      REG8_A,     REG8_A,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x80]  =  {1,  ADD,      REG8_A,     REG8_B,     0,        CARRY_D,  ZS_D,  4,   4,},   /*  required  */
-    [0x81]  =  {1,  ADD,      REG8_A,     REG8_C,     0,        CARRY_D,  ZS_D,  4,   4,},   /*  required  */
-    [0x82]  =  {1,  ADD,      REG8_A,     REG8_D,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x83]  =  {1,  ADD,      REG8_A,     REG8_E,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x84]  =  {1,  ADD,      REG8_A,     REG8_H,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x85]  =  {1,  ADD,      REG8_A,     REG8_L,     0,        CARRY_D,  ZS_D,  4,   4,},   /*  required  */
-    [0xC6]  =  {2,  ADD,      REG8_A,     IMM8,       0,        CARRY_D,  ZS_D,  7,   7,},   /*  required  */
-    [0xBE]  =  {1,  CP,       REG8_A,     PTR_HL,     0,        CARRY_D,  ZS_D,  7,   7,},   /*  required  */
-    [0xBF]  =  {1,  CP,       REG8_A,     REG8_A,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0xB8]  =  {1,  CP,       REG8_A,     REG8_B,     0,        CARRY_D,  ZS_D,  4,   4,},   /*  required  */
-    [0xB9]  =  {1,  CP,       REG8_A,     REG8_C,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0xBA]  =  {1,  CP,       REG8_A,     REG8_D,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0xBB]  =  {1,  CP,       REG8_A,     REG8_E,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0xBC]  =  {1,  CP,       REG8_A,     REG8_H,     0,        CARRY_D,  ZS_D,  4,   4,},   /*  required  */
-    [0xBD]  =  {1,  CP,       REG8_A,     REG8_L,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0xFE]  =  {2,  CP,       REG8_A,     IMM8,       0,        CARRY_D,  ZS_D,  7,   7,},   /*  required  */
-    [0x9E]  =  {1,  SBC,      REG8_A,     PTR_HL,     0,        CARRY_D,  ZS_D,  7,   7,},
-    [0x9F]  =  {1,  SBC,      REG8_A,     REG8_A,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x98]  =  {1,  SBC,      REG8_A,     REG8_B,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x99]  =  {1,  SBC,      REG8_A,     REG8_C,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x9A]  =  {1,  SBC,      REG8_A,     REG8_D,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x9B]  =  {1,  SBC,      REG8_A,     REG8_E,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x9C]  =  {1,  SBC,      REG8_A,     REG8_H,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x9D]  =  {1,  SBC,      REG8_A,     REG8_L,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0xDE]  =  {2,  SBC,      REG8_A,     IMM8,       0,        CARRY_D,  ZS_D,  7,   7,},   /*  required  */
-    [0x96]  =  {1,  SUB,      REG8_A,     PTR_HL,     0,        CARRY_D,  ZS_D,  7,   7,},
-    [0x97]  =  {1,  SUB,      REG8_A,     REG8_A,     0,        CARRY_D,  ZS_D,  4,   4,},   /*  required  */
-    [0x90]  =  {1,  SUB,      REG8_A,     REG8_B,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x91]  =  {1,  SUB,      REG8_A,     REG8_C,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x92]  =  {1,  SUB,      REG8_A,     REG8_D,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x93]  =  {1,  SUB,      REG8_A,     REG8_E,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x94]  =  {1,  SUB,      REG8_A,     REG8_H,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0x95]  =  {1,  SUB,      REG8_A,     REG8_L,     0,        CARRY_D,  ZS_D,  4,   4,},
-    [0xD6]  =  {2,  SUB,      REG8_A,     IMM8,       0,        CARRY_D,  ZS_D,  7,   7,},   /*  required  */
-    [0x09]  =  {1,  ADD,      REG16_HL,   REG16_BC,   0,        CARRY_D,  ZS_U,  11,  11,},  /*  required  */
-    [0x19]  =  {1,  ADD,      REG16_HL,   REG16_DE,   0,        CARRY_D,  ZS_U,  11,  11,},  /*  required  */
-    [0x29]  =  {1,  ADD,      REG16_HL,   REG16_HL,   0,        CARRY_D,  ZS_U,  11,  11,},  /*  required  */
-    [0x39]  =  {1,  ADD,      REG16_HL,   REG16_SP,   0,        CARRY_D,  ZS_U,  11,  11,},
-    [0x17]  =  {1,  RLA,      REG8_A,     0,          0,        CARRY_D,  ZS_U,  4,   4,},
-    [0x07]  =  {1,  RLCA,     REG8_A,     0,          0,        CARRY_D,  ZS_U,  4,   4,},   /*  required  */
-    [0x1F]  =  {1,  RRA,      REG8_A,     0,          0,        CARRY_D,  ZS_U,  4,   4,},   /*  required  */
-    [0x0F]  =  {1,  RRCA,     REG8_A,     0,          0,        CARRY_D,  ZS_U,  4,   4,},   /*  required  */
-    [0x3F]  =  {1,  CCF,      0,          0,          0,        CARRY_X,  ZS_U,  4,   4,},
-    [0x27]  =  {1,  DAA,      0,          0,          0,        CARRY_X,  ZS_D,  4,   4,},   /*  required  */
-    [0xA6]  =  {1,  AND,      REG8_A,     PTR_HL,     0,        CARRY_R,  ZS_D,  7,   7,},   /*  required  */
-    [0xA7]  =  {1,  AND,      REG8_A,     REG8_A,     0,        CARRY_R,  ZS_D,  4,   4,},   /*  required  */
-    [0xA0]  =  {1,  AND,      REG8_A,     REG8_B,     0,        CARRY_R,  ZS_D,  4,   4,},   /*  required  */
-    [0xA1]  =  {1,  AND,      REG8_A,     REG8_C,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xA2]  =  {1,  AND,      REG8_A,     REG8_D,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xA3]  =  {1,  AND,      REG8_A,     REG8_E,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xA4]  =  {1,  AND,      REG8_A,     REG8_H,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xA5]  =  {1,  AND,      REG8_A,     REG8_L,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xE6]  =  {2,  AND,      REG8_A,     IMM8,       0,        CARRY_R,  ZS_D,  7,   7,},   /*  required  */
-    [0xB6]  =  {1,  OR,       REG8_A,     PTR_HL,     0,        CARRY_R,  ZS_D,  7,   7,},   /*  required  */
-    [0xB7]  =  {1,  OR,       REG8_A,     REG8_A,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xB0]  =  {1,  OR,       REG8_A,     REG8_B,     0,        CARRY_R,  ZS_D,  4,   4,},   /*  required  */
-    [0xB1]  =  {1,  OR,       REG8_A,     REG8_C,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xB2]  =  {1,  OR,       REG8_A,     REG8_D,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xB3]  =  {1,  OR,       REG8_A,     REG8_E,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xB4]  =  {1,  OR,       REG8_A,     REG8_H,     0,        CARRY_R,  ZS_D,  4,   4,},   /*  required  */
-    [0xB5]  =  {1,  OR,       REG8_A,     REG8_L,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xF6]  =  {2,  OR,       REG8_A,     IMM8,       0,        CARRY_R,  ZS_D,  7,   7,},   /*  required  */
-    [0xAE]  =  {1,  XOR,      REG8_A,     PTR_HL,     0,        CARRY_R,  ZS_D,  7,   7,},
-    [0xAF]  =  {1,  XOR,      REG8_A,     REG8_A,     0,        CARRY_R,  ZS_D,  4,   4,},   /*  required  */
-    [0xA8]  =  {1,  XOR,      REG8_A,     REG8_B,     0,        CARRY_R,  ZS_D,  4,   4,},   /*  required  */
-    [0xA9]  =  {1,  XOR,      REG8_A,     REG8_C,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xAA]  =  {1,  XOR,      REG8_A,     REG8_D,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xAB]  =  {1,  XOR,      REG8_A,     REG8_E,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xAC]  =  {1,  XOR,      REG8_A,     REG8_H,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xAD]  =  {1,  XOR,      REG8_A,     REG8_L,     0,        CARRY_R,  ZS_D,  4,   4,},
-    [0xEE]  =  {2,  XOR,      REG8_A,     IMM8,       0,        CARRY_R,  ZS_D,  7,   7,},
-    [0x37]  =  {1,  SCF,      0,          0,          0,        CARRY_S,  ZS_U,  4,   4,},   /*  required  */
-    [0x35]  =  {1,  DEC,      PTR_HL,     0,          0,        CARRY_U,  ZS_D,  11,  11,},  /*  required  */
-    [0x3D]  =  {1,  DEC,      REG8_A,     0,          0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
-    [0x05]  =  {1,  DEC,      REG8_B,     0,          0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
-    [0x0D]  =  {1,  DEC,      REG8_C,     0,          0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
-    [0x15]  =  {1,  DEC,      REG8_D,     0,          0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
-    [0x1D]  =  {1,  DEC,      REG8_E,     0,          0,        CARRY_U,  ZS_D,  4,   4,},
-    [0x25]  =  {1,  DEC,      REG8_H,     0,          0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
-    [0x2D]  =  {1,  DEC,      REG8_L,     0,          0,        CARRY_U,  ZS_D,  4,   4,},
-    [0x34]  =  {1,  INC,      PTR_HL,     0,          0,        CARRY_U,  ZS_D,  11,  11,},  /*  required  */
-    [0x3C]  =  {1,  INC,      REG8_A,     0,          0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
-    [0x04]  =  {1,  INC,      REG8_B,     0,          0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
-    [0x0C]  =  {1,  INC,      REG8_C,     0,          0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
-    [0x14]  =  {1,  INC,      REG8_D,     0,          0,        CARRY_U,  ZS_D,  4,   4,},
-    [0x1C]  =  {1,  INC,      REG8_E,     0,          0,        CARRY_U,  ZS_D,  4,   4,},
-    [0x24]  =  {1,  INC,      REG8_H,     0,          0,        CARRY_U,  ZS_D,  4,   4,},
-    [0x2C]  =  {1,  INC,      REG8_L,     0,          0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
-    [0x2F]  =  {1,  CPL,      0,          0,          0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0xDC]  =  {3,  CALL,     IMM16,      0,          COND_C,   CARRY_U,  ZS_U,  10,  17,},
-    [0xFC]  =  {3,  CALL,     IMM16,      0,          COND_M,   CARRY_U,  ZS_U,  10,  17,},
-    [0xD4]  =  {3,  CALL,     IMM16,      0,          COND_NC,  CARRY_U,  ZS_U,  10,  17,},  /*  required  */
-    [0xCD]  =  {3,  CALL,     IMM16,      0,          COND_A,   CARRY_U,  ZS_U,  17,  17,},  /*  required  */
-    [0xC4]  =  {3,  CALL,     IMM16,      0,          COND_NZ,  CARRY_U,  ZS_U,  10,  17,},  /*  required  */
-    [0xF4]  =  {3,  CALL,     IMM16,      0,          COND_P,   CARRY_U,  ZS_U,  10,  17,},
-    [0xEC]  =  {3,  CALL,     IMM16,      0,          COND_PE,  CARRY_U,  ZS_U,  10,  17,},
-    [0xE4]  =  {3,  CALL,     IMM16,      0,          COND_PO,  CARRY_U,  ZS_U,  10,  17,},
-    [0xCC]  =  {3,  CALL,     IMM16,      0,          COND_Z,   CARRY_U,  ZS_U,  10,  17,},  /*  required  */
-    [0x0B]  =  {1,  DEC,      REG16_BC,   0,          0,        CARRY_U,  ZS_U,  6,   6,},
-    [0x1B]  =  {1,  DEC,      REG16_DE,   0,          0,        CARRY_U,  ZS_U,  6,   6,},   /*  required  */
-    [0x2B]  =  {1,  DEC,      REG16_HL,   0,          0,        CARRY_U,  ZS_U,  6,   6,},   /*  required  */
-    [0x3B]  =  {1,  DEC,      REG16_SP,   0,          0,        CARRY_U,  ZS_U,  6,   6,},
-    [0xF3]  =  {1,  DI,       0,          0,          0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x10]  =  {2,  DJNZ,     IMM8,       0,          0,        CARRY_U,  ZS_U,  13,  8,},
-    [0xFB]  =  {1,  EI,       0,          0,          0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0xE3]  =  {1,  PUTHLSP,  0,          0,          0,        CARRY_U,  ZS_U,  19,  19,},  /*  required  */
-    [0x08]  =  {1,  EXAF,     0,          0,          0,        CARRY_U,  ZS_U,  4,   4,},
-    [0xEB]  =  {1,  EXDEHL,   0,          0,          0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0xD9]  =  {1,  EXX,      0,          0,          0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x76]  =  {1,  HALT,     0,          0,          0,        CARRY_U,  ZS_U,  4,   4,},
-    [0xDB]  =  {2,  IN,       IMM8,       0,          0,        CARRY_U,  ZS_U,  11,  11,},  /*  required  */
-    [0x03]  =  {1,  INC,      REG16_BC,   0,          0,        CARRY_U,  ZS_U,  6,   6,},   /*  required  */
-    [0x13]  =  {1,  INC,      REG16_DE,   0,          0,        CARRY_U,  ZS_U,  6,   6,},   /*  required  */
-    [0x23]  =  {1,  INC,      REG16_HL,   0,          0,        CARRY_U,  ZS_U,  6,   6,},   /*  required  */
-    [0x33]  =  {1,  INC,      REG16_SP,   0,          0,        CARRY_U,  ZS_U,  6,   6,},
-    [0xE9]  =  {1,  JP,       REG16_HL,   0,          COND_A,   CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0xDA]  =  {3,  JP,       IMM16,      0,          COND_C,   CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0xFA]  =  {3,  JP,       IMM16,      0,          COND_M,   CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0xD2]  =  {3,  JP,       IMM16,      0,          COND_NC,  CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0xC3]  =  {3,  JP,       IMM16,      0,          COND_A,   CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0xC2]  =  {3,  JP,       IMM16,      0,          COND_NZ,  CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0xF2]  =  {3,  JP,       IMM16,      0,          COND_P,   CARRY_U,  ZS_U,  10,  10,},
-    [0xEA]  =  {3,  JP,       IMM16,      0,          COND_PE,  CARRY_U,  ZS_U,  10,  10,},
-    [0xE2]  =  {3,  JP,       IMM16,      0,          COND_PO,  CARRY_U,  ZS_U,  10,  10,},
-    [0xCA]  =  {3,  JP,       IMM16,      0,          COND_Z,   CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0x38]  =  {2,  JR,       IMM8,       0,          COND_C,   CARRY_U,  ZS_U,  12,  7,},
-    [0x18]  =  {2,  JR,       IMM8,       0,          COND_A,   CARRY_U,  ZS_U,  12,  12,},
-    [0x30]  =  {2,  JR,       IMM8,       0,          COND_NC,  CARRY_U,  ZS_U,  12,  7,},
-    [0x20]  =  {2,  JR,       IMM8,       0,          COND_NZ,  CARRY_U,  ZS_U,  12,  7,},
-    [0x28]  =  {2,  JR,       IMM8,       0,          COND_Z,   CARRY_U,  ZS_U,  12,  7,},
-    [0x02]  =  {1,  LD,       PTR_BC,     REG8_A,     0,        CARRY_U,  ZS_U,  7,   7,},
-    [0x12]  =  {1,  LD,       PTR_DE,     REG8_A,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x77]  =  {1,  LD,       PTR_HL,     REG8_A,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x70]  =  {1,  LD,       PTR_HL,     REG8_B,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x71]  =  {1,  LD,       PTR_HL,     REG8_C,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x72]  =  {1,  LD,       PTR_HL,     REG8_D,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x73]  =  {1,  LD,       PTR_HL,     REG8_E,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x74]  =  {1,  LD,       PTR_HL,     REG8_H,     0,        CARRY_U,  ZS_U,  7,   7,},
-    [0x75]  =  {1,  LD,       PTR_HL,     REG8_L,     0,        CARRY_U,  ZS_U,  7,   7,},
-    [0x36]  =  {2,  LD,       PTR_HL,     IMM8,       0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0x32]  =  {3,  LD,       PTR_IMM8,   REG8_A,     0,        CARRY_U,  ZS_U,  13,  13,},  /*  required  */
-    [0x22]  =  {3,  LD,       PTR_IMM16,  REG16_HL,   0,        CARRY_U,  ZS_U,  16,  16,},  /*  required  */
-    [0x0A]  =  {1,  LD,       REG8_A,     PTR_BC,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x1A]  =  {1,  LD,       REG8_A,     PTR_DE,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x7E]  =  {1,  LD,       REG8_A,     PTR_HL,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x3A]  =  {3,  LD,       REG8_A,     PTR_IMM8,   0,        CARRY_U,  ZS_U,  13,  13,},  /*  required  */
-    [0x7F]  =  {1,  LD,       REG8_A,     REG8_A,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x78]  =  {1,  LD,       REG8_A,     REG8_B,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x79]  =  {1,  LD,       REG8_A,     REG8_C,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x7A]  =  {1,  LD,       REG8_A,     REG8_D,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x7B]  =  {1,  LD,       REG8_A,     REG8_E,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x7C]  =  {1,  LD,       REG8_A,     REG8_H,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x7D]  =  {1,  LD,       REG8_A,     REG8_L,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x3E]  =  {2,  LD,       REG8_A,     IMM8,       0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x46]  =  {1,  LD,       REG8_B,     PTR_HL,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x47]  =  {1,  LD,       REG8_B,     REG8_A,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x40]  =  {1,  LD,       REG8_B,     REG8_B,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x41]  =  {1,  LD,       REG8_B,     REG8_C,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x42]  =  {1,  LD,       REG8_B,     REG8_D,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x43]  =  {1,  LD,       REG8_B,     REG8_E,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x44]  =  {1,  LD,       REG8_B,     REG8_H,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x45]  =  {1,  LD,       REG8_B,     REG8_L,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x06]  =  {2,  LD,       REG8_B,     IMM8,       0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x01]  =  {3,  LD,       REG16_BC,   IMM16,      0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0x4E]  =  {1,  LD,       REG8_C,     PTR_HL,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x4F]  =  {1,  LD,       REG8_C,     REG8_A,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x48]  =  {1,  LD,       REG8_C,     REG8_B,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x49]  =  {1,  LD,       REG8_C,     REG8_C,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x4A]  =  {1,  LD,       REG8_C,     REG8_D,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x4B]  =  {1,  LD,       REG8_C,     REG8_E,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x4C]  =  {1,  LD,       REG8_C,     REG8_H,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x4D]  =  {1,  LD,       REG8_C,     REG8_L,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x0E]  =  {2,  LD,       REG8_C,     IMM8,       0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x56]  =  {1,  LD,       REG8_D,     PTR_HL,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x57]  =  {1,  LD,       REG8_D,     REG8_A,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x50]  =  {1,  LD,       REG8_D,     REG8_B,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x51]  =  {1,  LD,       REG8_D,     REG8_C,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x52]  =  {1,  LD,       REG8_D,     REG8_D,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x53]  =  {1,  LD,       REG8_D,     REG8_E,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x54]  =  {1,  LD,       REG8_D,     REG8_H,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x55]  =  {1,  LD,       REG8_D,     REG8_L,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x16]  =  {2,  LD,       REG8_D,     IMM8,       0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x11]  =  {3,  LD,       REG16_DE,   IMM16,      0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0x5E]  =  {1,  LD,       REG8_E,     PTR_HL,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x5F]  =  {1,  LD,       REG8_E,     REG8_A,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x58]  =  {1,  LD,       REG8_E,     REG8_B,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x59]  =  {1,  LD,       REG8_E,     REG8_C,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x5A]  =  {1,  LD,       REG8_E,     REG8_D,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x5B]  =  {1,  LD,       REG8_E,     REG8_E,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x5C]  =  {1,  LD,       REG8_E,     REG8_H,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x5D]  =  {1,  LD,       REG8_E,     REG8_L,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x1E]  =  {2,  LD,       REG8_E,     IMM8,       0,        CARRY_U,  ZS_U,  7,   7,},
-    [0x66]  =  {1,  LD,       REG8_H,     PTR_HL,     0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x67]  =  {1,  LD,       REG8_H,     REG8_A,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x60]  =  {1,  LD,       REG8_H,     REG8_B,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x61]  =  {1,  LD,       REG8_H,     REG8_C,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x62]  =  {1,  LD,       REG8_H,     REG8_D,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x63]  =  {1,  LD,       REG8_H,     REG8_E,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x64]  =  {1,  LD,       REG8_H,     REG8_H,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x65]  =  {1,  LD,       REG8_H,     REG8_L,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x26]  =  {2,  LD,       REG8_H,     IMM8,       0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0x2A]  =  {3,  LD,       REG16_HL,   PTR_IMM16,  0,        CARRY_U,  ZS_U,  16,  16,},  /*  required  */
-    [0x21]  =  {3,  LD,       REG16_HL,   IMM16,      0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0x6E]  =  {1,  LD,       REG8_L,     PTR_HL,     0,        CARRY_U,  ZS_U,  7,   7,},
-    [0x6F]  =  {1,  LD,       REG8_L,     REG8_A,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x68]  =  {1,  LD,       REG8_L,     REG8_B,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x69]  =  {1,  LD,       REG8_L,     REG8_C,     0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0x6A]  =  {1,  LD,       REG8_L,     REG8_D,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x6B]  =  {1,  LD,       REG8_L,     REG8_E,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x6C]  =  {1,  LD,       REG8_L,     REG8_H,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x6D]  =  {1,  LD,       REG8_L,     REG8_L,     0,        CARRY_U,  ZS_U,  4,   4,},
-    [0x2E]  =  {2,  LD,       REG8_L,     IMM8,       0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
-    [0xF9]  =  {1,  LD,       REG16_SP,   REG16_HL,   0,        CARRY_U,  ZS_U,  6,   6,},
-    [0x31]  =  {3,  LD,       REG16_SP,   IMM16,      0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0x00]  =  {1,  NOP,      0,          0,          0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
-    [0xD3]  =  {2,  OUT,      IMM8,       0,          0,        CARRY_U,  ZS_U,  11,  11,},  /*  required  */
-    [0xF1]  =  {1,  POP,      REG16_AF,   0,          0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0xC1]  =  {1,  POP,      REG16_BC,   0,          0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0xD1]  =  {1,  POP,      REG16_DE,   0,          0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0xE1]  =  {1,  POP,      REG16_HL,   0,          0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0xF5]  =  {1,  PUSH,     REG16_AF,   0,          0,        CARRY_U,  ZS_U,  11,  11,},  /*  required  */
-    [0xC5]  =  {1,  PUSH,     REG16_BC,   0,          0,        CARRY_U,  ZS_U,  11,  11,},  /*  required  */
-    [0xD5]  =  {1,  PUSH,     REG16_DE,   0,          0,        CARRY_U,  ZS_U,  11,  11,},  /*  required  */
-    [0xE5]  =  {1,  PUSH,     REG16_HL,   0,          0,        CARRY_U,  ZS_U,  11,  11,},  /*  required  */
-    [0xC9]  =  {1,  RET,      0,          0,          COND_A,   CARRY_U,  ZS_U,  10,  10,},  /*  required  */
-    [0xD8]  =  {1,  RET,      0,          0,          COND_C,   CARRY_U,  ZS_U,  11,  5,},   /*  required  */
-    [0xF8]  =  {1,  RET,      0,          0,          COND_M,   CARRY_U,  ZS_U,  11,  5,},
-    [0xD0]  =  {1,  RET,      0,          0,          COND_NC,  CARRY_U,  ZS_U,  11,  5,},   /*  required  */
-    [0xC0]  =  {1,  RET,      0,          0,          COND_NZ,  CARRY_U,  ZS_U,  11,  5,},   /*  required  */
-    [0xF0]  =  {1,  RET,      0,          0,          COND_P,   CARRY_U,  ZS_U,  11,  5,},
-    [0xE8]  =  {1,  RET,      0,          0,          COND_PE,  CARRY_U,  ZS_U,  11,  5,},
-    [0xE0]  =  {1,  RET,      0,          0,          COND_PO,  CARRY_U,  ZS_U,  11,  5,},
-    [0xC8]  =  {1,  RET,      0,          0,          COND_Z,   CARRY_U,  ZS_U,  11,  5,},   /*  required  */
-    [0xC7]  =  {1,  RST_00H,  0,          0,          0,        CARRY_U,  ZS_U,  11,  11,},
-    [0xCF]  =  {1,  RST_08H,  0,          0,          0,        CARRY_U,  ZS_U,  11,  11,},
-    [0xD7]  =  {1,  RST_10H,  0,          0,          0,        CARRY_U,  ZS_U,  11,  11,},
-    [0xDF]  =  {1,  RST_18H,  0,          0,          0,        CARRY_U,  ZS_U,  11,  11,},
-    [0xE7]  =  {1,  RST_20H,  0,          0,          0,        CARRY_U,  ZS_U,  11,  11,},
-    [0xEF]  =  {1,  RST_28H,  0,          0,          0,        CARRY_U,  ZS_U,  11,  11,},
-    [0xF7]  =  {1,  RST_30H,  0,          0,          0,        CARRY_U,  ZS_U,  11,  11,},
-    [0xFF]  =  {1,  RST_38H,  0,          0,          0,        CARRY_U,  ZS_U,  11,  11,},
+    [0x8E]  =  {1, INIT(ADC,      REG8_A,     PTR_HL    ), 0,        CARRY_D,  ZS_D,  7,   7,},
+    [0x8F]  =  {1, INIT(ADC,      REG8_A,     REG8_A    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x88]  =  {1, INIT(ADC,      REG8_A,     REG8_B    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x89]  =  {1, INIT(ADC,      REG8_A,     REG8_C    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x8A]  =  {1, INIT(ADC,      REG8_A,     REG8_D    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x8B]  =  {1, INIT(ADC,      REG8_A,     REG8_E    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x8C]  =  {1, INIT(ADC,      REG8_A,     REG8_H    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x8D]  =  {1, INIT(ADC,      REG8_A,     REG8_L    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0xCE]  =  {2, INIT(ADC,      REG8_A,     IMM8      ), 0,        CARRY_D,  ZS_D,  7,   7,},
+    [0x86]  =  {1, INIT(ADD,      REG8_A,     PTR_HL    ), 0,        CARRY_D,  ZS_D,  7,   7,},   /*  required  */
+    [0x87]  =  {1, INIT(ADD,      REG8_A,     REG8_A    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x80]  =  {1, INIT(ADD,      REG8_A,     REG8_B    ), 0,        CARRY_D,  ZS_D,  4,   4,},   /*  required  */
+    [0x81]  =  {1, INIT(ADD,      REG8_A,     REG8_C    ), 0,        CARRY_D,  ZS_D,  4,   4,},   /*  required  */
+    [0x82]  =  {1, INIT(ADD,      REG8_A,     REG8_D    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x83]  =  {1, INIT(ADD,      REG8_A,     REG8_E    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x84]  =  {1, INIT(ADD,      REG8_A,     REG8_H    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x85]  =  {1, INIT(ADD,      REG8_A,     REG8_L    ), 0,        CARRY_D,  ZS_D,  4,   4,},   /*  required  */
+    [0xC6]  =  {2, INIT(ADD,      REG8_A,     IMM8      ), 0,        CARRY_D,  ZS_D,  7,   7,},   /*  required  */
+    [0xBE]  =  {1, INIT(CP,       REG8_A,     PTR_HL    ), 0,        CARRY_D,  ZS_D,  7,   7,},   /*  required  */
+    [0xBF]  =  {1, INIT(CP,       REG8_A,     REG8_A    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0xB8]  =  {1, INIT(CP,       REG8_A,     REG8_B    ), 0,        CARRY_D,  ZS_D,  4,   4,},   /*  required  */
+    [0xB9]  =  {1, INIT(CP,       REG8_A,     REG8_C    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0xBA]  =  {1, INIT(CP,       REG8_A,     REG8_D    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0xBB]  =  {1, INIT(CP,       REG8_A,     REG8_E    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0xBC]  =  {1, INIT(CP,       REG8_A,     REG8_H    ), 0,        CARRY_D,  ZS_D,  4,   4,},   /*  required  */
+    [0xBD]  =  {1, INIT(CP,       REG8_A,     REG8_L    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0xFE]  =  {2, INIT(CP,       REG8_A,     IMM8      ), 0,        CARRY_D,  ZS_D,  7,   7,},   /*  required  */
+    [0x9E]  =  {1, INIT(SBC,      REG8_A,     PTR_HL    ), 0,        CARRY_D,  ZS_D,  7,   7,},
+    [0x9F]  =  {1, INIT(SBC,      REG8_A,     REG8_A    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x98]  =  {1, INIT(SBC,      REG8_A,     REG8_B    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x99]  =  {1, INIT(SBC,      REG8_A,     REG8_C    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x9A]  =  {1, INIT(SBC,      REG8_A,     REG8_D    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x9B]  =  {1, INIT(SBC,      REG8_A,     REG8_E    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x9C]  =  {1, INIT(SBC,      REG8_A,     REG8_H    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x9D]  =  {1, INIT(SBC,      REG8_A,     REG8_L    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0xDE]  =  {2, INIT(SBC,      REG8_A,     IMM8      ), 0,        CARRY_D,  ZS_D,  7,   7,},   /*  required  */
+    [0x96]  =  {1, INIT(SUB,      REG8_A,     PTR_HL    ), 0,        CARRY_D,  ZS_D,  7,   7,},
+    [0x97]  =  {1, INIT(SUB,      REG8_A,     REG8_A    ), 0,        CARRY_D,  ZS_D,  4,   4,},   /*  required  */
+    [0x90]  =  {1, INIT(SUB,      REG8_A,     REG8_B    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x91]  =  {1, INIT(SUB,      REG8_A,     REG8_C    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x92]  =  {1, INIT(SUB,      REG8_A,     REG8_D    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x93]  =  {1, INIT(SUB,      REG8_A,     REG8_E    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x94]  =  {1, INIT(SUB,      REG8_A,     REG8_H    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0x95]  =  {1, INIT(SUB,      REG8_A,     REG8_L    ), 0,        CARRY_D,  ZS_D,  4,   4,},
+    [0xD6]  =  {2, INIT(SUB,      REG8_A,     IMM8      ), 0,        CARRY_D,  ZS_D,  7,   7,},   /*  required  */
+    [0x09]  =  {1, INIT(ADD,      REG16_HL,   REG16_BC  ), 0,        CARRY_D,  ZS_U,  11,  11,},  /*  required  */
+    [0x19]  =  {1, INIT(ADD,      REG16_HL,   REG16_DE  ), 0,        CARRY_D,  ZS_U,  11,  11,},  /*  required  */
+    [0x29]  =  {1, INIT(ADD,      REG16_HL,   REG16_HL  ), 0,        CARRY_D,  ZS_U,  11,  11,},  /*  required  */
+    [0x39]  =  {1, INIT(ADD,      REG16_HL,   REG16_SP  ), 0,        CARRY_D,  ZS_U,  11,  11,},
+    [0x17]  =  {1, INIT(RLA,      REG8_A,     0         ), 0,        CARRY_D,  ZS_U,  4,   4,},
+    [0x07]  =  {1, INIT(RLCA,     REG8_A,     0         ), 0,        CARRY_D,  ZS_U,  4,   4,},   /*  required  */
+    [0x1F]  =  {1, INIT(RRA,      REG8_A,     0         ), 0,        CARRY_D,  ZS_U,  4,   4,},   /*  required  */
+    [0x0F]  =  {1, INIT(RRCA,     REG8_A,     0         ), 0,        CARRY_D,  ZS_U,  4,   4,},   /*  required  */
+    [0x3F]  =  {1, INIT(CCF,      0,          0         ), 0,        CARRY_X,  ZS_U,  4,   4,},
+    [0x27]  =  {1, INIT(DAA,      0,          0         ), 0,        CARRY_X,  ZS_D,  4,   4,},   /*  required  */
+    [0xA6]  =  {1, INIT(AND,      REG8_A,     PTR_HL    ), 0,        CARRY_R,  ZS_D,  7,   7,},   /*  required  */
+    [0xA7]  =  {1, INIT(AND,      REG8_A,     REG8_A    ), 0,        CARRY_R,  ZS_D,  4,   4,},   /*  required  */
+    [0xA0]  =  {1, INIT(AND,      REG8_A,     REG8_B    ), 0,        CARRY_R,  ZS_D,  4,   4,},   /*  required  */
+    [0xA1]  =  {1, INIT(AND,      REG8_A,     REG8_C    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xA2]  =  {1, INIT(AND,      REG8_A,     REG8_D    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xA3]  =  {1, INIT(AND,      REG8_A,     REG8_E    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xA4]  =  {1, INIT(AND,      REG8_A,     REG8_H    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xA5]  =  {1, INIT(AND,      REG8_A,     REG8_L    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xE6]  =  {2, INIT(AND,      REG8_A,     IMM8      ), 0,        CARRY_R,  ZS_D,  7,   7,},   /*  required  */
+    [0xB6]  =  {1, INIT(OR,       REG8_A,     PTR_HL    ), 0,        CARRY_R,  ZS_D,  7,   7,},   /*  required  */
+    [0xB7]  =  {1, INIT(OR,       REG8_A,     REG8_A    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xB0]  =  {1, INIT(OR,       REG8_A,     REG8_B    ), 0,        CARRY_R,  ZS_D,  4,   4,},   /*  required  */
+    [0xB1]  =  {1, INIT(OR,       REG8_A,     REG8_C    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xB2]  =  {1, INIT(OR,       REG8_A,     REG8_D    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xB3]  =  {1, INIT(OR,       REG8_A,     REG8_E    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xB4]  =  {1, INIT(OR,       REG8_A,     REG8_H    ), 0,        CARRY_R,  ZS_D,  4,   4,},   /*  required  */
+    [0xB5]  =  {1, INIT(OR,       REG8_A,     REG8_L    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xF6]  =  {2, INIT(OR,       REG8_A,     IMM8      ), 0,        CARRY_R,  ZS_D,  7,   7,},   /*  required  */
+    [0xAE]  =  {1, INIT(XOR,      REG8_A,     PTR_HL    ), 0,        CARRY_R,  ZS_D,  7,   7,},
+    [0xAF]  =  {1, INIT(XOR,      REG8_A,     REG8_A    ), 0,        CARRY_R,  ZS_D,  4,   4,},   /*  required  */
+    [0xA8]  =  {1, INIT(XOR,      REG8_A,     REG8_B    ), 0,        CARRY_R,  ZS_D,  4,   4,},   /*  required  */
+    [0xA9]  =  {1, INIT(XOR,      REG8_A,     REG8_C    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xAA]  =  {1, INIT(XOR,      REG8_A,     REG8_D    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xAB]  =  {1, INIT(XOR,      REG8_A,     REG8_E    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xAC]  =  {1, INIT(XOR,      REG8_A,     REG8_H    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xAD]  =  {1, INIT(XOR,      REG8_A,     REG8_L    ), 0,        CARRY_R,  ZS_D,  4,   4,},
+    [0xEE]  =  {2, INIT(XOR,      REG8_A,     IMM8      ), 0,        CARRY_R,  ZS_D,  7,   7,},
+    [0x37]  =  {1, INIT(SCF,      0,          0         ), 0,        CARRY_S,  ZS_U,  4,   4,},   /*  required  */
+    [0x35]  =  {1, INIT(DEC,      PTR_HL,     0         ), 0,        CARRY_U,  ZS_D,  11,  11,},  /*  required  */
+    [0x3D]  =  {1, INIT(DEC,      REG8_A,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
+    [0x05]  =  {1, INIT(DEC,      REG8_B,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
+    [0x0D]  =  {1, INIT(DEC,      REG8_C,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
+    [0x15]  =  {1, INIT(DEC,      REG8_D,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
+    [0x1D]  =  {1, INIT(DEC,      REG8_E,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},
+    [0x25]  =  {1, INIT(DEC,      REG8_H,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
+    [0x2D]  =  {1, INIT(DEC,      REG8_L,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},
+    [0x34]  =  {1, INIT(INC,      PTR_HL,     0         ), 0,        CARRY_U,  ZS_D,  11,  11,},  /*  required  */
+    [0x3C]  =  {1, INIT(INC,      REG8_A,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
+    [0x04]  =  {1, INIT(INC,      REG8_B,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
+    [0x0C]  =  {1, INIT(INC,      REG8_C,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
+    [0x14]  =  {1, INIT(INC,      REG8_D,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},
+    [0x1C]  =  {1, INIT(INC,      REG8_E,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},
+    [0x24]  =  {1, INIT(INC,      REG8_H,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},
+    [0x2C]  =  {1, INIT(INC,      REG8_L,     0         ), 0,        CARRY_U,  ZS_D,  4,   4,},   /*  required  */
+    [0x2F]  =  {1, INIT(CPL,      0,          0         ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0xDC]  =  {3, INIT(CALL,     IMM16,      0         ), COND_C,   CARRY_U,  ZS_U,  10,  17,},
+    [0xFC]  =  {3, INIT(CALL,     IMM16,      0         ), COND_M,   CARRY_U,  ZS_U,  10,  17,},
+    [0xD4]  =  {3, INIT(CALL,     IMM16,      0         ), COND_NC,  CARRY_U,  ZS_U,  10,  17,},  /*  required  */
+    [0xCD]  =  {3, INIT(CALL,     IMM16,      0         ), COND_A,   CARRY_U,  ZS_U,  17,  17,},  /*  required  */
+    [0xC4]  =  {3, INIT(CALL,     IMM16,      0         ), COND_NZ,  CARRY_U,  ZS_U,  10,  17,},  /*  required  */
+    [0xF4]  =  {3, INIT(CALL,     IMM16,      0         ), COND_P,   CARRY_U,  ZS_U,  10,  17,},
+    [0xEC]  =  {3, INIT(CALL,     IMM16,      0         ), COND_PE,  CARRY_U,  ZS_U,  10,  17,},
+    [0xE4]  =  {3, INIT(CALL,     IMM16,      0         ), COND_PO,  CARRY_U,  ZS_U,  10,  17,},
+    [0xCC]  =  {3, INIT(CALL,     IMM16,      0         ), COND_Z,   CARRY_U,  ZS_U,  10,  17,},  /*  required  */
+    [0x0B]  =  {1, INIT(DEC,      REG16_BC,   0         ), 0,        CARRY_U,  ZS_U,  6,   6,},
+    [0x1B]  =  {1, INIT(DEC,      REG16_DE,   0         ), 0,        CARRY_U,  ZS_U,  6,   6,},   /*  required  */
+    [0x2B]  =  {1, INIT(DEC,      REG16_HL,   0         ), 0,        CARRY_U,  ZS_U,  6,   6,},   /*  required  */
+    [0x3B]  =  {1, INIT(DEC,      REG16_SP,   0         ), 0,        CARRY_U,  ZS_U,  6,   6,},
+    [0xF3]  =  {1, INIT(DI,       0,          0         ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x10]  =  {2, INIT(DJNZ,     IMM8,       0         ), 0,        CARRY_U,  ZS_U,  13,  8,},
+    [0xFB]  =  {1, INIT(EI,       0,          0         ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0xE3]  =  {1, INIT(PUTHLSP,  0,          0         ), 0,        CARRY_U,  ZS_U,  19,  19,},  /*  required  */
+    [0x08]  =  {1, INIT(EXAF,     0,          0         ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0xEB]  =  {1, INIT(EXDEHL,   0,          0         ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0xD9]  =  {1, INIT(EXX,      0,          0         ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x76]  =  {1, INIT(HALT,     0,          0         ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0xDB]  =  {2, INIT(IN,       IMM8,       0         ), 0,        CARRY_U,  ZS_U,  11,  11,},  /*  required  */
+    [0x03]  =  {1, INIT(INC,      REG16_BC,   0         ), 0,        CARRY_U,  ZS_U,  6,   6,},   /*  required  */
+    [0x13]  =  {1, INIT(INC,      REG16_DE,   0         ), 0,        CARRY_U,  ZS_U,  6,   6,},   /*  required  */
+    [0x23]  =  {1, INIT(INC,      REG16_HL,   0         ), 0,        CARRY_U,  ZS_U,  6,   6,},   /*  required  */
+    [0x33]  =  {1, INIT(INC,      REG16_SP,   0         ), 0,        CARRY_U,  ZS_U,  6,   6,},
+    [0xE9]  =  {1, INIT(JP,       REG16_HL,   0         ), COND_A,   CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0xDA]  =  {3, INIT(JP,       IMM16,      0         ), COND_C,   CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0xFA]  =  {3, INIT(JP,       IMM16,      0         ), COND_M,   CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0xD2]  =  {3, INIT(JP,       IMM16,      0         ), COND_NC,  CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0xC3]  =  {3, INIT(JP,       IMM16,      0         ), COND_A,   CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0xC2]  =  {3, INIT(JP,       IMM16,      0         ), COND_NZ,  CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0xF2]  =  {3, INIT(JP,       IMM16,      0         ), COND_P,   CARRY_U,  ZS_U,  10,  10,},
+    [0xEA]  =  {3, INIT(JP,       IMM16,      0         ), COND_PE,  CARRY_U,  ZS_U,  10,  10,},
+    [0xE2]  =  {3, INIT(JP,       IMM16,      0         ), COND_PO,  CARRY_U,  ZS_U,  10,  10,},
+    [0xCA]  =  {3, INIT(JP,       IMM16,      0         ), COND_Z,   CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0x38]  =  {2, INIT(JR,       IMM8,       0         ), COND_C,   CARRY_U,  ZS_U,  12,  7,},
+    [0x18]  =  {2, INIT(JR,       IMM8,       0         ), COND_A,   CARRY_U,  ZS_U,  12,  12,},
+    [0x30]  =  {2, INIT(JR,       IMM8,       0         ), COND_NC,  CARRY_U,  ZS_U,  12,  7,},
+    [0x20]  =  {2, INIT(JR,       IMM8,       0         ), COND_NZ,  CARRY_U,  ZS_U,  12,  7,},
+    [0x28]  =  {2, INIT(JR,       IMM8,       0         ), COND_Z,   CARRY_U,  ZS_U,  12,  7,},
+    [0x02]  =  {1, INIT(LD,       PTR_BC,     REG8_A    ), 0,        CARRY_U,  ZS_U,  7,   7,},
+    [0x12]  =  {1, INIT(LD,       PTR_DE,     REG8_A    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x77]  =  {1, INIT(LD,       PTR_HL,     REG8_A    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x70]  =  {1, INIT(LD,       PTR_HL,     REG8_B    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x71]  =  {1, INIT(LD,       PTR_HL,     REG8_C    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x72]  =  {1, INIT(LD,       PTR_HL,     REG8_D    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x73]  =  {1, INIT(LD,       PTR_HL,     REG8_E    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x74]  =  {1, INIT(LD,       PTR_HL,     REG8_H    ), 0,        CARRY_U,  ZS_U,  7,   7,},
+    [0x75]  =  {1, INIT(LD,       PTR_HL,     REG8_L    ), 0,        CARRY_U,  ZS_U,  7,   7,},
+    [0x36]  =  {2, INIT(LD,       PTR_HL,     IMM8      ), 0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0x32]  =  {3, INIT(LD,       PTR_IMM8,   REG8_A    ), 0,        CARRY_U,  ZS_U,  13,  13,},  /*  required  */
+    [0x22]  =  {3, INIT(LD,       PTR_IMM16,  REG16_HL  ), 0,        CARRY_U,  ZS_U,  16,  16,},  /*  required  */
+    [0x0A]  =  {1, INIT(LD,       REG8_A,     PTR_BC    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x1A]  =  {1, INIT(LD,       REG8_A,     PTR_DE    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x7E]  =  {1, INIT(LD,       REG8_A,     PTR_HL    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x3A]  =  {3, INIT(LD,       REG8_A,     PTR_IMM8  ), 0,        CARRY_U,  ZS_U,  13,  13,},  /*  required  */
+    [0x7F]  =  {1, INIT(LD,       REG8_A,     REG8_A    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x78]  =  {1, INIT(LD,       REG8_A,     REG8_B    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x79]  =  {1, INIT(LD,       REG8_A,     REG8_C    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x7A]  =  {1, INIT(LD,       REG8_A,     REG8_D    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x7B]  =  {1, INIT(LD,       REG8_A,     REG8_E    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x7C]  =  {1, INIT(LD,       REG8_A,     REG8_H    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x7D]  =  {1, INIT(LD,       REG8_A,     REG8_L    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x3E]  =  {2, INIT(LD,       REG8_A,     IMM8      ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x46]  =  {1, INIT(LD,       REG8_B,     PTR_HL    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x47]  =  {1, INIT(LD,       REG8_B,     REG8_A    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x40]  =  {1, INIT(LD,       REG8_B,     REG8_B    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x41]  =  {1, INIT(LD,       REG8_B,     REG8_C    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x42]  =  {1, INIT(LD,       REG8_B,     REG8_D    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x43]  =  {1, INIT(LD,       REG8_B,     REG8_E    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x44]  =  {1, INIT(LD,       REG8_B,     REG8_H    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x45]  =  {1, INIT(LD,       REG8_B,     REG8_L    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x06]  =  {2, INIT(LD,       REG8_B,     IMM8      ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x01]  =  {3, INIT(LD,       REG16_BC,   IMM16     ), 0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0x4E]  =  {1, INIT(LD,       REG8_C,     PTR_HL    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x4F]  =  {1, INIT(LD,       REG8_C,     REG8_A    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x48]  =  {1, INIT(LD,       REG8_C,     REG8_B    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x49]  =  {1, INIT(LD,       REG8_C,     REG8_C    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x4A]  =  {1, INIT(LD,       REG8_C,     REG8_D    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x4B]  =  {1, INIT(LD,       REG8_C,     REG8_E    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x4C]  =  {1, INIT(LD,       REG8_C,     REG8_H    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x4D]  =  {1, INIT(LD,       REG8_C,     REG8_L    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x0E]  =  {2, INIT(LD,       REG8_C,     IMM8      ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x56]  =  {1, INIT(LD,       REG8_D,     PTR_HL    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x57]  =  {1, INIT(LD,       REG8_D,     REG8_A    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x50]  =  {1, INIT(LD,       REG8_D,     REG8_B    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x51]  =  {1, INIT(LD,       REG8_D,     REG8_C    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x52]  =  {1, INIT(LD,       REG8_D,     REG8_D    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x53]  =  {1, INIT(LD,       REG8_D,     REG8_E    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x54]  =  {1, INIT(LD,       REG8_D,     REG8_H    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x55]  =  {1, INIT(LD,       REG8_D,     REG8_L    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x16]  =  {2, INIT(LD,       REG8_D,     IMM8      ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x11]  =  {3, INIT(LD,       REG16_DE,   IMM16     ), 0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0x5E]  =  {1, INIT(LD,       REG8_E,     PTR_HL    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x5F]  =  {1, INIT(LD,       REG8_E,     REG8_A    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x58]  =  {1, INIT(LD,       REG8_E,     REG8_B    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x59]  =  {1, INIT(LD,       REG8_E,     REG8_C    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x5A]  =  {1, INIT(LD,       REG8_E,     REG8_D    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x5B]  =  {1, INIT(LD,       REG8_E,     REG8_E    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x5C]  =  {1, INIT(LD,       REG8_E,     REG8_H    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x5D]  =  {1, INIT(LD,       REG8_E,     REG8_L    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x1E]  =  {2, INIT(LD,       REG8_E,     IMM8      ), 0,        CARRY_U,  ZS_U,  7,   7,},
+    [0x66]  =  {1, INIT(LD,       REG8_H,     PTR_HL    ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x67]  =  {1, INIT(LD,       REG8_H,     REG8_A    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x60]  =  {1, INIT(LD,       REG8_H,     REG8_B    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x61]  =  {1, INIT(LD,       REG8_H,     REG8_C    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x62]  =  {1, INIT(LD,       REG8_H,     REG8_D    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x63]  =  {1, INIT(LD,       REG8_H,     REG8_E    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x64]  =  {1, INIT(LD,       REG8_H,     REG8_H    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x65]  =  {1, INIT(LD,       REG8_H,     REG8_L    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x26]  =  {2, INIT(LD,       REG8_H,     IMM8      ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0x2A]  =  {3, INIT(LD,       REG16_HL,   PTR_IMM16 ), 0,        CARRY_U,  ZS_U,  16,  16,},  /*  required  */
+    [0x21]  =  {3, INIT(LD,       REG16_HL,   IMM16     ), 0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0x6E]  =  {1, INIT(LD,       REG8_L,     PTR_HL    ), 0,        CARRY_U,  ZS_U,  7,   7,},
+    [0x6F]  =  {1, INIT(LD,       REG8_L,     REG8_A    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x68]  =  {1, INIT(LD,       REG8_L,     REG8_B    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x69]  =  {1, INIT(LD,       REG8_L,     REG8_C    ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0x6A]  =  {1, INIT(LD,       REG8_L,     REG8_D    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x6B]  =  {1, INIT(LD,       REG8_L,     REG8_E    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x6C]  =  {1, INIT(LD,       REG8_L,     REG8_H    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x6D]  =  {1, INIT(LD,       REG8_L,     REG8_L    ), 0,        CARRY_U,  ZS_U,  4,   4,},
+    [0x2E]  =  {2, INIT(LD,       REG8_L,     IMM8      ), 0,        CARRY_U,  ZS_U,  7,   7,},   /*  required  */
+    [0xF9]  =  {1, INIT(LD,       REG16_SP,   REG16_HL  ), 0,        CARRY_U,  ZS_U,  6,   6,},
+    [0x31]  =  {3, INIT(LD,       REG16_SP,   IMM16     ), 0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0x00]  =  {1, INIT(NOP,      0,          0         ), 0,        CARRY_U,  ZS_U,  4,   4,},   /*  required  */
+    [0xD3]  =  {2, INIT(OUT,      IMM8,       0         ), 0,        CARRY_U,  ZS_U,  11,  11,},  /*  required  */
+    [0xF1]  =  {1, INIT(POP,      REG16_AF,   0         ), 0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0xC1]  =  {1, INIT(POP,      REG16_BC,   0         ), 0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0xD1]  =  {1, INIT(POP,      REG16_DE,   0         ), 0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0xE1]  =  {1, INIT(POP,      REG16_HL,   0         ), 0,        CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0xF5]  =  {1, INIT(PUSH,     REG16_AF,   0         ), 0,        CARRY_U,  ZS_U,  11,  11,},  /*  required  */
+    [0xC5]  =  {1, INIT(PUSH,     REG16_BC,   0         ), 0,        CARRY_U,  ZS_U,  11,  11,},  /*  required  */
+    [0xD5]  =  {1, INIT(PUSH,     REG16_DE,   0         ), 0,        CARRY_U,  ZS_U,  11,  11,},  /*  required  */
+    [0xE5]  =  {1, INIT(PUSH,     REG16_HL,   0         ), 0,        CARRY_U,  ZS_U,  11,  11,},  /*  required  */
+    [0xC9]  =  {1, INIT(RET,      0,          0         ), COND_A,   CARRY_U,  ZS_U,  10,  10,},  /*  required  */
+    [0xD8]  =  {1, INIT(RET,      0,          0         ), COND_C,   CARRY_U,  ZS_U,  11,  5,},   /*  required  */
+    [0xF8]  =  {1, INIT(RET,      0,          0         ), COND_M,   CARRY_U,  ZS_U,  11,  5,},
+    [0xD0]  =  {1, INIT(RET,      0,          0         ), COND_NC,  CARRY_U,  ZS_U,  11,  5,},   /*  required  */
+    [0xC0]  =  {1, INIT(RET,      0,          0         ), COND_NZ,  CARRY_U,  ZS_U,  11,  5,},   /*  required  */
+    [0xF0]  =  {1, INIT(RET,      0,          0         ), COND_P,   CARRY_U,  ZS_U,  11,  5,},
+    [0xE8]  =  {1, INIT(RET,      0,          0         ), COND_PE,  CARRY_U,  ZS_U,  11,  5,},
+    [0xE0]  =  {1, INIT(RET,      0,          0         ), COND_PO,  CARRY_U,  ZS_U,  11,  5,},
+    [0xC8]  =  {1, INIT(RET,      0,          0         ), COND_Z,   CARRY_U,  ZS_U,  11,  5,},   /*  required  */
+    [0xC7]  =  {1, INIT(RST_00H,  0,          0         ), 0,        CARRY_U,  ZS_U,  11,  11,},
+    [0xCF]  =  {1, INIT(RST_08H,  0,          0         ), 0,        CARRY_U,  ZS_U,  11,  11,},
+    [0xD7]  =  {1, INIT(RST_10H,  0,          0         ), 0,        CARRY_U,  ZS_U,  11,  11,},
+    [0xDF]  =  {1, INIT(RST_18H,  0,          0         ), 0,        CARRY_U,  ZS_U,  11,  11,},
+    [0xE7]  =  {1, INIT(RST_20H,  0,          0         ), 0,        CARRY_U,  ZS_U,  11,  11,},
+    [0xEF]  =  {1, INIT(RST_28H,  0,          0         ), 0,        CARRY_U,  ZS_U,  11,  11,},
+    [0xF7]  =  {1, INIT(RST_30H,  0,          0         ), 0,        CARRY_U,  ZS_U,  11,  11,},
+    [0xFF]  =  {1, INIT(RST_38H,  0,          0         ), 0,        CARRY_U,  ZS_U,  11,  11,},
 };
 
 enum
@@ -742,6 +748,8 @@ uint32_t step(struct cpu *cpu)
     const struct opcode *opcode = opcodes + op;
 
     cpu->inat = pc;
+    cpu->next = 0;
+    cpu->jump = 0;
     set_pc(cpu, 0, pc + 1);
 
     switch (opcode->type)
@@ -980,6 +988,9 @@ uint32_t step(struct cpu *cpu)
                     set_sp(cpu, 0, sp - 2);
 
                     set_pc(cpu, 0, addr);
+                    cpu->next = pc + opcode->size;
+                    cpu->jump = get_pc(cpu, 0);
+
                     cpu->clk += opcode->slow;
                     return opcode->slow;
                 }
@@ -994,6 +1005,9 @@ uint32_t step(struct cpu *cpu)
                     uint16_t addr = dst.get(cpu, 0);
 
                     set_pc(cpu, 0, addr);
+                    cpu->next = pc + opcode->size;
+                    cpu->jump = get_pc(cpu, 0);
+
                     cpu->clk += opcode->slow;
                     return opcode->slow;
                 }
@@ -1010,6 +1024,9 @@ uint32_t step(struct cpu *cpu)
                 int32_t addr = (int32_t)pc + opcode->size + off;
 
                 set_pc(cpu, 0, (uint16_t)addr);
+                cpu->next = pc + opcode->size;
+                cpu->jump = get_pc(cpu, 0);
+
                 cpu->clk += opcode->slow;
                 return opcode->slow;
             }
@@ -1025,6 +1042,9 @@ uint32_t step(struct cpu *cpu)
                     set_sp(cpu, 0, sp + 2);
 
                     set_pc(cpu, 0, hi << 8 | lo << 0);
+                    cpu->next = pc + opcode->size;
+                    cpu->jump = get_pc(cpu, 0);
+
                     cpu->clk += opcode->slow;
                     return opcode->slow;
                 }
@@ -1134,6 +1154,8 @@ uint32_t step(struct cpu *cpu)
     }
 
     set_pc(cpu, 0, pc + opcode->size);
+    cpu->next = get_pc(cpu, 0);
+    cpu->jump = get_pc(cpu, 0);
 
     cpu->clk += opcode->fast;
     return opcode->fast;
@@ -1153,6 +1175,10 @@ void intr(struct cpu *cpu, uint16_t addr)
         set_sp(cpu, 0, sp - 2);
 
         set_pc(cpu, 0, addr);
+        cpu->intr = 1;
+        cpu->inat = link;
+        cpu->next = link;
+        cpu->jump = get_pc(cpu, 0);
     }
 }
 
@@ -1181,11 +1207,25 @@ enum
 
 struct cpu cpu;
 
-void run(int cycles)
+void run(struct cpu *cpu,int cycles)
 {
     while (cycles > 0)
     {
-        cycles -= step(&cpu);
+        cycles -= step(cpu);
+
+        if (cpu->next != cpu->jump)
+        {
+            const struct opcode *opcode = opcodes + cpu->get_mem(cpu, cpu->inat);
+
+            if (opcode->type == JP && opcode->dst == IMM16)
+            {
+            }
+            else
+            {
+                printf("%-20s\n", cpu->intr ? "INTERRUPT" : opcode->dasm);
+                cpu->intr = 0;
+            }
+        }
     }
 }
 
@@ -1270,11 +1310,6 @@ void init(struct cpu *cpu, uint8_t *mem)
     cpu->cpu_state.regs[REG_AF] = 0x0002;
     cpu->cpu_state.regs[REG_SP] = 0xF000;
     cpu->cpu_state.regs[REG_PC] = 0x0001;
-}
-
-void shadow_intr(uint16_t addr)
-{
-    intr(&cpu, addr);
 }
 
 #include <stdio.h>
@@ -1433,11 +1468,11 @@ int main(int argc, char *argv[])
 
     for(;;)
     {
-        run(17066);
-        shadow_intr(8);
+        run(&cpu, 17066);
+        intr(&cpu, 8);
         render(cpu.mem);
-        run(17066);
-        shadow_intr(16);
+        run(&cpu, 17066);
+        intr(&cpu, 16);
         get_input();
         SDL_Delay(15);
 
