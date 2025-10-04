@@ -5,6 +5,7 @@ invaders.bin: invaders.h invaders.g invaders.f invaders.e
 	cat $^ > $@
 invaders.asm: invaders.bin
 	z80dasm -l -b blockfile -g0 -t -a $^ > $@
+	cat $@ | python3 align.py | sponge $@
 all: main
 .PHONY: clean
 clean:
