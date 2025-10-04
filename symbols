@@ -1,556 +1,208 @@
-2000 file home simont invaders RAMUse html waitOnDraw
-2000 file home simont invaders RAMUse html waitOnDraw
-2000 file home simont invaders RAMUse html waitOnDraw
-2000 file home simont invaders RAMUse html waitOnDraw
-2222 file home simont invaders RAMUse html 
-1474 file home simont invaders code html CnvtPixNumber
-1474 file home simont invaders code html CnvtPixNumber
-1439 file home simont invaders code html DrawSimpSprite
-1474 file home simont invaders code html CnvtPixNumber
-1A47 file home simont invaders code html ConvToScr
-147C file home simont invaders code html RememberShields
-1474 file home simont invaders code html CnvtPixNumber
-2061 file home simont invaders RAMUse html collision
-2061 file home simont invaders RAMUse html collision
-2061 file home simont invaders RAMUse html collision
-2025 file home simont invaders RAMUse html plyrShotStatus
-2029 file home simont invaders RAMUse html obj1CoorYr
-2002 file home simont invaders RAMUse html alienIsExploding
-2009 file home simont invaders RAMUse html refAlienYr
-1504 file home simont invaders code html CodeBug1
-1562 file home simont invaders code html FindRow
-202A file home simont invaders RAMUse html obj1CoorXr
-156F file home simont invaders code html FindColumn
-2064 file home simont invaders RAMUse html expAlienYr
-2025 file home simont invaders RAMUse html plyrShotStatus
-1581 file home simont invaders code html GetAlienStatPtr
-0A5F file home simont invaders code html ScoreForAlien
-1A3B file home simont invaders code html ReadDesc
-15D3 file home simont invaders code html DrawSprite
-2003 file home simont invaders RAMUse html expAlienTimer
-2025 file home simont invaders RAMUse html plyrShotStatus
-2064 file home simont invaders RAMUse html expAlienYr
-1424 file home simont invaders code html EraseSimpleSprite
-2025 file home simont invaders RAMUse html plyrShotStatus
-2002 file home simont invaders RAMUse html alienIsExploding
-19DC file home simont invaders code html SoundBits3Off
-1590 file home simont invaders code html WrapRef
-2009 file home simont invaders RAMUse html refAlienYr
-1554 file home simont invaders code html Cnt16s
-200A file home simont invaders RAMUse html refAlienXr
-1554 file home simont invaders code html Cnt16s
-2085 file home simont invaders RAMUse html saucerHit
-2067 file home simont invaders RAMUse html playerDataMSB
-1590 file home simont invaders code html WrapRef
-200D file home simont invaders RAMUse html rackDirection
-200D file home simont invaders RAMUse html rackDirection
-2008 file home simont invaders RAMUse html refAlienDXr
-200E file home simont invaders RAMUse html rackDownDelta
-2007 file home simont invaders RAMUse html refAlienDYr
-1474 file home simont invaders code html CnvtPixNumber
-1611 file home simont invaders code html GetPlayerDataPtr
-2082 file home simont invaders RAMUse html numAliens
-2067 file home simont invaders RAMUse html playerDataMSB
-2015 file home simont invaders RAMUse html playerAlive
-2025 file home simont invaders RAMUse html plyrShotStatus
-20EF file home simont invaders RAMUse html gameMode
-202D file home simont invaders RAMUse html fireBounce
-17C0 file home simont invaders code html ReadInputs
-2025 file home simont invaders RAMUse html plyrShotStatus
-202D file home simont invaders RAMUse html fireBounce
-17C0 file home simont invaders code html ReadInputs
-202D file home simont invaders RAMUse html fireBounce
-20ED file home simont invaders RAMUse html demoCmdPtrLSB
-20ED file home simont invaders RAMUse html demoCmdPtrLSB
-201D file home simont invaders RAMUse html nextDemoCmd
-1910 file home simont invaders code html CurPlyAlive
-1950 file home simont invaders code html PrintHiScore
-20CE file home simont invaders RAMUse html twoPlayers
-0A93 file home simont invaders code html PrintMessageDel
-2067 file home simont invaders RAMUse html playerDataMSB
-08FF file home simont invaders code html DrawChar
-0AB1 file home simont invaders code html OneSecDelay
-0A93 file home simont invaders code html PrintMessageDel
-0AB6 file home simont invaders code html TwoSecDelay
-09D6 file home simont invaders code html ClearPlayField
-20EF file home simont invaders RAMUse html gameMode
-19D1 file home simont invaders code html EnableGameTasks
-2015 file home simont invaders RAMUse html playerAlive
-14D8 file home simont invaders code html PlayerShotHit
-18FA file home simont invaders code html SoundBits3On
-19D7 file home simont invaders code html DsableGameTasks
-20CF file home simont invaders RAMUse html aShotReloadRate
-2025 file home simont invaders RAMUse html plyrShotStatus
-19DC file home simont invaders code html SoundBits3Off
-18FA file home simont invaders code html SoundBits3On
-2068 file home simont invaders RAMUse html playerOK
-2082 file home simont invaders RAMUse html numAliens
-209B file home simont invaders RAMUse html fleetSndHold
-2098 file home simont invaders RAMUse html soundPort5
-2095 file home simont invaders RAMUse html changeFleetSnd
-2082 file home simont invaders RAMUse html numAliens
-2097 file home simont invaders RAMUse html fleetSndReload
-2095 file home simont invaders RAMUse html changeFleetSnd
-19DC file home simont invaders code html SoundBits3Off
-2067 file home simont invaders RAMUse html playerDataMSB
-209A file home simont invaders RAMUse html tilt
-09D6 file home simont invaders code html ClearPlayField
-209A file home simont invaders RAMUse html tilt
-19D7 file home simont invaders code html DsableGameTasks
-0A93 file home simont invaders code html PrintMessageDel
-0AB1 file home simont invaders code html OneSecDelay
-209A file home simont invaders RAMUse html tilt
-2093 file home simont invaders RAMUse html waitStartLoop
-18FA file home simont invaders code html SoundBits3On
-08F3 file home simont invaders code html PrintMessage
-206C file home simont invaders RAMUse html temp206C
-1856 file home simont invaders code html ReadPriStruct
-0AB1 file home simont invaders code html OneSecDelay
-1856 file home simont invaders code html ReadPriStruct
-1439 file home simont invaders code html DrawSimpSprite
-206C file home simont invaders RAMUse html temp206C
-0A93 file home simont invaders code html PrintMessageDel
-01D9 file home simont invaders code html AddDelta
-20CA file home simont invaders RAMUse html splashTargetY
-20C2 file home simont invaders RAMUse html splashAnForm
-20CC file home simont invaders RAMUse html splashImRestLSB
-20C7 file home simont invaders RAMUse html splashImageLSB
-1A3B file home simont invaders code html ReadDesc
-15D3 file home simont invaders code html DrawSprite
-20CB file home simont invaders RAMUse html splashReached
-1A32 file home simont invaders code html BlockCopy
-2080 file home simont invaders RAMUse html shotSync
-207E file home simont invaders RAMUse html alienShotDelta
-20C1 file home simont invaders RAMUse html isrSplashTask
-2055 file home simont invaders RAMUse html squShotStatus
-2055 file home simont invaders RAMUse html squShotStatus
-08FF file home simont invaders code html DrawChar
-0AB6 file home simont invaders code html TwoSecDelay
-1956 file home simont invaders code html DrawStatus
-20CF file home simont invaders RAMUse html aShotReloadRate
-2067 file home simont invaders RAMUse html playerDataMSB
-2082 file home simont invaders RAMUse html numAliens
-2094 file home simont invaders RAMUse html soundPort3
-2094 file home simont invaders RAMUse html soundPort3
-14D8 file home simont invaders code html PlayerShotHit
-1597 file home simont invaders code html RackBump
-2067 file home simont invaders RAMUse html playerDataMSB
-08F3 file home simont invaders code html PrintMessage
-1931 file home simont invaders code html DrawScore
-1931 file home simont invaders code html DrawScore
-09AD file home simont invaders code html Print4Digits
-08F3 file home simont invaders code html PrintMessage
-20EB file home simont invaders RAMUse html numCoins
-09B2 file home simont invaders code html DrawHexByte
-1931 file home simont invaders code html DrawScore
-1A5C file home simont invaders code html ClearScreen
-191A file home simont invaders code html DrawScoreHead
-1950 file home simont invaders code html PrintHiScore
-1947 file home simont invaders code html DrawNumCredits
-19DC file home simont invaders code html SoundBits3Off
-206D file home simont invaders RAMUse html invaded
-19D7 file home simont invaders code html DsableGameTasks
-1947 file home simont invaders code html DrawNumCredits
-20C1 file home simont invaders RAMUse html isrSplashTask
-09D6 file home simont invaders code html ClearPlayField
-08F3 file home simont invaders code html PrintMessage
-201E file home simont invaders RAMUse html hidMessSeq
-201E file home simont invaders RAMUse html hidMessSeq
-08F3 file home simont invaders code html PrintMessage
-20E9 file home simont invaders RAMUse html suspendPlay
-2094 file home simont invaders RAMUse html soundPort3
-2094 file home simont invaders RAMUse html soundPort3
-1439 file home simont invaders code html DrawSimpSprite
-14CB file home simont invaders code html ClearSmallSprite
-1A32 file home simont invaders code html BlockCopy
-1A69 file home simont invaders code html RestoreShields
-19E6 file home simont invaders code html DrawNumShips
-18D4 file home simont invaders code html init
-2072 file home simont invaders RAMUse html vblankStatus
-20C0 file home simont invaders RAMUse html isrDelay
-17CD file home simont invaders code html CheckHandleTilt
-20EA file home simont invaders RAMUse html coinSwitch
-20EB file home simont invaders RAMUse html numCoins
-20EB file home simont invaders RAMUse html numCoins
-1947 file home simont invaders code html DrawNumCredits
-20EA file home simont invaders RAMUse html coinSwitch
-20E9 file home simont invaders RAMUse html suspendPlay
-20EF file home simont invaders RAMUse html gameMode
-20EB file home simont invaders RAMUse html numCoins
-0ABF file home simont invaders code html ISRSplTasks
-2093 file home simont invaders RAMUse html waitStartLoop
-0765 file home simont invaders code html WaitForStart
-20EA file home simont invaders RAMUse html coinSwitch
-1740 file home simont invaders code html TimeFleetSound
-2032 file home simont invaders RAMUse html obj2TimerExtra
-2080 file home simont invaders RAMUse html shotSync
-0100 file home simont invaders code html DrawAlien
-0248 file home simont invaders code html RunGameObjs
-0913 file home simont invaders code html TimeToSaucer
-2072 file home simont invaders RAMUse html vblankStatus
-20E9 file home simont invaders RAMUse html suspendPlay
-20EF file home simont invaders RAMUse html gameMode
-20C1 file home simont invaders RAMUse html isrSplashTask
-0141 file home simont invaders code html CursorNextAlien
-0886 file home simont invaders code html GetAlRefPtr
-2009 file home simont invaders RAMUse html refAlienYr
-200B file home simont invaders RAMUse html alienPosLSB
-2008 file home simont invaders RAMUse html refAlienDXr
-200D file home simont invaders RAMUse html rackDirection
-21FB file home simont invaders RAMUse html p1RefAlienDX
-22FB file home simont invaders RAMUse html p2RefAlienDX
-1538 file home simont invaders code html AExplodeTime
-2006 file home simont invaders RAMUse html alienCurIndex
-2067 file home simont invaders RAMUse html playerDataMSB
-200B file home simont invaders RAMUse html alienPosLSB
-15D3 file home simont invaders code html DrawSprite
-2000 file home simont invaders RAMUse html waitOnDraw
-2068 file home simont invaders RAMUse html playerOK
-2000 file home simont invaders RAMUse html waitOnDraw
-2067 file home simont invaders RAMUse html playerDataMSB
-2006 file home simont invaders RAMUse html alienCurIndex
-01A1 file home simont invaders code html MoveRefAlien
-2006 file home simont invaders RAMUse html alienCurIndex
-017A file home simont invaders code html GetAlienCoords
-200B file home simont invaders RAMUse html alienPosLSB
-2004 file home simont invaders RAMUse html alienRow
-2000 file home simont invaders RAMUse html waitOnDraw
-01CD file home simont invaders code html ReturnTwo
-01D9 file home simont invaders code html AddDelta
-1A32 file home simont invaders code html BlockCopy
-1A32 file home simont invaders code html BlockCopy
-021E file home simont invaders code html CopyShields
-2081 file home simont invaders RAMUse html tmp2081
-2081 file home simont invaders RAMUse html tmp2081
-1A69 file home simont invaders code html RestoreShields
-147C file home simont invaders code html RememberShields
-2068 file home simont invaders RAMUse html playerOK
-2069 file home simont invaders RAMUse html enableAlienFire
-206A file home simont invaders RAMUse html alienFireDelay
-039B file home simont invaders code html DrawPlayerDie
-201A file home simont invaders RAMUse html playerYr
-1424 file home simont invaders code html EraseSimpleSprite
-1A32 file home simont invaders code html BlockCopy
-19DC file home simont invaders code html SoundBits3Off
-206D file home simont invaders RAMUse html invaded
-20EF file home simont invaders RAMUse html gameMode
-19D7 file home simont invaders code html DsableGameTasks
-20CE file home simont invaders RAMUse html twoPlayers
-2067 file home simont invaders RAMUse html playerDataMSB
-020E file home simont invaders code html RememberShields2
-01E4 file home simont invaders code html CopyRAMMirror
-2067 file home simont invaders RAMUse html playerDataMSB
-0AB6 file home simont invaders code html TwoSecDelay
-2011 file home simont invaders RAMUse html obj0TimerLSB
-2098 file home simont invaders RAMUse html soundPort5
-09D6 file home simont invaders code html ClearPlayField
-1A7F file home simont invaders code html RemoveShip
-1A7F file home simont invaders code html RemoveShip
-0209 file home simont invaders code html RememberShields1
-201B file home simont invaders RAMUse html playerXr
-20EF file home simont invaders RAMUse html gameMode
-201D file home simont invaders RAMUse html nextDemoCmd
-0381 file home simont invaders code html MovePlayerRight
-038E file home simont invaders code html MovePlayerLeft
-17C0 file home simont invaders code html ReadInputs
-0381 file home simont invaders code html MovePlayerRight
-038E file home simont invaders code html MovePlayerLeft
-1A3B file home simont invaders code html ReadDesc
-1A47 file home simont invaders code html ConvToScr
-1439 file home simont invaders code html DrawSimpSprite
-2012 file home simont invaders RAMUse html obj0TimerExtra
-201B file home simont invaders RAMUse html playerXr
-201B file home simont invaders RAMUse html playerXr
-2015 file home simont invaders RAMUse html playerAlive
-2018 file home simont invaders RAMUse html plyrSprPicL
-1A06 file home simont invaders code html CompYToBeam
-03FA file home simont invaders code html InitPlyShot
-040A file home simont invaders code html MovePlyShot
-0436 file home simont invaders code html EndOfBlowup
-0430 file home simont invaders code html ReadPlyShot
-1452 file home simont invaders code html EraseShifted
-0430 file home simont invaders code html ReadPlyShot
-1400 file home simont invaders code html DrawShiftedSprite
-201B file home simont invaders RAMUse html playerXr
-202A file home simont invaders RAMUse html obj1CoorXr
-0430 file home simont invaders code html ReadPlyShot
-1400 file home simont invaders code html DrawShiftedSprite
-0430 file home simont invaders code html ReadPlyShot
-1452 file home simont invaders code html EraseShifted
-202C file home simont invaders RAMUse html shotDeltaX
-2029 file home simont invaders RAMUse html obj1CoorYr
-1491 file home simont invaders code html DrawSprCollision
-2061 file home simont invaders RAMUse html collision
-2002 file home simont invaders RAMUse html alienIsExploding
-0436 file home simont invaders code html EndOfBlowup
-1A3B file home simont invaders code html ReadDesc
-0430 file home simont invaders code html ReadPlyShot
-1452 file home simont invaders code html EraseShifted
-1A32 file home simont invaders code html BlockCopy
-208D file home simont invaders RAMUse html sauScoreLSB
-208D file home simont invaders RAMUse html sauScoreLSB
-208F file home simont invaders RAMUse html shotCountLSB
-208F file home simont invaders RAMUse html shotCountLSB
-2084 file home simont invaders RAMUse html saucerActive
-2032 file home simont invaders RAMUse html obj2TimerExtra
-2038 file home simont invaders RAMUse html rolShotCFirLSB
-2038 file home simont invaders RAMUse html rolShotCFirLSB
-0550 file home simont invaders code html ToShotStruct
-2046 file home simont invaders RAMUse html pluShotStepCnt
-2070 file home simont invaders RAMUse html otherShot1
-2056 file home simont invaders RAMUse html squShotStepCnt
-2071 file home simont invaders RAMUse html otherShot2
-0563 file home simont invaders code html HandleAlienShot
-2078 file home simont invaders RAMUse html aShotBlowCnt
-055B file home simont invaders code html FromShotStruct
-1A32 file home simont invaders code html BlockCopy
-206E file home simont invaders RAMUse html skipPlunger
-2080 file home simont invaders RAMUse html shotSync
-0550 file home simont invaders code html ToShotStruct
-2036 file home simont invaders RAMUse html rolShotStepCnt
-2070 file home simont invaders RAMUse html otherShot1
-2056 file home simont invaders RAMUse html squShotStepCnt
-2071 file home simont invaders RAMUse html otherShot2
-0563 file home simont invaders code html HandleAlienShot
-2076 file home simont invaders RAMUse html aShotCFirLSB
-2076 file home simont invaders RAMUse html aShotCFirLSB
-2078 file home simont invaders RAMUse html aShotBlowCnt
-055B file home simont invaders code html FromShotStruct
-1A32 file home simont invaders code html BlockCopy
-2082 file home simont invaders RAMUse html numAliens
-206E file home simont invaders RAMUse html skipPlunger
-2076 file home simont invaders RAMUse html aShotCFirLSB
-0550 file home simont invaders code html ToShotStruct
-2046 file home simont invaders RAMUse html pluShotStepCnt
-2070 file home simont invaders RAMUse html otherShot1
-2036 file home simont invaders RAMUse html rolShotStepCnt
-2071 file home simont invaders RAMUse html otherShot2
-0563 file home simont invaders code html HandleAlienShot
-2076 file home simont invaders RAMUse html aShotCFirLSB
-2076 file home simont invaders RAMUse html aShotCFirLSB
-2078 file home simont invaders RAMUse html aShotBlowCnt
-055B file home simont invaders code html FromShotStruct
-1A32 file home simont invaders code html BlockCopy
-2076 file home simont invaders RAMUse html aShotCFirLSB
-2058 file home simont invaders RAMUse html squShotCFirLSB
-207F file home simont invaders RAMUse html shotPicEnd
-1A32 file home simont invaders code html BlockCopy
-1A32 file home simont invaders code html BlockCopy
-20C1 file home simont invaders RAMUse html isrSplashTask
-2069 file home simont invaders RAMUse html enableAlienFire
-2070 file home simont invaders RAMUse html otherShot1
-20CF file home simont invaders RAMUse html aShotReloadRate
-2071 file home simont invaders RAMUse html otherShot2
-20CF file home simont invaders RAMUse html aShotReloadRate
-2076 file home simont invaders RAMUse html aShotCFirLSB
-2076 file home simont invaders RAMUse html aShotCFirLSB
-062F file home simont invaders code html FindInColumn
-017A file home simont invaders code html GetAlienCoords
-207B file home simont invaders RAMUse html alienShotYr
-1A06 file home simont invaders code html CompYToBeam
-0644 file home simont invaders code html ShotBlowingUp
-2079 file home simont invaders RAMUse html aShotImageLSB
-2079 file home simont invaders RAMUse html aShotImageLSB
-207B file home simont invaders RAMUse html alienShotYr
-207E file home simont invaders RAMUse html alienShotDelta
-207B file home simont invaders RAMUse html alienShotYr
-207B file home simont invaders RAMUse html alienShotYr
-2061 file home simont invaders RAMUse html collision
-207B file home simont invaders RAMUse html alienShotYr
-2015 file home simont invaders RAMUse html playerAlive
-2073 file home simont invaders RAMUse html aShotStatus
-2073 file home simont invaders RAMUse html aShotStatus
-201B file home simont invaders RAMUse html playerXr
-156F file home simont invaders code html FindColumn
-2067 file home simont invaders RAMUse html playerDataMSB
-2079 file home simont invaders RAMUse html aShotImageLSB
-207D file home simont invaders RAMUse html alienShotSize
-1A3B file home simont invaders code html ReadDesc
-1491 file home simont invaders code html DrawSprCollision
-1A3B file home simont invaders code html ReadDesc
-1452 file home simont invaders code html EraseShifted
-2048 file home simont invaders RAMUse html pluShotCFirLSB
-2080 file home simont invaders RAMUse html shotSync
-2056 file home simont invaders RAMUse html squShotStepCnt
-2082 file home simont invaders RAMUse html numAliens
-1A06 file home simont invaders code html CompYToBeam
-208A file home simont invaders RAMUse html saucerPriPicMSB
-19DC file home simont invaders code html SoundBits3Off
-14CB file home simont invaders code html ClearSmallSprite
-19DC file home simont invaders code html SoundBits3Off
-20F1 file home simont invaders RAMUse html adjustScore
-208D file home simont invaders RAMUse html sauScoreLSB
-2087 file home simont invaders RAMUse html saucerPriLocLSB
-20F2 file home simont invaders RAMUse html scoreDeltaLSB
-1439 file home simont invaders code html DrawSimpSprite
-1A3B file home simont invaders code html ReadDesc
-1A47 file home simont invaders code html ConvToScr
-2087 file home simont invaders RAMUse html saucerPriLocLSB
-1A32 file home simont invaders code html BlockCopy
-2093 file home simont invaders RAMUse html waitStartLoop
-09D6 file home simont invaders code html ClearPlayField
-08F3 file home simont invaders code html PrintMessage
-20EB file home simont invaders RAMUse html numCoins
-08F3 file home simont invaders code html PrintMessage
-20CE file home simont invaders RAMUse html twoPlayers
-20EB file home simont invaders RAMUse html numCoins
-20EB file home simont invaders RAMUse html numCoins
-1947 file home simont invaders code html DrawNumCredits
-20F8 file home simont invaders RAMUse html P1ScorL
-20FC file home simont invaders RAMUse html P2ScorL
-19D7 file home simont invaders code html DsableGameTasks
-20EF file home simont invaders RAMUse html gameMode
-20E7 file home simont invaders RAMUse html player1Alive
-20E5 file home simont invaders RAMUse html player1Ex
-1956 file home simont invaders code html DrawStatus
-01EF file home simont invaders code html DrawShieldPl1
-01F5 file home simont invaders code html DrawShieldPl2
-08D1 file home simont invaders code html GetShipsPerCred
-21FF file home simont invaders RAMUse html p1ShipsRem
-22FF file home simont invaders RAMUse html p2ShipsRem
-21FE file home simont invaders RAMUse html p1RackCnt
-22FE file home simont invaders RAMUse html p2RackCnt
-01C0 file home simont invaders code html InitAliens
-1904 file home simont invaders code html InitAliensP2
-21FC file home simont invaders RAMUse html p1RefAlienY
-22FC file home simont invaders RAMUse html p2RefAlienYr
-01E4 file home simont invaders code html CopyRAMMirror
-1A7F file home simont invaders code html RemoveShip
-088D file home simont invaders code html PromptPlayer
-09D6 file home simont invaders code html ClearPlayField
-20C1 file home simont invaders RAMUse html isrSplashTask
-01CF file home simont invaders code html DrawBottomLine
-2067 file home simont invaders RAMUse html playerDataMSB
-0213 file home simont invaders code html RestoreShields2
-01CF file home simont invaders code html DrawBottomLine
-00B1 file home simont invaders code html InitRack
-19D1 file home simont invaders code html EnableGameTasks
-18FA file home simont invaders code html SoundBits3On
-1618 file home simont invaders code html PlrFireOrDemo
-190A file home simont invaders code html PlyrShotAndBump
-15F3 file home simont invaders code html CountAliens
-0988 file home simont invaders code html AdjustScore
-2082 file home simont invaders RAMUse html numAliens
-170E file home simont invaders code html AShotReloadRate
-08D8 file home simont invaders code html SpeedShots
-172C file home simont invaders code html ShotSound
-18FA file home simont invaders code html SoundBits3On
-1775 file home simont invaders code html FleetDelayExShip
-1804 file home simont invaders code html CtrlSaucerSound
-08F3 file home simont invaders code html PrintMessage
-0798 file home simont invaders code html NewGame
-021A file home simont invaders code html RestoreShields1
-2008 file home simont invaders RAMUse html refAlienDXr
-2009 file home simont invaders RAMUse html refAlienYr
-0886 file home simont invaders code html GetAlRefPtr
-2067 file home simont invaders RAMUse html playerDataMSB
-08F3 file home simont invaders code html PrintMessage
-2067 file home simont invaders RAMUse html playerDataMSB
-08FF file home simont invaders code html DrawChar
-20C0 file home simont invaders RAMUse html isrDelay
-20C0 file home simont invaders RAMUse html isrDelay
-1931 file home simont invaders code html DrawScore
-2067 file home simont invaders RAMUse html playerDataMSB
-14CB file home simont invaders code html ClearSmallSprite
-2082 file home simont invaders RAMUse html numAliens
-207E file home simont invaders RAMUse html alienShotDelta
-20CE file home simont invaders RAMUse html twoPlayers
-14CB file home simont invaders code html ClearSmallSprite
-08FF file home simont invaders code html DrawChar
-08F3 file home simont invaders code html PrintMessage
-1439 file home simont invaders code html DrawSimpSprite
-2009 file home simont invaders RAMUse html refAlienYr
-2091 file home simont invaders RAMUse html tillSaucerLSB
-2083 file home simont invaders RAMUse html saucerStart
-2091 file home simont invaders RAMUse html tillSaucerLSB
-1611 file home simont invaders code html GetPlayerDataPtr
-1910 file home simont invaders code html CurPlyAlive
-1439 file home simont invaders code html DrawSimpSprite
-1910 file home simont invaders code html CurPlyAlive
-2099 file home simont invaders RAMUse html extraHold
-18FA file home simont invaders code html SoundBits3On
-20F1 file home simont invaders RAMUse html adjustScore
-20F1 file home simont invaders RAMUse html adjustScore
-20F2 file home simont invaders RAMUse html scoreDeltaLSB
-09AD file home simont invaders code html Print4Digits
-09B2 file home simont invaders code html DrawHexByte
-08FF file home simont invaders code html DrawChar
-2067 file home simont invaders RAMUse html playerDataMSB
-20E9 file home simont invaders RAMUse html suspendPlay
-09D6 file home simont invaders code html ClearPlayField
-2067 file home simont invaders RAMUse html playerDataMSB
-01E4 file home simont invaders code html CopyRAMMirror
-2067 file home simont invaders RAMUse html playerDataMSB
-2067 file home simont invaders RAMUse html playerDataMSB
-2098 file home simont invaders RAMUse html soundPort5
-01F5 file home simont invaders code html DrawShieldPl2
-1904 file home simont invaders code html InitAliensP2
-01EF file home simont invaders code html DrawShieldPl1
-01C0 file home simont invaders code html InitAliens
-20C0 file home simont invaders RAMUse html isrDelay
-20C0 file home simont invaders RAMUse html isrDelay
-2015 file home simont invaders RAMUse html playerAlive
-20EF file home simont invaders RAMUse html gameMode
-18FA file home simont invaders code html SoundBits3On
-097C file home simont invaders code html AlienScoreValue
-20C1 file home simont invaders RAMUse html isrSplashTask
-20CB file home simont invaders RAMUse html splashReached
-20C1 file home simont invaders RAMUse html isrSplashTask
-08FF file home simont invaders code html DrawChar
-20C0 file home simont invaders RAMUse html isrDelay
-20C0 file home simont invaders RAMUse html isrDelay
-0A93 file home simont invaders code html PrintMessageDel
-0AD7 file home simont invaders code html WaitOnDelay
-0AD7 file home simont invaders code html WaitOnDelay
-20C1 file home simont invaders RAMUse html isrSplashTask
-0ABB file home simont invaders code html SplashDemo
-1868 file home simont invaders code html SplashSprite
-0AAB file home simont invaders code html SplashSquiggly
-0A93 file home simont invaders code html PrintMessageDel
-20C0 file home simont invaders RAMUse html isrDelay
-20C0 file home simont invaders RAMUse html isrDelay
-1A32 file home simont invaders code html BlockCopy
-0AB1 file home simont invaders code html OneSecDelay
-20EC file home simont invaders RAMUse html splashAnimate
-0A93 file home simont invaders code html PrintMessageDel
-0AB1 file home simont invaders code html OneSecDelay
-1815 file home simont invaders code html DrawAdvTable
-0AB6 file home simont invaders code html TwoSecDelay
-20EC file home simont invaders RAMUse html splashAnimate
-0AE2 file home simont invaders code html IniSplashAni
-0A80 file home simont invaders code html Animate
-0AE2 file home simont invaders code html IniSplashAni
-0A80 file home simont invaders code html Animate
-0AB1 file home simont invaders code html OneSecDelay
-0AE2 file home simont invaders code html IniSplashAni
-0A80 file home simont invaders code html Animate
-0AB1 file home simont invaders code html OneSecDelay
-14CB file home simont invaders code html ClearSmallSprite
-0AB6 file home simont invaders code html TwoSecDelay
-09D6 file home simont invaders code html ClearPlayField
-21FF file home simont invaders RAMUse html p1ShipsRem
-08D1 file home simont invaders code html GetShipsPerCred
-21FF file home simont invaders RAMUse html p1ShipsRem
-1A7F file home simont invaders code html RemoveShip
-01E4 file home simont invaders code html CopyRAMMirror
-01C0 file home simont invaders code html InitAliens
-01EF file home simont invaders code html DrawShieldPl1
-021A file home simont invaders code html RestoreShields1
-20C1 file home simont invaders RAMUse html isrSplashTask
-01CF file home simont invaders code html DrawBottomLine
-1618 file home simont invaders code html PlrFireOrDemo
-2025 file home simont invaders RAMUse html plyrShotStatus
-20C1 file home simont invaders RAMUse html isrSplashTask
-0AB1 file home simont invaders code html OneSecDelay
-08F3 file home simont invaders code html PrintMessage
-20EC file home simont invaders RAMUse html splashAnimate
-08FF file home simont invaders code html DrawChar
-1856 file home simont invaders code html ReadPriStruct
-0AB6 file home simont invaders code html TwoSecDelay
-20EC file home simont invaders RAMUse html splashAnimate
-0AE2 file home simont invaders code html IniSplashAni
-0A80 file home simont invaders code html Animate
-09D6 file home simont invaders code html ClearPlayField
-0A93 file home simont invaders code html PrintMessageDel
-190A file home simont invaders code html PlyrShotAndBump
-199A file home simont invaders code html CheckHiddenMes
+00b1 code InitRack
+0100 code DrawAlien
+0141 code CursorNextAlien
+017a code GetAlienCoords
+01a1 code MoveRefAlien
+01c0 code InitAliens
+01cd code ReturnTwo
+01cf code DrawBottomLine
+01d9 code AddDelta
+01e4 code CopyRAMMirror
+01ef code DrawShieldPl1
+01f5 code DrawShieldPl2
+0209 code RememberShields1
+020e code RememberShields2
+0213 code RestoreShields2
+021a code RestoreShields1
+021e code CopyShields
+0248 code RunGameObjs
+0381 code MovePlayerRight
+038e code MovePlayerLeft
+039b code DrawPlayerDie
+03fa code InitPlyShot
+040a code MovePlyShot
+0430 code ReadPlyShot
+0436 code EndOfBlowup
+0550 code ToShotStruct
+055b code FromShotStruct
+0563 code HandleAlienShot
+062f code FindInColumn
+0644 code ShotBlowingUp
+0765 code WaitForStart
+0798 code NewGame
+0886 code GetAlRefPtr
+088d code PromptPlayer
+08d1 code GetShipsPerCred
+08d8 code SpeedShots
+08f3 code PrintMessage
+08ff code DrawChar
+0913 code TimeToSaucer
+097c code AlienScoreValue
+0988 code AdjustScore
+09ad code Print4Digits
+09b2 code DrawHexByte
+09d6 code ClearPlayField
+0a5f code ScoreForAlien
+0a80 code Animate
+0a93 code PrintMessageDel
+0aab code SplashSquiggly
+0ab1 code OneSecDelay
+0ab6 code TwoSecDelay
+0abb code SplashDemo
+0abf code ISRSplTasks
+0ad7 code WaitOnDelay
+0ae2 code IniSplashAni
+1400 code DrawShiftedSprite
+1424 code EraseSimpleSprite
+1439 code DrawSimpSprite
+1452 code EraseShifted
+1474 code CnvtPixNumber
+147c code RememberShields
+1491 code DrawSprCollision
+14cb code ClearSmallSprite
+14d8 code PlayerShotHit
+1504 code CodeBug1
+1538 code AExplodeTime
+1554 code Cnt16s
+1562 code FindRow
+156f code FindColumn
+1581 code GetAlienStatPtr
+1590 code WrapRef
+1597 code RackBump
+15d3 code DrawSprite
+15f3 code CountAliens
+1611 code GetPlayerDataPtr
+1618 code PlrFireOrDemo
+170e code AShotReloadRate
+172c code ShotSound
+1740 code TimeFleetSound
+1775 code FleetDelayExShip
+17c0 code ReadInputs
+17cd code CheckHandleTilt
+1804 code CtrlSaucerSound
+1815 code DrawAdvTable
+1856 code ReadPriStruct
+1868 code SplashSprite
+18d4 code init
+18fa code SoundBits3On
+1904 code InitAliensP2
+190a code PlyrShotAndBump
+1910 code CurPlyAlive
+191a code DrawScoreHead
+1931 code DrawScore
+1947 code DrawNumCredits
+1950 code PrintHiScore
+1956 code DrawStatus
+199a code CheckHiddenMes
+19d1 code EnableGameTasks
+19d7 code DsableGameTasks
+19dc code SoundBits3Off
+19e6 code DrawNumShips
+1a06 code CompYToBeam
+1a32 code BlockCopy
+1a3b code ReadDesc
+1a47 code ConvToScr
+1a5c code ClearScreen
+1a69 code RestoreShields
+1a7f code RemoveShip
+2000 data waitOnDraw
+2002 data alienIsExploding
+2003 data expAlienTimer
+2004 data alienRow
+2006 data alienCurIndex
+2007 data refAlienDYr
+2008 data refAlienDXr
+2009 data refAlienYr
+200a data refAlienXr
+200b data alienPosLSB
+200d data rackDirection
+200e data rackDownDelta
+2011 data obj0TimerLSB
+2012 data obj0TimerExtra
+2015 data playerAlive
+2018 data plyrSprPicL
+201a data playerYr
+201b data playerXr
+201d data nextDemoCmd
+201e data hidMessSeq
+2025 data plyrShotStatus
+2029 data obj1CoorYr
+202a data obj1CoorXr
+202c data shotDeltaX
+202d data fireBounce
+2032 data obj2TimerExtra
+2036 data rolShotStepCnt
+2038 data rolShotCFirLSB
+2046 data pluShotStepCnt
+2048 data pluShotCFirLSB
+2055 data squShotStatus
+2056 data squShotStepCnt
+2058 data squShotCFirLSB
+2061 data collision
+2064 data expAlienYr
+2067 data playerDataMSB
+2068 data playerOK
+2069 data enableAlienFire
+206a data alienFireDelay
+206c data temp206C
+206d data invaded
+206e data skipPlunger
+2070 data otherShot1
+2071 data otherShot2
+2072 data vblankStatus
+2073 data aShotStatus
+2076 data aShotCFirLSB
+2078 data aShotBlowCnt
+2079 data aShotImageLSB
+207b data alienShotYr
+207d data alienShotSize
+207e data alienShotDelta
+207f data shotPicEnd
+2080 data shotSync
+2081 data tmp2081
+2082 data numAliens
+2083 data saucerStart
+2084 data saucerActive
+2085 data saucerHit
+2087 data saucerPriLocLSB
+208a data saucerPriPicMSB
+208d data sauScoreLSB
+208f data shotCountLSB
+2091 data tillSaucerLSB
+2093 data waitStartLoop
+2094 data soundPort3
+2095 data changeFleetSnd
+2097 data fleetSndReload
+2098 data soundPort5
+2099 data extraHold
+209a data tilt
+209b data fleetSndHold
+20c0 data isrDelay
+20c1 data isrSplashTask
+20c2 data splashAnForm
+20c7 data splashImageLSB
+20ca data splashTargetY
+20cb data splashReached
+20cc data splashImRestLSB
+20ce data twoPlayers
+20cf data aShotReloadRate
+20e5 data player1Ex
+20e7 data player1Alive
+20e9 data suspendPlay
+20ea data coinSwitch
+20eb data numCoins
+20ec data splashAnimate
+20ed data demoCmdPtrLSB
+20ef data gameMode
+20f1 data adjustScore
+20f2 data scoreDeltaLSB
+20f8 data P1ScorL
+20fc data P2ScorL
+21fb data p1RefAlienDX
+21fc data p1RefAlienY
+21fe data p1RackCnt
+21ff data p1ShipsRem
+22fb data p2RefAlienDX
+22fc data p2RefAlienYr
+22fe data p2RackCnt
+22ff data p2ShipsRem
