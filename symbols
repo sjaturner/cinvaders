@@ -1,208 +1,208 @@
-00b1 code InitRack
-0100 code DrawAlien
-0141 code CursorNextAlien
-017a code GetAlienCoords
-01a1 code MoveRefAlien
-01c0 code InitAliens
-01cd code ReturnTwo
-01cf code DrawBottomLine
-01d9 code AddDelta
-01e4 code CopyRAMMirror
-01ef code DrawShieldPl1
-01f5 code DrawShieldPl2
-0209 code RememberShields1
-020e code RememberShields2
-0213 code RestoreShields2
-021a code RestoreShields1
-021e code CopyShields
-0248 code RunGameObjs
-0381 code MovePlayerRight
-038e code MovePlayerLeft
-039b code DrawPlayerDie
-03fa code InitPlyShot
-040a code MovePlyShot
-0430 code ReadPlyShot
-0436 code EndOfBlowup
-0550 code ToShotStruct
-055b code FromShotStruct
-0563 code HandleAlienShot
-062f code FindInColumn
-0644 code ShotBlowingUp
-0765 code WaitForStart
-0798 code NewGame
-0886 code GetAlRefPtr
-088d code PromptPlayer
-08d1 code GetShipsPerCred
-08d8 code SpeedShots
-08f3 code PrintMessage
-08ff code DrawChar
-0913 code TimeToSaucer
-097c code AlienScoreValue
-0988 code AdjustScore
-09ad code Print4Digits
-09b2 code DrawHexByte
-09d6 code ClearPlayField
-0a5f code ScoreForAlien
-0a80 code Animate
-0a93 code PrintMessageDel
-0aab code SplashSquiggly
-0ab1 code OneSecDelay
-0ab6 code TwoSecDelay
-0abb code SplashDemo
-0abf code ISRSplTasks
-0ad7 code WaitOnDelay
-0ae2 code IniSplashAni
-1400 code DrawShiftedSprite
-1424 code EraseSimpleSprite
-1439 code DrawSimpSprite
-1452 code EraseShifted
-1474 code CnvtPixNumber
-147c code RememberShields
-1491 code DrawSprCollision
-14cb code ClearSmallSprite
-14d8 code PlayerShotHit
-1504 code CodeBug1
-1538 code AExplodeTime
-1554 code Cnt16s
-1562 code FindRow
-156f code FindColumn
-1581 code GetAlienStatPtr
-1590 code WrapRef
-1597 code RackBump
-15d3 code DrawSprite
-15f3 code CountAliens
-1611 code GetPlayerDataPtr
-1618 code PlrFireOrDemo
-170e code AShotReloadRate
-172c code ShotSound
-1740 code TimeFleetSound
-1775 code FleetDelayExShip
-17c0 code ReadInputs
-17cd code CheckHandleTilt
-1804 code CtrlSaucerSound
-1815 code DrawAdvTable
-1856 code ReadPriStruct
-1868 code SplashSprite
-18d4 code init
-18fa code SoundBits3On
-1904 code InitAliensP2
-190a code PlyrShotAndBump
-1910 code CurPlyAlive
-191a code DrawScoreHead
-1931 code DrawScore
-1947 code DrawNumCredits
-1950 code PrintHiScore
-1956 code DrawStatus
-199a code CheckHiddenMes
-19d1 code EnableGameTasks
-19d7 code DsableGameTasks
-19dc code SoundBits3Off
-19e6 code DrawNumShips
-1a06 code CompYToBeam
-1a32 code BlockCopy
-1a3b code ReadDesc
-1a47 code ConvToScr
-1a5c code ClearScreen
-1a69 code RestoreShields
-1a7f code RemoveShip
-2000 data waitOnDraw
-2002 data alienIsExploding
-2003 data expAlienTimer
-2004 data alienRow
-2006 data alienCurIndex
-2007 data refAlienDYr
-2008 data refAlienDXr
-2009 data refAlienYr
-200a data refAlienXr
-200b data alienPosLSB
-200d data rackDirection
-200e data rackDownDelta
-2011 data obj0TimerLSB
-2012 data obj0TimerExtra
-2015 data playerAlive
-2018 data plyrSprPicL
-201a data playerYr
-201b data playerXr
-201d data nextDemoCmd
-201e data hidMessSeq
-2025 data plyrShotStatus
-2029 data obj1CoorYr
-202a data obj1CoorXr
-202c data shotDeltaX
-202d data fireBounce
-2032 data obj2TimerExtra
-2036 data rolShotStepCnt
-2038 data rolShotCFirLSB
-2046 data pluShotStepCnt
-2048 data pluShotCFirLSB
-2055 data squShotStatus
-2056 data squShotStepCnt
-2058 data squShotCFirLSB
-2061 data collision
-2064 data expAlienYr
-2067 data playerDataMSB
-2068 data playerOK
-2069 data enableAlienFire
-206a data alienFireDelay
-206c data temp206C
-206d data invaded
-206e data skipPlunger
-2070 data otherShot1
-2071 data otherShot2
-2072 data vblankStatus
-2073 data aShotStatus
-2076 data aShotCFirLSB
-2078 data aShotBlowCnt
-2079 data aShotImageLSB
-207b data alienShotYr
-207d data alienShotSize
-207e data alienShotDelta
-207f data shotPicEnd
-2080 data shotSync
-2081 data tmp2081
-2082 data numAliens
-2083 data saucerStart
-2084 data saucerActive
-2085 data saucerHit
-2087 data saucerPriLocLSB
-208a data saucerPriPicMSB
-208d data sauScoreLSB
-208f data shotCountLSB
-2091 data tillSaucerLSB
-2093 data waitStartLoop
-2094 data soundPort3
-2095 data changeFleetSnd
-2097 data fleetSndReload
-2098 data soundPort5
-2099 data extraHold
-209a data tilt
-209b data fleetSndHold
-20c0 data isrDelay
-20c1 data isrSplashTask
-20c2 data splashAnForm
-20c7 data splashImageLSB
-20ca data splashTargetY
-20cb data splashReached
-20cc data splashImRestLSB
-20ce data twoPlayers
-20cf data aShotReloadRate
-20e5 data player1Ex
-20e7 data player1Alive
-20e9 data suspendPlay
-20ea data coinSwitch
-20eb data numCoins
-20ec data splashAnimate
-20ed data demoCmdPtrLSB
-20ef data gameMode
-20f1 data adjustScore
-20f2 data scoreDeltaLSB
-20f8 data P1ScorL
-20fc data P2ScorL
-21fb data p1RefAlienDX
-21fc data p1RefAlienY
-21fe data p1RackCnt
-21ff data p1ShipsRem
-22fb data p2RefAlienDX
-22fc data p2RefAlienYr
-22fe data p2RackCnt
-22ff data p2ShipsRem
+00b1  code  InitRack           init_rack
+0100  code  DrawAlien          draw_alien
+0141  code  CursorNextAlien    cursor_next_alien
+017a  code  GetAlienCoords     get_alien_coords
+01a1  code  MoveRefAlien       move_ref_alien
+01c0  code  InitAliens         init_aliens
+01cd  code  ReturnTwo          return_two
+01cf  code  DrawBottomLine     draw_bottom_line
+01d9  code  AddDelta           add_delta
+01e4  code  CopyRAMMirror      copy_rammirror
+01ef  code  DrawShieldPl1      draw_shield_pl1
+01f5  code  DrawShieldPl2      draw_shield_pl2
+0209  code  RememberShields1   remember_shields1
+020e  code  RememberShields2   remember_shields2
+0213  code  RestoreShields2    restore_shields2
+021a  code  RestoreShields1    restore_shields1
+021e  code  CopyShields        copy_shields
+0248  code  RunGameObjs        run_game_objs
+0381  code  MovePlayerRight    move_player_right
+038e  code  MovePlayerLeft     move_player_left
+039b  code  DrawPlayerDie      draw_player_die
+03fa  code  InitPlyShot        init_ply_shot
+040a  code  MovePlyShot        move_ply_shot
+0430  code  ReadPlyShot        read_ply_shot
+0436  code  EndOfBlowup        end_of_blowup
+0550  code  ToShotStruct       to_shot_struct
+055b  code  FromShotStruct     from_shot_struct
+0563  code  HandleAlienShot    handle_alien_shot
+062f  code  FindInColumn       find_in_column
+0644  code  ShotBlowingUp      shot_blowing_up
+0765  code  WaitForStart       wait_for_start
+0798  code  NewGame            new_game
+0886  code  GetAlRefPtr        get_al_ref_ptr
+088d  code  PromptPlayer       prompt_player
+08d1  code  GetShipsPerCred    get_ships_per_cred
+08d8  code  SpeedShots         speed_shots
+08f3  code  PrintMessage       print_message
+08ff  code  DrawChar           draw_char
+0913  code  TimeToSaucer       time_to_saucer
+097c  code  AlienScoreValue    alien_score_value
+0988  code  AdjustScore        adjust_score_code
+09ad  code  Print4Digits       print4digits
+09b2  code  DrawHexByte        draw_hex_byte
+09d6  code  ClearPlayField     clear_play_field
+0a5f  code  ScoreForAlien      score_for_alien
+0a80  code  Animate            animate
+0a93  code  PrintMessageDel    print_message_del
+0aab  code  SplashSquiggly     splash_squiggly
+0ab1  code  OneSecDelay        one_sec_delay
+0ab6  code  TwoSecDelay        two_sec_delay
+0abb  code  SplashDemo         splash_demo
+0abf  code  ISRSplTasks        isrspl_tasks
+0ad7  code  WaitOnDelay        wait_on_delay
+0ae2  code  IniSplashAni       ini_splash_ani
+1400  code  DrawShiftedSprite  draw_shifted_sprite
+1424  code  EraseSimpleSprite  erase_simple_sprite
+1439  code  DrawSimpSprite     draw_simp_sprite
+1452  code  EraseShifted       erase_shifted
+1474  code  CnvtPixNumber      cnvt_pix_number
+147c  code  RememberShields    remember_shields
+1491  code  DrawSprCollision   draw_spr_collision
+14cb  code  ClearSmallSprite   clear_small_sprite
+14d8  code  PlayerShotHit      player_shot_hit
+1504  code  CodeBug1           code_bug1
+1538  code  AExplodeTime       aexplode_time
+1554  code  Cnt16s             cnt16s
+1562  code  FindRow            find_row
+156f  code  FindColumn         find_column
+1581  code  GetAlienStatPtr    get_alien_stat_ptr
+1590  code  WrapRef            wrap_ref
+1597  code  RackBump           rack_bump
+15d3  code  DrawSprite         draw_sprite
+15f3  code  CountAliens        count_aliens
+1611  code  GetPlayerDataPtr   get_player_data_ptr
+1618  code  PlrFireOrDemo      plr_fire_or_demo
+170e  code  AShotReloadRate    ashot_reload_rate
+172c  code  ShotSound          shot_sound
+1740  code  TimeFleetSound     time_fleet_sound
+1775  code  FleetDelayExShip   fleet_delay_ex_ship
+17c0  code  ReadInputs         read_inputs
+17cd  code  CheckHandleTilt    check_handle_tilt
+1804  code  CtrlSaucerSound    ctrl_saucer_sound
+1815  code  DrawAdvTable       draw_adv_table
+1856  code  ReadPriStruct      read_pri_struct
+1868  code  SplashSprite       splash_sprite
+18d4  code  init               init
+18fa  code  SoundBits3On       sound_bits3on
+1904  code  InitAliensP2       init_aliens_p2
+190a  code  PlyrShotAndBump    plyr_shot_and_bump
+1910  code  CurPlyAlive        cur_ply_alive
+191a  code  DrawScoreHead      draw_score_head
+1931  code  DrawScore          draw_score
+1947  code  DrawNumCredits     draw_num_credits
+1950  code  PrintHiScore       print_hi_score
+1956  code  DrawStatus         draw_status
+199a  code  CheckHiddenMes     check_hidden_mes
+19d1  code  EnableGameTasks    enable_game_tasks
+19d7  code  DsableGameTasks    dsable_game_tasks
+19dc  code  SoundBits3Off      sound_bits3off
+19e6  code  DrawNumShips       draw_num_ships
+1a06  code  CompYToBeam        comp_yto_beam
+1a32  code  BlockCopy          block_copy
+1a3b  code  ReadDesc           read_desc
+1a47  code  ConvToScr          conv_to_scr
+1a5c  code  ClearScreen        clear_screen
+1a69  code  RestoreShields     restore_shields
+1a7f  code  RemoveShip         remove_ship
+2000  data  waitOnDraw         wait_on_draw
+2002  data  alienIsExploding   alien_is_exploding
+2003  data  expAlienTimer      exp_alien_timer
+2004  data  alienRow           alien_row
+2006  data  alienCurIndex      alien_cur_index
+2007  data  refAlienDYr        ref_alien_dyr
+2008  data  refAlienDXr        ref_alien_dxr
+2009  data  refAlienYr         ref_alien_yr
+200a  data  refAlienXr         ref_alien_xr
+200b  data  alienPosLSB        alien_pos_lsb
+200d  data  rackDirection      rack_direction
+200e  data  rackDownDelta      rack_down_delta
+2011  data  obj0TimerLSB       obj0timer_lsb
+2012  data  obj0TimerExtra     obj0timer_extra
+2015  data  playerAlive        player_alive
+2018  data  plyrSprPicL        plyr_spr_pic_l
+201a  data  playerYr           player_yr
+201b  data  playerXr           player_xr
+201d  data  nextDemoCmd        next_demo_cmd
+201e  data  hidMessSeq         hid_mess_seq
+2025  data  plyrShotStatus     plyr_shot_status
+2029  data  obj1CoorYr         obj1coor_yr
+202a  data  obj1CoorXr         obj1coor_xr
+202c  data  shotDeltaX         shot_delta_x
+202d  data  fireBounce         fire_bounce
+2032  data  obj2TimerExtra     obj2timer_extra
+2036  data  rolShotStepCnt     rol_shot_step_cnt
+2038  data  rolShotCFirLSB     rol_shot_cfir_lsb
+2046  data  pluShotStepCnt     plu_shot_step_cnt
+2048  data  pluShotCFirLSB     plu_shot_cfir_lsb
+2055  data  squShotStatus      squ_shot_status
+2056  data  squShotStepCnt     squ_shot_step_cnt
+2058  data  squShotCFirLSB     squ_shot_cfir_lsb
+2061  data  collision          collision
+2064  data  expAlienYr         exp_alien_yr
+2067  data  playerDataMSB      player_data_msb
+2068  data  playerOK           player_ok
+2069  data  enableAlienFire    enable_alien_fire
+206a  data  alienFireDelay     alien_fire_delay
+206c  data  temp206C           temp206c
+206d  data  invaded            invaded
+206e  data  skipPlunger        skip_plunger
+2070  data  otherShot1         other_shot1
+2071  data  otherShot2         other_shot2
+2072  data  vblankStatus       vblank_status
+2073  data  aShotStatus        a_shot_status
+2076  data  aShotCFirLSB       a_shot_cfir_lsb
+2078  data  aShotBlowCnt       a_shot_blow_cnt
+2079  data  aShotImageLSB      a_shot_image_lsb
+207b  data  alienShotYr        alien_shot_yr
+207d  data  alienShotSize      alien_shot_size
+207e  data  alienShotDelta     alien_shot_delta
+207f  data  shotPicEnd         shot_pic_end
+2080  data  shotSync           shot_sync
+2081  data  tmp2081            tmp2081
+2082  data  numAliens          num_aliens
+2083  data  saucerStart        saucer_start
+2084  data  saucerActive       saucer_active
+2085  data  saucerHit          saucer_hit
+2087  data  saucerPriLocLSB    saucer_pri_loc_lsb
+208a  data  saucerPriPicMSB    saucer_pri_pic_msb
+208d  data  sauScoreLSB        sau_score_lsb
+208f  data  shotCountLSB       shot_count_lsb
+2091  data  tillSaucerLSB      till_saucer_lsb
+2093  data  waitStartLoop      wait_start_loop
+2094  data  soundPort3         sound_port3
+2095  data  changeFleetSnd     change_fleet_snd
+2097  data  fleetSndReload     fleet_snd_reload
+2098  data  soundPort5         sound_port5
+2099  data  extraHold          extra_hold
+209a  data  tilt               tilt
+209b  data  fleetSndHold       fleet_snd_hold
+20c0  data  isrDelay           isr_delay
+20c1  data  isrSplashTask      isr_splash_task
+20c2  data  splashAnForm       splash_an_form
+20c7  data  splashImageLSB     splash_image_lsb
+20ca  data  splashTargetY      splash_target_y
+20cb  data  splashReached      splash_reached
+20cc  data  splashImRestLSB    splash_im_rest_lsb
+20ce  data  twoPlayers         two_players
+20cf  data  aShotReloadRate    a_shot_reload_rate
+20e5  data  player1Ex          player1ex
+20e7  data  player1Alive       player1alive
+20e9  data  suspendPlay        suspend_play
+20ea  data  coinSwitch         coin_switch
+20eb  data  numCoins           num_coins
+20ec  data  splashAnimate      splash_animate
+20ed  data  demoCmdPtrLSB      demo_cmd_ptr_lsb
+20ef  data  gameMode           game_mode
+20f1  data  adjustScore        adjust_score_data
+20f2  data  scoreDeltaLSB      score_delta_lsb
+20f8  data  P1ScorL            p1scor_l
+20fc  data  P2ScorL            p2scor_l
+21fb  data  p1RefAlienDX       p1ref_alien_dx
+21fc  data  p1RefAlienY        p1ref_alien_y
+21fe  data  p1RackCnt          p1rack_cnt
+21ff  data  p1ShipsRem         p1ships_rem
+22fb  data  p2RefAlienDX       p2ref_alien_dx
+22fc  data  p2RefAlienYr       p2ref_alien_yr
+22fe  data  p2RackCnt          p2rack_cnt
+22ff  data  p2ShipsRem         p2ships_rem

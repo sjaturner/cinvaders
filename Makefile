@@ -5,7 +5,7 @@ invaders.bin: invaders.h invaders.g invaders.f invaders.e
 	cat $^ > $@
 invaders.asm: invaders.bin
 	z80dasm -l -b blockfile -g0 -t -a $^ > $@
-	cat $@ | python3 align.py | sed 's/jp c_end/jp d_first/' | sponge $@
+	cat $@ | python3 symbolise.py | python3 align.py | sed 's/jp c_end/jp d_first/' | sponge $@
 validate.bin: invaders.asm
 	z80asm $^ -o $@
 	md5sum $@ invaders.bin
