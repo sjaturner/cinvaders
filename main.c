@@ -1258,8 +1258,10 @@ void dump(void)
     printf("cpu.cpu_state.ie:%04x\n",           cpu.cpu_state.ie);
 }
 
+char get_mem_trace[0x10000];
 uint8_t get_mem(struct cpu *cpu, uint16_t addr)
 {
+    get_mem_trace[addr] |= 1;
     return cpu->mem[addr];
 }
 
@@ -1415,6 +1417,14 @@ void get_input()
                         dip1 |= (1 << 4);
                         break;
                     case SDLK_q:
+                        printf("\n");
+                        for(unsigned addr = 0; addr < sizeof(get_mem_trace); ++addr)
+                        {
+                            if (get_mem_trace[addr])
+                            {
+                                printf("%04x\n", addr);
+                            }
+                        }
                         exit(0);
                         break;
                     default:
