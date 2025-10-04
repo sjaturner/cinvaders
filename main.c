@@ -1217,12 +1217,30 @@ void run(struct cpu *cpu,int cycles)
         {
             const struct opcode *opcode = opcodes + cpu->get_mem(cpu, cpu->inat);
 
-            if (opcode->type == JP && opcode->dst == IMM16)
+            if (0 && opcode->type == JP && opcode->dst == IMM16)
             {
             }
             else
             {
-                printf("%-20s\n", cpu->intr ? "INTERRUPT" : opcode->dasm);
+                printf("%-20s ", cpu->intr ? "INTERRUPT" : opcode->dasm);
+                uint16_t sp = get_sp(cpu, 0);
+                printf("inat:%04x next:%04x jump:%04x sp:%04x ", cpu->inat, cpu->next, cpu->jump, sp);
+
+                for (int i = -2; i <= 2; ++i)
+                {
+                    printf("%04x ", *(uint16_t *)(cpu->mem + sp + i * 2));
+                }
+
+                if (cpu->jump == *(uint16_t *)(cpu->mem + sp + -1 * 2))
+                {
+                    printf("ret");
+                }
+                else if (cpu->next == *(uint16_t *)(cpu->mem + sp + 0 * 2))
+                {
+                    printf("call");
+                }
+
+                printf("\n");
                 cpu->intr = 0;
             }
         }
