@@ -1185,6 +1185,7 @@ void intr(struct cpu *cpu, uint16_t addr)
         cpu->inat = link;
         cpu->next = link;
         cpu->jump = get_pc(cpu, 0);
+        set_ie(cpu, 0, 0);
 
         ++cpu->sub_depth;
     }
@@ -1258,6 +1259,17 @@ void run(struct cpu *cpu,int cycles)
             uint16_t sp = get_sp(cpu, 0);
             static uint16_t last_sp;
             static int last_sub_depth;
+            int ie = get_ie(cpu, 0);
+
+            static uint16_t spatinat[0x10000][2];
+            int spanomaly = 0;
+
+            if (ie && spatinat[cpu->inat][ie] != sp)
+            {
+                spanomaly = 1;
+            }
+
+            spatinat[cpu->inat][ie] = sp;
 
             switch (cpu->inat)
             {
@@ -1266,12 +1278,12 @@ void run(struct cpu *cpu,int cycles)
                     --cpu->sub_depth;
             }
 
-            if (sp != last_sp || last_sub_depth != cpu->sub_depth)
+            if (1 || sp != last_sp || last_sub_depth != cpu->sub_depth)
             {
                 printf("%-32s ", cpu->intr ? "INTERRUPT" : opcode->dasm);
                 cpu->intr = 0;
 
-                printf("inat:%04x next:%04x jump:%04x sp:%04x sub_depth:%d ", cpu->inat, cpu->next, cpu->jump, sp, cpu->sub_depth);
+                printf("inat:%04x next:%04x jump:%04x sp:%04x sub_depth:%d spanomaly:%d ie:%d ", cpu->inat, cpu->next, cpu->jump, sp, cpu->sub_depth, spanomaly, ie);
 
                 for (int i = -2; i <= 2; ++i)
                 {
