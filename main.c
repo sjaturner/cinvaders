@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 enum
 {
@@ -1426,6 +1427,7 @@ void render(uint8_t *mem)
     SDL_RenderPresent(machine->renderer);
 }
 
+char *save;
 void get_input()
 {
     static SDL_Event event = { };
@@ -1480,6 +1482,17 @@ void get_input()
                         }
                         exit(0);
                         break;
+                    case SDLK_s:
+                        if (save)
+                        {
+                            FILE *f = fopen(save, "w");
+                            if(fwrite(cpu.mem, 0x10000, 1, f) != 1)
+                            {
+                                assert(0); 
+                            }
+                            exit(0);
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -1517,6 +1530,31 @@ struct machine *init_machine(void)
 
 int main(int argc, char *argv[])
 {
+    char *load = 0;
+
+    for (;;)
+    {
+        int opt = getopt(argc, argv, "l:s:");
+
+        if (opt == -1)
+        {
+            break;
+        }
+
+        switch (opt)
+        {
+            case 'l':
+                load = optarg;
+                break;
+            case 's':
+                save = optarg;
+                break;
+            default: /* '?' */
+                printf("bad arg %c\n", opt);
+                exit(EXIT_FAILURE);
+        }
+    }
+    
     printf("Keys:\n");
     printf("    Left Arrow:  Left.\n");
     printf("    Right Arrow: Right.\n");
@@ -1529,34 +1567,54 @@ int main(int argc, char *argv[])
 
     init(&cpu, calloc(0x10000, 1));
 
-    char *bank_name[] = { "invaders.h", "invaders.g", "invaders.f", "invaders.e" };
-
-    for (int i = 0; i < 4; i++)
+    if (load)
     {
-        FILE *fp = fopen(bank_name[i], "rb");
-        if (!fp)
-        {
-            return 0;
-        }
-        if (fread(cpu.mem + (i * 0x0800), 1, 0x0800, fp) != 0x0800)
-        {
-            return 0;
-        }
-        fclose(fp);
-    }
+        FILE *f = fopen(load, "r");
+        assert(f);
 
-    cpu.mem[0] = 0xc3;
+        if(fread(cpu.mem, 0x10000, 1, f) != 1)
+        {
+            assert(f);
+        }
 
-    for(;;)
-    {
-        run(&cpu, 17066);
-        intr(&cpu, 8);
         render(cpu.mem);
-        run(&cpu, 17066);
-        intr(&cpu, 16);
-        get_input();
-        SDL_Delay(15);
 
+        for (;;)
+        {
+            get_input();
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            char *bank_name[] = { "invaders.h", "invaders.g", "invaders.f", "invaders.e" };
+
+            FILE *fp = fopen(bank_name[i], "rb");
+            if (!fp)
+            {
+                return 0;
+            }
+            if (fread(cpu.mem + (i * 0x0800), 1, 0x0800, fp) != 0x0800)
+            {
+                return 0;
+            }
+            fclose(fp);
+        }
+
+        cpu.mem[0] = 0xc3;
+
+        for(;;)
+        {
+            run(&cpu, 17066);
+            intr(&cpu, 8);
+            render(cpu.mem);
+            run(&cpu, 17066);
+            intr(&cpu, 16);
+            get_input();
+            SDL_Delay(15);
+
+        }
     }
 
     return 1;
