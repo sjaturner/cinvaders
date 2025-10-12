@@ -1217,7 +1217,7 @@ enum
 
 struct cpu cpu;
 
-void run(struct cpu *cpu,int cycles)
+void run(struct cpu *cpu, int cycles)
 {
     while (cycles > 0)
     {
@@ -1473,7 +1473,7 @@ void get_input()
                     case SDLK_q:
                         exit(0);
                         printf("\n");
-                        for(unsigned addr = 0; addr < sizeof(get_mem_trace); ++addr)
+                        for (unsigned addr = 0; addr < sizeof(get_mem_trace); ++addr)
                         {
                             if (get_mem_trace[addr])
                             {
@@ -1486,9 +1486,9 @@ void get_input()
                         if (save)
                         {
                             FILE *f = fopen(save, "w");
-                            if(fwrite(cpu.mem, 0x10000, 1, f) != 1)
+                            if (fwrite(cpu.mem, 0x10000, 1, f) != 1)
                             {
-                                assert(0); 
+                                assert(0);
                             }
                             exit(0);
                         }
@@ -1554,7 +1554,7 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
         }
     }
-    
+
     printf("Keys:\n");
     printf("    Left Arrow:  Left.\n");
     printf("    Right Arrow: Right.\n");
@@ -1572,7 +1572,7 @@ int main(int argc, char *argv[])
         FILE *f = fopen(load, "r");
         assert(f);
 
-        if(fread(cpu.mem, 0x10000, 1, f) != 1)
+        if (fread(cpu.mem, 0x10000, 1, f) != 1)
         {
             assert(f);
         }
@@ -1604,7 +1604,7 @@ int main(int argc, char *argv[])
 
         cpu.mem[0] = 0xc3;
 
-        for(;;)
+        for (;;)
         {
             run(&cpu, 17066);
             intr(&cpu, 8);
@@ -1619,4 +1619,3 @@ int main(int argc, char *argv[])
 
     return 1;
 }
-
