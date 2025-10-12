@@ -1528,6 +1528,26 @@ struct machine *init_machine(void)
     return machine;
 }
 
+struct regval
+{
+    uint16_t af;
+    uint16_t bc;
+    uint16_t de;
+    uint16_t hl;
+    uint16_t sp;
+    uint16_t pc;
+};
+
+void init_regs(struct cpu *cpu, struct regval *regval)
+{
+    set_af(cpu, 0, regval->af);
+    set_bc(cpu, 0, regval->bc);
+    set_de(cpu, 0, regval->de);
+    set_hl(cpu, 0, regval->hl);
+    set_sp(cpu, 0, regval->sp);
+    set_pc(cpu, 0, regval->pc);
+}
+
 int main(int argc, char *argv[])
 {
     char *load = 0;
@@ -1576,6 +1596,16 @@ int main(int argc, char *argv[])
         {
             assert(f);
         }
+
+        struct regval regval = {
+            .de = 0x1c60,
+            .bc = 0x1000,
+            .hl = 0x2501,
+            .sp = 0x2400,
+            .pc = 0x1439,
+        };
+
+        init_regs(&cpu, &regval);
 
         render(cpu.mem);
 
