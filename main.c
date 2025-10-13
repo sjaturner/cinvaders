@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "symbols.h"
+
 enum
 {
     REG_AF,
@@ -1428,6 +1430,15 @@ void render(uint8_t *mem)
 }
 
 char *save;
+void save_core(void)
+{
+    FILE *f = fopen(save, "w");
+    if (fwrite(cpu.mem, 0x10000, 1, f) != 1)
+    {
+        assert(0);
+    }
+}
+
 void get_input()
 {
     static SDL_Event event = { };
@@ -1485,11 +1496,7 @@ void get_input()
                     case SDLK_s:
                         if (save)
                         {
-                            FILE *f = fopen(save, "w");
-                            if (fwrite(cpu.mem, 0x10000, 1, f) != 1)
-                            {
-                                assert(0);
-                            }
+                            save_core();
                             exit(0);
                         }
                         break;
@@ -1602,10 +1609,29 @@ int main(int argc, char *argv[])
             .bc = 0x1000,
             .hl = 0x2501,
             .sp = 0x2400,
-            .pc = 0x1439,
+            .pc = 0,
         };
 
         init_regs(&cpu, &regval);
+
+        cpu.mem[0] = 0xCD;
+        cpu.mem[1] = draw_simp_sprite >> 0 * 8 & 0xff;
+        cpu.mem[2] = draw_simp_sprite >> 1 * 8 & 0xff;
+
+        memset(cpu.mem + 0x2400, 0, 0x4000 - 0x2400);
+
+        uint32_t cycles = 0;
+        for (;;)
+        {
+            cycles += step(&cpu);
+
+            printf("pc:%04x sp:%04x\n", get_pc(&cpu, 0), get_sp(&cpu, 0));
+
+            if (get_sp(&cpu, 0) == 0x2400)
+            {
+                break;
+            }
+        }
 
         render(cpu.mem);
 
