@@ -1605,7 +1605,7 @@ int main(int argc, char *argv[])
         }
 
         struct regval regval = {
-            .de = 0x1c60,
+            .de = player_sprite,
             .bc = 0x1000,
             .hl = 0x2501,
             .sp = 0x2400,

@@ -459,6 +459,7 @@ enum
     l1bb0h               =  0x1bb0,
     l1bc0h               =  0x1bc0,
     l1c00h               =  0x1c00,
+    player_sprite		 =  0x1c60,
     l1c60h               =  0x1c60,
     l1c70h               =  0x1c70,
     l1ca3h               =  0x1ca3,

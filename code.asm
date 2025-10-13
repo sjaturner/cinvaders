@@ -4056,7 +4056,7 @@ Alien Pulling Upside Down 'Y'
  1BC0: 00 10 00 0E 05 00 00 00 00 00 07 D0 1C C8 9B 03
 
  AlienSprCYB:
- ; Alien sprite C pulling upside down Y. Note the difference between this and the first picutre
+ ; Alien sprite C pulling upside down Y. Note the difference between this and the first picture
  ; above. The Y is closer to the ship. This gives the effect of the Y kind of "sticking" in the
  ; animation.
  ; ........
