@@ -4485,7 +4485,7 @@ Flying Saucer Sprite
  1DBE: 0E 2C 68 1D           ; Flying Saucer
  1DC2: 0C 2C 20 1C           ; Alien C, sprite 0
  1DC6: 0A 2C 40 1C           ; Alien B, sprite 1
- 1DCA: 08 2C 00 1C           ; Alien A, sprite 0
+ one_plaher: 08 2C 00 1C           ; Alien A, sprite 0
  1DCE: FF                    ; End of list
  ;
  AlienScoreTable:

@@ -193,7 +193,7 @@ draw_alien:
     rlca                             ; 0120     07               ;  ...   4 -> 32 (type 3) on top row
     ld e,a                           ; 0121     5f               ;  Sprite offset LSB
     ld d,000h                        ; 0122     16 00            ;  MSB is 0
-    ld hl,l1c00h                     ; 0124     21 00 1c         ;  Position 0 alien sprites
+    ld hl,sprite_aliens_start_a      ; 0124     21 00 1c         ;  Position 0 alien sprites
     add hl,de                        ; 0127     19               ;  Offset to sprite type
     ex de,hl                         ; 0128     eb               ;  Sprite offset to DE
     ld a,b                           ; 0129     78               ;  Animation frame number
@@ -332,9 +332,9 @@ sub_01e4h:
 copy_rammirror:                                                 
     ld b,0c0h                        ; 01e4     06 c0            ;  Number of bytes
 sub_01e6h:                                                      
-    ld de,l1b00h                     ; 01e6     11 00 1b         ;  RAM mirror in ROM
+    ld de,rammirror                  ; 01e6     11 00 1b         ;  RAM mirror in ROM
     ld hl,wait_on_draw               ; 01e9     21 00 20         ;  Start of RAM
-    jp h_end                         ; 01ec     c3 32 1a         ;  Copy [DE]->[HL] and return
+    jp block_copy                    ; 01ec     c3 32 1a         ;  Copy [DE]->[HL] and return
 sub_01efh:                                                      
 draw_shield_pl1:                                                
     ld hl,02142h                     ; 01ef     21 42 21         ;  Player 1 shield buffer (remember between games in multi-player)
@@ -344,11 +344,11 @@ draw_shield_pl2:
     ld hl,02242h                     ; 01f5     21 42 22         ;  Player 2 shield buffer (remember between games in multi-player)
 l01f8h:                                                         
     ld c,004h                        ; 01f8     0e 04            ;  Going to draw 4 shields
-    ld de,l1d20h                     ; 01fa     11 20 1d         ;  Shield pixel pattern
+    ld de,image_shield               ; 01fa     11 20 1d         ;  Shield pixel pattern
 l01fdh:                                                         
     push de                          ; 01fd     d5               ;  Hold the start for the next shield
     ld b,02ch                        ; 01fe     06 2c            ;  44 bytes to copy
-    call h_end                       ; 0200     cd 32 1a         ;  Block copy DE to HL (B bytes)
+    call block_copy                  ; 0200     cd 32 1a         ;  Block copy DE to HL (B bytes)
     pop de                           ; 0203     d1               ;  Restore start of shield pattern
     dec c                            ; 0204     0d               ;  Drawn all shields?
     jp nz,l01fdh                     ; 0205     c2 fd 01         ;  No ... go draw them all
@@ -475,9 +475,9 @@ l0288h:
     ld b,010h                        ; 02b1     06 10            ;  16 Bytes
     call erase_simple_sprite         ; 02b3     cd 24 14         ;  Erase simple sprite (the player)
     ld hl,02010h                     ; 02b6     21 10 20         ;  Restore player ...
-    ld de,l1b10h                     ; 02b9     11 10 1b         ;  ... structure ...
+    ld de,restore_player_struct      ; 02b9     11 10 1b         ;  ... structure ...
     ld b,010h                        ; 02bc     06 10            ;  ... from ...
-    call h_end                       ; 02be     cd 32 1a         ;  ... ROM mirror
+    call block_copy                  ; 02be     cd 32 1a         ;  ... ROM mirror
     ld b,000h                        ; 02c1     06 00            ;  Turn off ...
     call sound_bits3off              ; 02c3     cd dc 19         ;  ... all sounds
     ld a,(invaded)                   ; 02c6     3a 6d 20         ;  Has rack reached ...
@@ -606,7 +606,7 @@ draw_player_die:
     rlca                             ; 03a2     07               ;  *4
     rlca                             ; 03a3     07               ;  *8
     rlca                             ; 03a4     07               ;  *16
-    ld hl,l1c70h                     ; 03a5     21 70 1c         ;  Base blow-up sprite location
+    ld hl,sprite_base_blowup         ; 03a5     21 70 1c         ;  Base blow-up sprite location
     add a,l                          ; 03a8     85               ;  Offset sprite ...
     ld l,a                           ; 03a9     6f               ;  ... pointer
     ld (plyr_spr_pic_l),hl           ; 03aa     22 18 20         ;  New blow-up sprite picture
@@ -697,9 +697,9 @@ end_of_blowup:
     call read_ply_shot               ; 0436     cd 30 04         ;  Read the shot structure
     call erase_shifted               ; 0439     cd 52 14         ;  Erase the player's shot
     ld hl,plyr_shot_status           ; 043c     21 25 20         ;  Reinit ...
-    ld de,l1b25h                     ; 043f     11 25 1b         ;  ... shot structure ...
+    ld de,shot_struct                ; 043f     11 25 1b         ;  ... shot structure ...
     ld b,007h                        ; 0442     06 07            ;  ... from ...
-    call h_end                       ; 0444     cd 32 1a         ;  ... ROM mirror
+    call block_copy                  ; 0444     cd 32 1a         ;  ... ROM mirror
     ld hl,(sau_score_lsb)            ; 0447     2a 8d 20         ;  Get pointer to saucer-score table
     inc l                            ; 044a     2c               ;  Every shot explosion advances it one
     ld a,l                           ; 044b     7d               ;  Have we passed ...
@@ -752,7 +752,7 @@ l048ah:
     ld de,l1b30h                     ; 04ab     11 30 1b         ;  Reload ...
     ld hl,02030h                     ; 04ae     21 30 20         ;  ... object ...
     ld b,010h                        ; 04b1     06 10            ;  ... structure ...
-    jp h_end                         ; 04b3     c3 32 1a         ;  ... from ROM mirror and out
+    jp block_copy                    ; 04b3     c3 32 1a         ;  ... from ROM mirror and out
     pop hl                           ; 04b6     e1               ;  Game object data
     ld a,(skip_plunger)              ; 04b7     3a 6e 20         ;  One alien left? Skip plunger shot?
     and a                            ; 04ba     a7               ;  Check
@@ -781,7 +781,7 @@ l04e7h:
     ld de,l1b40h                     ; 04f1     11 40 1b         ;  Reload ...
     ld hl,02040h                     ; 04f4     21 40 20         ;  ... object ...
     ld b,010h                        ; 04f7     06 10            ;  ... structure ...
-    call h_end                       ; 04f9     cd 32 1a         ;  ... from mirror
+    call block_copy                  ; 04f9     cd 32 1a         ;  ... from mirror
     ld a,(num_aliens)                ; 04fc     3a 82 20         ;  Number of aliens on screen
     dec a                            ; 04ff     3d               ;  Is there only one left?
     jp nz,l0508h                     ; 0500     c2 08 05         ;  No ... move on
@@ -813,7 +813,7 @@ l0534h:
     ld de,l1b50h                     ; 053e     11 50 1b         ;  Reload
     ld hl,02050h                     ; 0541     21 50 20         ;  ... object ...
     ld b,010h                        ; 0544     06 10            ;  ... structure ...
-    call h_end                       ; 0546     cd 32 1a         ;  ... from mirror
+    call block_copy                  ; 0546     cd 32 1a         ;  ... from mirror
     ld hl,(a_shot_cfir_lsb)          ; 0549     2a 76 20         ;  Copy pointer to column-firing table ...
     ld (squ_shot_cfir_lsb),hl        ; 054c     22 58 20         ;  ... back to data structure (for next shot)
     ret                              ; 054f     c9               ;  Done
@@ -822,12 +822,12 @@ to_shot_struct:
     ld (shot_pic_end),a              ; 0550     32 7f 20         ;  LSB of last byte of last picture in sprite
     ld hl,a_shot_status              ; 0553     21 73 20         ;  Destination is the shot-structure
     ld b,00bh                        ; 0556     06 0b            ;  11 bytes
-    jp h_end                         ; 0558     c3 32 1a         ;  Block copy and out
+    jp block_copy                    ; 0558     c3 32 1a         ;  Block copy and out
 l055bh:                                                         
 from_shot_struct:                                               
     ld de,a_shot_status              ; 055b     11 73 20         ;  Source is the shot-structure
     ld b,00bh                        ; 055e     06 0b            ;  11 bytes
-    jp h_end                         ; 0560     c3 32 1a         ;  Block copy and out
+    jp block_copy                    ; 0560     c3 32 1a         ;  Block copy and out
 sub_0563h:                                                      
 handle_alien_shot:                                              
     ld hl,a_shot_status              ; 0563     21 73 20         ;  Start of active shot structure
@@ -967,7 +967,7 @@ shot_blowing_up:
     cp 003h                          ; 0649     fe 03            ;  First tick, 4, we draw the explosion
     jp nz,l0667h                     ; 064b     c2 67 06         ;  After that just wait
     call sub_0675h                   ; 064e     cd 75 06         ;  Erase the shot
-    ld hl,l1cdch                     ; 0651     21 dc 1c         ;  Alien shot ...
+    ld hl,sprite_ashot_explode       ; 0651     21 dc 1c         ;  Alien shot ...
     ld (a_shot_image_lsb),hl         ; 0654     22 79 20         ;  ... explosion sprite
     ld hl,0207ch                     ; 0657     21 7c 20         ;  Alien shot Y
     dec (hl)                         ; 065a     35               ;  Left two for ...
@@ -1108,12 +1108,12 @@ l074bh:
     or b                             ; 0751     b0               ;  ... in ...
     ld (hl),a                        ; 0752     77               ;  ... saucer-hit sound
     call sub_1770h                   ; 0753     cd 70 17         ;  Turn off fleet sound and start saucer-hit
-    ld hl,l1d7ch                     ; 0756     21 7c 1d         ;  Sprite for saucer blowing up
+    ld hl,sprite_saucer_blowup       ; 0756     21 7c 1d         ;  Sprite for saucer blowing up
     ld (saucer_pri_loc_lsb),hl       ; 0759     22 87 20         ;  Store it in structure
     jp sub_073ch                     ; 075c     c3 3c 07         ;  Draw the flying saucer
 sub_075fh:                                                      
-    ld de,l1b83h                     ; 075f     11 83 1b         ;  Data for saucer (702 sets count to 0A)
-    jp h_end                         ; 0762     c3 32 1a         ;  Reset saucer object data
+    ld de,data_for_saucer            ; 075f     11 83 1b         ;  Data for saucer (702 sets count to 0A)
+    jp block_copy                    ; 0762     c3 32 1a         ;  Reset saucer object data
 l0765h:                                                         
 wait_for_start:                                                 
     ld a,001h                        ; 0765     3e 01            ;  Tell ISR that we ...
@@ -1123,7 +1123,7 @@ wait_for_start:
     call sub_1979h                   ; 076e     cd 79 19         ;  Suspend game tasks
     call clear_play_field            ; 0771     cd d6 09         ;  Clear center window
     ld hl,03013h                     ; 0774     21 13 30         ;  Screen coordinates
-    ld de,l1ff3h                     ; 0777     11 f3 1f         ;  "PRESS"
+    ld de,msg_push                   ; 0777     11 f3 1f         ;  "PRESS" or maybe "PUSH "
     ld c,004h                        ; 077a     0e 04            ;  Message length
     call print_message               ; 077c     cd f3 08         ;  Print it
 l077fh:                                                         
@@ -1132,7 +1132,7 @@ l077fh:
     ld hl,02810h                     ; 0783     21 10 28         ;  Screen coordinates
     ld c,014h                        ; 0786     0e 14            ;  Message length
     jp nz,l0857h                     ; 0788     c2 57 08         ;  Take 1 or 2 player start
-    ld de,l1acfh                     ; 078b     11 cf 1a         ;  "ONLY 1PLAYER BUTTON "
+    ld de,only_one_player_btn        ; 078b     11 cf 1a         ;  "ONLY 1PLAYER BUTTON "
     call print_message               ; 078e     cd f3 08         ;  Print message
     in a,(001h)                      ; 0791     db 01            ;  Read player controls
     and 004h                         ; 0793     e6 04            ;  1Player start button?
@@ -1220,7 +1220,7 @@ l0849h:
     nop                              ; 0855     00              
     nop                              ; 0856     00              
 l0857h:                                                         
-    ld de,l1abah                     ; 0857     11 ba 1a         ;  "1 OR 2PLAYERS BUTTON"
+    ld de,msg_one_or_two_players_btn ; 0857     11 ba 1a         ;  "1 OR 2PLAYERS BUTTON"
     call print_message               ; 085a     cd f3 08         ;  Print message
     ld b,098h                        ; 085d     06 98            ;  -2 (take away 2 credits)
     in a,(001h)                      ; 085f     db 01            ;  Read player controls
@@ -1254,7 +1254,7 @@ get_al_ref_ptr:
 sub_088dh:                                                      
 prompt_player:                                                  
     ld hl,02b11h                     ; 088d     21 11 2b         ;  Screen coordinates
-    ld de,l1b70h                     ; 0890     11 70 1b         ;  Message "PLAY PLAYER<1>"
+    ld de,msg_play_player_one        ; 0890     11 70 1b         ;  Message "PLAY PLAYER<1>"
     ld c,00eh                        ; 0893     0e 0e            ;  14 bytes in message
     call print_message               ; 0895     cd f3 08         ;  Print the message
     ld a,(player_data_msb)           ; 0898     3a 67 20         ;  Get the player number
@@ -1318,7 +1318,7 @@ print_message:
     ret                              ; 08fe     c9               ;  Out
 sub_08ffh:                                                      
 draw_char:                                                      
-    ld de,l1e00h                     ; 08ff     11 00 1e         ;  Character set
+    ld de,character_set              ; 08ff     11 00 1e         ;  Character set
     push hl                          ; 0902     e5               ;  Preserve
     ld h,000h                        ; 0903     26 00            ;  MSB=0
     ld l,a                           ; 0905     6f               ;  Character number to L
@@ -1381,7 +1381,7 @@ l0958h:
     dec a                            ; 095a     3d               ;  ... spot
     jp nz,l0958h                     ; 095b     c2 58 09         ;  Find spot for new ship
     ld b,010h                        ; 095e     06 10            ;  16 byte sprite
-    ld de,l1c60h                     ; 0960     11 60 1c         ;  Player sprite
+    ld de,sprite_player              ; 0960     11 60 1c         ;  Player sprite
     call draw_simp_sprite            ; 0963     cd 39 14         ;  Draw the sprite
     pop af                           ; 0966     f1               ;  Restore the count
     inc a                            ; 0967     3c               ;  +1
@@ -1396,7 +1396,7 @@ l0958h:
     jp sound_bits3on                 ; 0979     c3 fa 18         ;  ... for extra man
 sub_097ch:                                                      
 alien_score_value:                                              
-    ld hl,l1da0h                     ; 097c     21 a0 1d         ;  Table for scores for hitting alien
+    ld hl,table_alien_score_val      ; 097c     21 a0 1d         ;  Table for scores for hitting alien
     cp 002h                          ; 097f     fe 02            ;  0 or 1 (lower two rows) ...
     ret c                            ; 0981     d8               ;  ... return HL points to value 10
     inc hl                           ; 0982     23               ;  next value
@@ -1498,7 +1498,7 @@ l09efh:
     and 007h                         ; 0a0c     e6 07            ;  0-7
     inc a                            ; 0a0e     3c               ;  Now 1-8
     ld (hl),a                        ; 0a0f     77               ;  Update count since player just beat a rack
-    ld hl,l1da2h                     ; 0a10     21 a2 1d         ;  Starting coordinate of alien table
+    ld hl,coord_start_alien_table    ; 0a10     21 a2 1d         ;  Starting coordinate of alien table
 l0a13h:                                                         
     inc hl                           ; 0a13     23               ;  Find the ...
     dec a                            ; 0a14     3d               ;  ... right entry ...
@@ -1631,7 +1631,7 @@ sub_0ae2h:
 ini_splash_ani:                                                 
     ld hl,splash_an_form             ; 0ae2     21 c2 20         ;  The splash-animation descriptor
     ld b,00ch                        ; 0ae5     06 0c            ;  C bytes
-    jp h_end                         ; 0ae7     c3 32 1a         ;  Block copy DE to descriptor
+    jp block_copy                    ; 0ae7     c3 32 1a         ;  Block copy DE to descriptor
 l0aeah:                                                         
     xor a                            ; 0aea     af               ;  Make a 0
     out (003h),a                     ; 0aeb     d3 03            ;  Turn off sound
@@ -1644,9 +1644,9 @@ l0aeah:
     ld hl,03017h                     ; 0afa     21 17 30         ;  Screen coordinates (middle near top)
     ld c,004h                        ; 0afd     0e 04            ;  4 characters in "PLAY"
     jp nz,l0be8h                     ; 0aff     c2 e8 0b         ;  Not 0 ... do "normal" PLAY
-    ld de,l1cfah                     ; 0b02     11 fa 1c         ;  The "PLAy" with an upside down 'Y'
+    ld de,msg_play_upside_down       ; 0b02     11 fa 1c         ;  The "PLAy" with an upside down 'Y'
     call print_message_del           ; 0b05     cd 93 0a         ;  Print the "PLAy"
-    ld de,l1dafh                     ; 0b08     11 af 1d         ;  "SPACE  INVADERS" message
+    ld de,msg_space_invaders         ; 0b08     11 af 1d         ;  "SPACE  INVADERS" message
 l0b0bh:                                                         
     call sub_0acfh                   ; 0b0b     cd cf 0a         ;  Print to middle-ish of screen
     call one_sec_delay               ; 0b0e     cd b1 0a         ;  One second delay
@@ -1655,14 +1655,14 @@ l0b0bh:
     ld a,(splash_animate)            ; 0b17     3a ec 20         ;  Do splash ...
     and a                            ; 0b1a     a7               ;  ... animations?
     jp nz,l0b4ah                     ; 0b1b     c2 4a 0b         ;  Not 0 ... no animations
-    ld de,l1a95h                     ; 0b1e     11 95 1a         ;  Animate sprite from Y=FE to Y=9E step -1
+    ld de,splash_animation_struct_1  ; 0b1e     11 95 1a         ;  Animate sprite from Y=FE to Y=9E step -1
     call ini_splash_ani              ; 0b21     cd e2 0a         ;  Copy to splash-animate structure
     call animate                     ; 0b24     cd 80 0a         ;  Wait for ISR to move sprite (small alien)
     ld de,l1bb0h                     ; 0b27     11 b0 1b         ;  Animate sprite from Y=98 to Y=FF step 1
     call ini_splash_ani              ; 0b2a     cd e2 0a         ;  Copy to splash-animate structure
     call animate                     ; 0b2d     cd 80 0a         ;  Wait for ISR to move sprite (alien pulling upside down Y)
     call one_sec_delay               ; 0b30     cd b1 0a         ;  One second delay
-    ld de,l1fc9h                     ; 0b33     11 c9 1f         ;  Animate sprite from Y=FF to Y=97 step 1
+    ld de,splash_animation_struct_3  ; 0b33     11 c9 1f         ;  Animate sprite from Y=FF to Y=97 step 1
     call ini_splash_ani              ; 0b36     cd e2 0a         ;  Copy to splash-animate structure
     call animate                     ; 0b39     cd 80 0a         ;  Wait for ISR to move sprite (alien pushing Y)
     call one_sec_delay               ; 0b3c     cd b1 0a         ;  One second delay
@@ -1704,7 +1704,7 @@ l0b89h:
     call sub_1988h                   ; 0b90     cd 88 19         ;  ** Something else at one time? Jump straight to clear-play-field
     ld c,00ch                        ; 0b93     0e 0c            ;  Message size
     ld hl,02c11h                     ; 0b95     21 11 2c         ;  Screen coordinates
-    ld de,l1f90h                     ; 0b98     11 90 1f         ;  "INSERT  COIN"
+    ld de,msg_insert_coin            ; 0b98     11 90 1f         ;  "INSERT  COIN"
     call print_message               ; 0b9b     cd f3 08         ;  Print message
     ld a,(splash_animate)            ; 0b9e     3a ec 20         ;  Do splash ...
     cp 000h                          ; 0ba1     fe 00            ;  ... animations?
@@ -1713,20 +1713,20 @@ l0b89h:
     ld a,002h                        ; 0ba9     3e 02            ;  Character "C"
     call draw_char                   ; 0bab     cd ff 08         ;  Put an extra "C" for "CCOIN" on the screen
 l0baeh:                                                         
-    ld bc,l1f9ch                     ; 0bae     01 9c 1f         ;  "<1 OR 2 PLAYERS>  "
+    ld bc,coord_msg_one_or_two_play  ; 0bae     01 9c 1f         ;  "<1 OR 2 PLAYERS>  "
     call read_pri_struct             ; 0bb1     cd 56 18         ;  Load the screen,pointer
     call sub_184ch                   ; 0bb4     cd 4c 18         ;  Print the message
     in a,(002h)                      ; 0bb7     db 02            ;  Display coin info (bit 7) ...
     rlca                             ; 0bb9     07               ;  ... on demo screen?
     jp c,l0bc3h                      ; 0bba     da c3 0b         ;  1 means no ... skip it
-    ld bc,l1fa0h                     ; 0bbd     01 a0 1f         ;  "*1 PLAYER  1 COIN "
+    ld bc,coord_msg_one_play_one_coi ; 0bbd     01 a0 1f         ;  "*1 PLAYER  1 COIN "
     call sub_183ah                   ; 0bc0     cd 3a 18         ;  Load the descriptor
 l0bc3h:                                                         
     call two_sec_delay               ; 0bc3     cd b6 0a         ;  Print TWO descriptors worth
     ld a,(splash_animate)            ; 0bc6     3a ec 20         ;  Doing splash ...
     cp 000h                          ; 0bc9     fe 00            ;  ... animation?
     jp nz,l0bdah                     ; 0bcb     c2 da 0b         ;  Not 0 ... not on this screen
-    ld de,l1fd5h                     ; 0bce     11 d5 1f         ;  Animation for small alien to line up with extra "C"
+    ld de,splash_animation_struct_4  ; 0bce     11 d5 1f         ;  Animation for small alien to line up with extra "C"
     call ini_splash_ani              ; 0bd1     cd e2 0a         ;  Copy the animation block
     call animate                     ; 0bd4     cd 80 0a         ;  Wait for the animation to complete
     call sub_189eh                   ; 0bd7     cd 9e 18         ;  Animate alien shot to extra "C"
@@ -1739,7 +1739,7 @@ l0bdah:
     call clear_play_field            ; 0be2     cd d6 09         ;  Clear play field
     jp l18dfh                        ; 0be5     c3 df 18         ;  Keep splashing
 l0be8h:                                                         
-    ld de,l1dabh                     ; 0be8     11 ab 1d         ;  "PLAY" with normal 'Y'
+    ld de,msg_play_normal            ; 0be8     11 ab 1d         ;  "PLAY" with normal 'Y'
     call print_message_del           ; 0beb     cd 93 0a         ;  Print it
     jp l0b0bh                        ; 0bee     c3 0b 0b         ;  Continue with splash (HL will be pointing to next message)
 sub_0bf1h:                                                      
@@ -4284,7 +4284,7 @@ l1698h:
     and a                            ; 169b     a7               ;  Is this a single player game?
     jp z,l16c9h                      ; 169c     ca c9 16         ;  Yes ... short message
     ld hl,02803h                     ; 169f     21 03 28         ;  Screen coordinates
-    ld de,l1aa6h                     ; 16a2     11 a6 1a         ;  "GAME OVER PLAYER< >"
+    ld de,msg_game_over_player_x     ; 16a2     11 a6 1a         ;  "GAME OVER PLAYER< >"
     ld c,014h                        ; 16a5     0e 14            ;  20 characters
     call print_message_del           ; 16a7     cd 93 0a         ;  Print message
     dec h                            ; 16aa     25               ;  Back up ...
@@ -4305,7 +4305,7 @@ l16b7h:
     jp l02edh                        ; 16c6     c3 ed 02         ;  Switch players and game loop
 l16c9h:                                                         
     ld hl,02d18h                     ; 16c9     21 18 2d         ;  Screen coordinates
-    ld de,l1aa6h                     ; 16cc     11 a6 1a         ;  "GAME OVER PLAYER< >"
+    ld de,msg_game_over_player_x     ; 16cc     11 a6 1a         ;  "GAME OVER PLAYER< >"
     ld c,00ah                        ; 16cf     0e 0a            ;  Just the "GAME OVER" part
     call print_message_del           ; 16d1     cd 93 0a         ;  Print message
     call two_sec_delay               ; 16d4     cd b6 0a         ;  Long delay
@@ -4338,8 +4338,8 @@ ashot_reload_rate:
     call sub_09cah                   ; 170e     cd ca 09         ;  Get score descriptor for active player
     inc hl                           ; 1711     23               ;  MSB value
     ld a,(hl)                        ; 1712     7e               ;  Get the MSB value
-    ld de,l1cb8h                     ; 1713     11 b8 1c         ;  Score MSB table
-    ld hl,l1aa1h                     ; 1716     21 a1 1a         ;  Corresponding fire reload rate table
+    ld de,score_msb_table            ; 1713     11 b8 1c         ;  Score MSB table
+    ld hl,shot_reload_rate           ; 1716     21 a1 1a         ;  Corresponding fire reload rate table
     ld c,004h                        ; 1719     0e 04            ;  Only 4 entries (a 5th value of 7 is used after that)
     ld b,a                           ; 171b     47               ;  Hold the score value
 l171ch:                                                         
@@ -4403,8 +4403,8 @@ fleet_delay_ex_ship:
     ld a,(change_fleet_snd)          ; 1775     3a 95 20         ;  Time for new ...
     and a                            ; 1778     a7               ;  ... fleet movement sound?
     jp z,l17aah                      ; 1779     ca aa 17         ;  No ... skip to extra-man timing
-    ld hl,f_end                      ; 177c     21 11 1a         ;  Number of aliens list coupled ...
-    ld de,l1a21h                     ; 177f     11 21 1a         ;  ... with delay list
+    ld hl,table_number_of_aliens     ; 177c     21 11 1a         ;  Number of aliens list coupled ...
+    ld de,table_associated_delay                     ; 177f     11 21 1a         ;  ... with delay list
     ld a,(num_aliens)                ; 1782     3a 82 20         ;  Get the number of aliens on the screen
 l1785h:                                                         
     cp (hl)                          ; 1785     be               ;  Compare it to the first list value
@@ -4472,7 +4472,7 @@ l17dch:
     ld (tilt),a                      ; 17e5     32 9a 20         ;  ... handling TILT
     call dsable_game_tasks           ; 17e8     cd d7 19         ;  Disable game tasks
     ei                               ; 17eb     fb               ;  Re-enable interrupts
-    ld de,l1cbch                     ; 17ec     11 bc 1c         ;  Message "TILT"
+    ld de,msg_tilt                   ; 17ec     11 bc 1c         ;  Message "TILT"
     ld hl,03016h                     ; 17ef     21 16 30         ;  Center of screen
     ld c,004h                        ; 17f2     0e 04            ;  Four letters
     call print_message_del           ; 17f4     cd 93 0a         ;  Print "TILT"
@@ -4496,12 +4496,12 @@ ctrl_saucer_sound:
 sub_1815h:                                                      
 draw_adv_table:                                                 
     ld hl,02810h                     ; 1815     21 10 28         ;  0x410 is 1040 rotCol=32, rotRow=16
-    ld de,l1ca3h                     ; 1818     11 a3 1c         ;  "*SCORE ADVANCE TABLE*"
+    ld de,msg_score_advance_table    ; 1818     11 a3 1c         ;  "*SCORE ADVANCE TABLE*"
     ld c,015h                        ; 181b     0e 15            ;  21 bytes in message
     call print_message               ; 181d     cd f3 08         ;  Print message
     ld a,00ah                        ; 1820     3e 0a            ;  10 bytes in every "=xx POINTS" string
     ld (temp206c),a                  ; 1822     32 6c 20         ;  Hold the count
-    ld bc,l1dbeh                     ; 1825     01 be 1d         ;  Coordinate/sprite for drawing table
+    ld bc,table_coord_sprite_score   ; 1825     01 be 1d         ;  Coordinate/sprite for drawing table
 l1828h:                                                         
     call read_pri_struct             ; 1828     cd 56 18         ;  Get HL=coordinate, DE=image
     jp c,l1837h                      ; 182b     da 37 18         ;  Move on if done
@@ -4509,7 +4509,7 @@ l1828h:
     jp l1828h                        ; 1831     c3 28 18         ;  Do all in table
     call one_sec_delay               ; 1834     cd b1 0a         ;  One second delay
 l1837h:                                                         
-    ld bc,l1dcfh                     ; 1837     01 cf 1d         ;  Coordinate/message for drawing table
+    ld bc,table_coord_msg_score      ; 1837     01 cf 1d         ;  Coordinate/message for drawing table
 sub_183ah:                                                      
     call read_pri_struct             ; 183a     cd 56 18         ;  Get HL=coordinate, DE=message
     ret c                            ; 183d     d8               ;  Out if done
@@ -4581,7 +4581,7 @@ sub_189eh:
     ld hl,02050h                     ; 189e     21 50 20         ;  Task descriptor for game object 4 (squiggly shot)
     ld de,l1bc0h                     ; 18a1     11 c0 1b         ;  Task info for animate-shot-to-extra-C
     ld b,010h                        ; 18a4     06 10            ;  Block copy ...
-    call h_end                       ; 18a6     cd 32 1a         ;  ... 16 bytes
+    call block_copy                  ; 18a6     cd 32 1a         ;  ... 16 bytes
     ld a,002h                        ; 18a9     3e 02            ;  Set shot sync ...
     ld (shot_sync),a                 ; 18ab     32 80 20         ;  ... to run the squiggly shot
     ld a,0ffh                        ; 18ae     3e ff            ;  Shot direction (-1)
@@ -4652,7 +4652,7 @@ sub_191ah:
 draw_score_head:                                                
     ld c,01ch                        ; 191a     0e 1c            ;  28 bytes in message
     ld hl,0241eh                     ; 191c     21 1e 24         ;  Screen coordinates
-    ld de,l1ae4h                     ; 191f     11 e4 1a         ;  Score header message
+    ld de,msg_score_header           ; 191f     11 e4 1a         ;  Score header message
     jp print_message                 ; 1922     c3 f3 08         ;  Print score header
 sub_1925h:                                                      
     ld hl,p1scor_l                   ; 1925     21 f8 20         ;  Player 1 score descriptor
@@ -4674,7 +4674,7 @@ draw_score:
 sub_193ch:                                                      
     ld c,007h                        ; 193c     0e 07            ;  7 bytes in message
     ld hl,03501h                     ; 193e     21 01 35         ;  Screen coordinates
-    ld de,l1fa9h                     ; 1941     11 a9 1f         ;  Message = "CREDIT "
+    ld de,msg_credit                 ; 1941     11 a9 1f         ;  Message = "CREDIT "
     jp print_message                 ; 1944     c3 f3 08         ;  Print message
 sub_1947h:                                                      
 draw_num_credits:                                               
@@ -4789,7 +4789,7 @@ draw_num_ships:
     ld hl,02701h                     ; 19e6     21 01 27         ;  Screen coordinates
     jp z,sub_19fah                   ; 19e9     ca fa 19         ;  None in reserve ... skip display
 l19ech:                                                         
-    ld de,l1c60h                     ; 19ec     11 60 1c         ;  Player sprite
+    ld de,sprite_player              ; 19ec     11 60 1c         ;  Player sprite
     ld b,010h                        ; 19ef     06 10            ;  16 rows
     ld c,a                           ; 19f1     4f               ;  Hold count
     call draw_simp_sprite            ; 19f2     cd 39 14         ;  Display 1byte sprite to screen
@@ -4817,6 +4817,7 @@ f_end:
                                                                 
 ; BLOCK 'h' (start 0x1a11 end 0x1a32)                           
 h_first:                                                        
+table_number_of_aliens:                                          ; congruent with table_associated_delay
     defb 032h                        ; 1a11     32              
     defb 02bh                        ; 1a12     2b              
     defb 024h                        ; 1a13     24              
@@ -4833,7 +4834,7 @@ h_first:
     defb 003h                        ; 1a1e     03              
     defb 002h                        ; 1a1f     02              
     defb 001h                        ; 1a20     01              
-l1a21h:                                                         
+table_associated_delay:                                          ; congruent with table_number_of_aliens
     defb 034h                        ; 1a21     34              
     defb 02eh                        ; 1a22     2e              
     defb 027h                        ; 1a23     27              
@@ -4945,7 +4946,19 @@ i_end:
 g_first:                                                        
     defb 000h                        ; 1a93     00              
     defb 000h                        ; 1a94     00              
-l1a95h:                                                         
+
+                                     ; Splash screen animation structure 1
+                                     ; 00   Image form (increments each draw)
+                                     ; 00   Delta X
+                                     ; FF   Delta Y is -1
+                                     ; B8   X coordinate
+                                     ; FE   Y starting coordiante
+                                     ; 1C20 Base image (small alien)
+                                     ; 10   Size of image (16 bytes)
+                                     ; 9E   Target Y coordiante
+                                     ; 00   Reached Y flag
+                                     ; 1C20 Base iamge (small alien)
+splash_animation_struct_1:                                                         
     defb 000h                        ; 1a95     00              
     defb 000h                        ; 1a96     00              
     defb 0ffh                        ; 1a97     ff              
@@ -4958,13 +4971,19 @@ l1a95h:
     defb 000h                        ; 1a9e     00              
     defb 020h                        ; 1a9f     20              
     defb 01ch                        ; 1aa0     1c              
-l1aa1h:                                                         
+
+                                     ; The tables at 1cb8 AND 1aa1 control how fast shots are created. The speed is based
+                                     ; on the upper byte of the player's score. For a score of less than or equal 0200 then
+                                     ; the fire speed is 30. For a score less than or equal 1000 the shot speed is 10. Less
+                                     ; than or equal 2000 the speed is 0B. Less than or equal 3000 is 08. And anything
+                                     ; above 3000 is 07.
+shot_reload_rate:                                                         
     defb 030h                        ; 1aa1     30              
     defb 010h                        ; 1aa2     10              
     defb 00bh                        ; 1aa3     0b              
     defb 008h                        ; 1aa4     08              
     defb 007h                        ; 1aa5     07              
-l1aa6h:                                                         
+msg_game_over_player_x:                                                         
     defb 006h                        ; 1aa6     06              
     defb 000h                        ; 1aa7     00              
     defb 00ch                        ; 1aa8     0c              
@@ -4985,7 +5004,7 @@ l1aa6h:
     defb 024h                        ; 1ab7     24              
     defb 026h                        ; 1ab8     26              
     defb 025h                        ; 1ab9     25              
-l1abah:                                                         
+msg_one_or_two_players_btn:                                                         
     defb 01bh                        ; 1aba     1b              
     defb 026h                        ; 1abb     26              
     defb 00eh                        ; 1abc     0e              
@@ -5007,7 +5026,7 @@ l1abah:
     defb 00eh                        ; 1acc     0e              
     defb 00dh                        ; 1acd     0d              
     defb 026h                        ; 1ace     26              
-l1acfh:                                                         
+only_one_player_btn:                                                         
     defb 00eh                        ; 1acf     0e              
     defb 00dh                        ; 1ad0     0d              
     defb 00bh                        ; 1ad1     0b              
@@ -5029,7 +5048,7 @@ l1acfh:
     defb 00eh                        ; 1ae1     0e              
     defb 00dh                        ; 1ae2     0d              
     defb 026h                        ; 1ae3     26              
-l1ae4h:                                                         
+msg_score_header:                                                         
     defb 026h                        ; 1ae4     26              
     defb 012h                        ; 1ae5     12              
     defb 002h                        ; 1ae6     02              
@@ -5058,7 +5077,7 @@ l1ae4h:
     defb 01ch                        ; 1afd     1c              
     defb 025h                        ; 1afe     25              
     defb 026h                        ; 1aff     26              
-l1b00h:                                                         
+rammirror:                                                         
     defb 001h                        ; 1b00     01              
     defb 000h                        ; 1b01     00              
     defb 000h                        ; 1b02     00              
@@ -5075,7 +5094,7 @@ l1b00h:
     defb 000h                        ; 1b0d     00              
     defb 0f8h                        ; 1b0e     f8              
     defb 000h                        ; 1b0f     00              
-l1b10h:                                                         
+restore_player_struct:                                                         
     defb 000h                        ; 1b10     00              
     defb 080h                        ; 1b11     80              
     defb 000h                        ; 1b12     00              
@@ -5097,7 +5116,7 @@ l1b10h:
     defb 000h                        ; 1b22     00              
     defb 0bbh                        ; 1b23     bb              
     defb 003h                        ; 1b24     03              
-l1b25h:                                                         
+shot_struct:                                                         
     defb 000h                        ; 1b25     00              
     defb 010h                        ; 1b26     10              
     defb 090h                        ; 1b27     90              
@@ -5179,7 +5198,7 @@ l1b58h:
     defb 000h                        ; 1b6d     00              
     defb 000h                        ; 1b6e     00              
     defb 000h                        ; 1b6f     00              
-l1b70h:                                                         
+msg_play_player_one:                                                         
     defb 00fh                        ; 1b70     0f              
     defb 00bh                        ; 1b71     0b              
     defb 000h                        ; 1b72     00              
@@ -5199,7 +5218,7 @@ l1b70h:
     defb 001h                        ; 1b80     01              
     defb 0ffh                        ; 1b81     ff              
     defb 0ffh                        ; 1b82     ff              
-l1b83h:                                                         
+data_for_saucer:                                                         
     defb 000h                        ; 1b83     00              
     defb 000h                        ; 1b84     00              
     defb 000h                        ; 1b85     00              
@@ -5327,7 +5346,8 @@ l1bc0h:
     defb 000h                        ; 1bfd     00              
     defb 01ch                        ; 1bfe     1c              
     defb 039h                        ; 1bff     39              
-l1c00h:                                                         
+sprite_aliens_start_a:                                                         
+sprite_alien_a_0;
     defb 000h                        ; 1c00     00              
     defb 000h                        ; 1c01     00              
     defb 039h                        ; 1c02     39              
@@ -5360,6 +5380,7 @@ l1c00h:
     defb 078h                        ; 1c1d     78              
     defb 000h                        ; 1c1e     00              
     defb 000h                        ; 1c1f     00              
+sprite_alien_c_0:
     defb 000h                        ; 1c20     00              
     defb 000h                        ; 1c21     00              
     defb 000h                        ; 1c22     00              
@@ -5376,6 +5397,7 @@ l1c00h:
     defb 000h                        ; 1c2d     00              
     defb 000h                        ; 1c2e     00              
     defb 000h                        ; 1c2f     00              
+sprite_aliens_start_b:
     defb 000h                        ; 1c30     00              
     defb 000h                        ; 1c31     00              
     defb 038h                        ; 1c32     38              
@@ -5392,6 +5414,7 @@ l1c00h:
     defb 038h                        ; 1c3d     38              
     defb 000h                        ; 1c3e     00              
     defb 000h                        ; 1c3f     00              
+sprite_alien_b_1:
     defb 000h                        ; 1c40     00              
     defb 000h                        ; 1c41     00              
     defb 000h                        ; 1c42     00              
@@ -5424,7 +5447,7 @@ l1c00h:
     defb 000h                        ; 1c5d     00              
     defb 000h                        ; 1c5e     00              
     defb 000h                        ; 1c5f     00              
-l1c60h:                                                         
+sprite_player:                                                         
     defb 000h                        ; 1c60     00              
     defb 000h                        ; 1c61     00              
     defb 00fh                        ; 1c62     0f              
@@ -5441,7 +5464,7 @@ l1c60h:
     defb 01fh                        ; 1c6d     1f              
     defb 00fh                        ; 1c6e     0f              
     defb 000h                        ; 1c6f     00              
-l1c70h:                                                         
+sprite_base_blowup:                                                         
     defb 000h                        ; 1c70     00              
     defb 004h                        ; 1c71     04              
     defb 001h                        ; 1c72     01              
@@ -5493,7 +5516,7 @@ l1c70h:
     defb 00dh                        ; 1ca0     0d              
     defb 013h                        ; 1ca1     13              
     defb 012h                        ; 1ca2     12              
-l1ca3h:                                                         
+msg_score_advance_table:                                                         
     defb 028h                        ; 1ca3     28              
     defb 012h                        ; 1ca4     12              
     defb 002h                        ; 1ca5     02              
@@ -5515,12 +5538,12 @@ l1ca3h:
     defb 00bh                        ; 1cb5     0b              
     defb 004h                        ; 1cb6     04              
     defb 028h                        ; 1cb7     28              
-l1cb8h:                                                         
+score_msb_table:                                                         
     defb 002h                        ; 1cb8     02              
     defb 010h                        ; 1cb9     10              
     defb 020h                        ; 1cba     20              
     defb 030h                        ; 1cbb     30              
-l1cbch:                                                         
+msg_tilt:                                                         
     defb 013h                        ; 1cbc     13              
     defb 008h                        ; 1cbd     08              
     defb 00bh                        ; 1cbe     0b              
@@ -5553,7 +5576,7 @@ l1cbch:
     defb 022h                        ; 1cd9     22              
     defb 054h                        ; 1cda     54              
     defb 088h                        ; 1cdb     88              
-l1cdch:                                                         
+sprite_ashot_explode:                                                         
     defb 04ah                        ; 1cdc     4a              
     defb 015h                        ; 1cdd     15              
     defb 0beh                        ; 1cde     be              
@@ -5584,7 +5607,7 @@ l1cdch:
     defb 048h                        ; 1cf7     48              
     defb 0feh                        ; 1cf8     fe              
     defb 090h                        ; 1cf9     90              
-l1cfah:                                                         
+msg_play_upside_down:                                                         
     defb 00fh                        ; 1cfa     0f              
     defb 00bh                        ; 1cfb     0b              
     defb 000h                        ; 1cfc     00              
@@ -5623,7 +5646,7 @@ l1cfah:
     defb 006h                        ; 1d1d     06              
     defb 00ah                        ; 1d1e     0a              
     defb 003h                        ; 1d1f     03              
-l1d20h:                                                         
+image_shield:                                                         
     defb 0ffh                        ; 1d20     ff              
     defb 00fh                        ; 1d21     0f              
     defb 0ffh                        ; 1d22     ff              
@@ -5698,6 +5721,7 @@ l1d50h:
     defb 000h                        ; 1d65     00              
     defb 000h                        ; 1d66     00              
     defb 000h                        ; 1d67     00              
+sprite_flying_saucer:
     defb 004h                        ; 1d68     04              
     defb 00ch                        ; 1d69     0c              
     defb 01eh                        ; 1d6a     1e              
@@ -5718,7 +5742,7 @@ l1d50h:
     defb 000h                        ; 1d79     00              
     defb 000h                        ; 1d7a     00              
     defb 000h                        ; 1d7b     00              
-l1d7ch:                                                         
+sprite_saucer_blowup:                                                         
     defb 000h                        ; 1d7c     00              
     defb 022h                        ; 1d7d     22              
     defb 000h                        ; 1d7e     00              
@@ -5755,11 +5779,11 @@ l1d7ch:
     defb 01dh                        ; 1d9d     1d              
     defb 01ah                        ; 1d9e     1a              
     defb 01ah                        ; 1d9f     1a              
-l1da0h:                                                         
-    defb 010h                        ; 1da0     10              
-    defb 020h                        ; 1da1     20              
-l1da2h:                                                         
-    defb 030h                        ; 1da2     30              
+table_alien_score_val:                                                         
+    defb 010h                        ; 1da0     10               ; Bottom two rows
+    defb 020h                        ; 1da1     20               ; Middle rows
+coord_start_alien_table:                                         ; Lol, fuck me - preinc in loop                
+    defb 030h                        ; 1da2     30               ; Weird overlap, this is the last of - Highest row.
     defb 060h                        ; 1da3     60              
     defb 050h                        ; 1da4     50              
     defb 048h                        ; 1da5     48              
@@ -5768,12 +5792,12 @@ l1da2h:
     defb 040h                        ; 1da8     40              
     defb 040h                        ; 1da9     40              
     defb 040h                        ; 1daa     40              
-l1dabh:                                                         
+msg_play_normal:                                                         
     defb 00fh                        ; 1dab     0f              
     defb 00bh                        ; 1dac     0b              
     defb 000h                        ; 1dad     00              
     defb 018h                        ; 1dae     18              
-l1dafh:                                                         
+msg_space_invaders:                                                         
     defb 012h                        ; 1daf     12              
     defb 00fh                        ; 1db0     0f              
     defb 000h                        ; 1db1     00              
@@ -5789,25 +5813,27 @@ l1dafh:
     defb 004h                        ; 1dbb     04              
     defb 011h                        ; 1dbc     11              
     defb 012h                        ; 1dbd     12              
-l1dbeh:                                                         
+
+table_coord_sprite_score:                                                         
     defb 00eh                        ; 1dbe     0e              
     defb 02ch                        ; 1dbf     2c              
-    defb 068h                        ; 1dc0     68              
+    defb 068h                        ; 1dc0     68               ; ref 1d68
     defb 01dh                        ; 1dc1     1d              
     defb 00ch                        ; 1dc2     0c              
     defb 02ch                        ; 1dc3     2c              
-    defb 020h                        ; 1dc4     20              
-    defb 01ch                        ; 1dc5     1c              
+    defb 020h                        ; 1dc4     20               ; ref 1c20 
+    defb 01ch                        ; 1dc5     1c               
     defb 00ah                        ; 1dc6     0a              
     defb 02ch                        ; 1dc7     2c              
-    defb 040h                        ; 1dc8     40              
+    defb 040h                        ; 1dc8     40               ; ref 1c40
     defb 01ch                        ; 1dc9     1c              
     defb 008h                        ; 1dca     08              
     defb 02ch                        ; 1dcb     2c              
-    defb 000h                        ; 1dcc     00              
+    defb 000h                        ; 1dcc     00               ; ref 1c00
     defb 01ch                        ; 1dcd     1c              
     defb 0ffh                        ; 1dce     ff              
-l1dcfh:                                                         
+
+table_coord_msg_score:               ;                           ; references strings below
     defb 00eh                        ; 1dcf     0e              
     defb 02eh                        ; 1dd0     2e              
     defb 0e0h                        ; 1dd1     e0              
@@ -5825,6 +5851,8 @@ l1dcfh:
     defb 099h                        ; 1ddd     99              
     defb 01ch                        ; 1dde     1c              
     defb 0ffh                        ; 1ddf     ff              
+
+msg_mystery:
     defb 027h                        ; 1de0     27              
     defb 038h                        ; 1de1     38              
     defb 026h                        ; 1de2     26              
@@ -5835,6 +5863,8 @@ l1dcfh:
     defb 004h                        ; 1de7     04              
     defb 011h                        ; 1de8     11              
     defb 018h                        ; 1de9     18              
+
+msg_thirty_points:
     defb 027h                        ; 1dea     27              
     defb 01dh                        ; 1deb     1d              
     defb 01ah                        ; 1dec     1a              
@@ -5845,6 +5875,8 @@ l1dcfh:
     defb 00dh                        ; 1df1     0d              
     defb 013h                        ; 1df2     13              
     defb 012h                        ; 1df3     12              
+
+msg_twenty_points:
     defb 027h                        ; 1df4     27              
     defb 01ch                        ; 1df5     1c              
     defb 01ah                        ; 1df6     1a              
@@ -5855,9 +5887,12 @@ l1dcfh:
     defb 00dh                        ; 1dfb     0d              
     defb 013h                        ; 1dfc     13              
     defb 012h                        ; 1dfd     12              
+
+padding_align_font:
     defb 000h                        ; 1dfe     00              
     defb 000h                        ; 1dff     00              
-l1e00h:                                                         
+
+character_set:                                                         
     defb 000h                        ; 1e00     00              
     defb 01fh                        ; 1e01     1f              
     defb 024h                        ; 1e02     24              
@@ -6194,6 +6229,7 @@ l1e00h:
     defb 003h                        ; 1f4d     03              
     defb 000h                        ; 1f4e     00              
     defb 000h                        ; 1f4f     00              
+
     defb 024h                        ; 1f50     24              
     defb 01bh                        ; 1f51     1b              
     defb 026h                        ; 1f52     26              
@@ -6212,6 +6248,7 @@ l1e00h:
     defb 025h                        ; 1f5f     25              
     defb 026h                        ; 1f60     26              
     defb 026h                        ; 1f61     26              
+
     defb 028h                        ; 1f62     28              
     defb 01bh                        ; 1f63     1b              
     defb 026h                        ; 1f64     26              
@@ -6242,6 +6279,8 @@ l1e00h:
     defb 002h                        ; 1f7d     02              
     defb 001h                        ; 1f7e     01              
     defb 000h                        ; 1f7f     00              
+
+sprite_alien_y_0:
     defb 060h                        ; 1f80     60              
     defb 010h                        ; 1f81     10              
     defb 00fh                        ; 1f82     0f              
@@ -6258,7 +6297,8 @@ l1e00h:
     defb 03dh                        ; 1f8d     3d              
     defb 01ah                        ; 1f8e     1a              
     defb 000h                        ; 1f8f     00              
-l1f90h:                                                         
+
+msg_insert_coin:                                                         
     defb 008h                        ; 1f90     08              
     defb 00dh                        ; 1f91     0d              
     defb 012h                        ; 1f92     12              
@@ -6271,22 +6311,29 @@ l1f90h:
     defb 00eh                        ; 1f99     0e              
     defb 008h                        ; 1f9a     08              
     defb 00dh                        ; 1f9b     0d              
-l1f9ch:                                                         
+
+coord_msg_one_or_two_play:                                                         
     defb 00dh                        ; 1f9c     0d              
     defb 02ah                        ; 1f9d     2a              
-    defb 050h                        ; 1f9e     50              
+    defb 050h                        ; 1f9e     50               ; ref 1f50
     defb 01fh                        ; 1f9f     1f              
-l1fa0h:                                                         
+
+coord_msg_one_play_one_coi:                                                         
     defb 00ah                        ; 1fa0     0a              
     defb 02ah                        ; 1fa1     2a              
-    defb 062h                        ; 1fa2     62              
-    defb 01fh                        ; 1fa3     1f              
+    defb 062h                        ; 1fa2     62               ; ref 1f62
+    defb 01fh                        ; 1fa3     1f               
+
+coord_msg_two_play_two_coi:                                                         
     defb 007h                        ; 1fa4     07              
     defb 02ah                        ; 1fa5     2a              
-    defb 0e1h                        ; 1fa6     e1              
+    defb 0e1h                        ; 1fa6     e1               ; ref 1fe1
     defb 01fh                        ; 1fa7     1f              
+
+terminate_table:
     defb 0ffh                        ; 1fa8     ff              
-l1fa9h:                                                         
+
+msg_credit:                                                         
     defb 002h                        ; 1fa9     02              
     defb 011h                        ; 1faa     11              
     defb 004h                        ; 1fab     04              
@@ -6294,6 +6341,8 @@ l1fa9h:
     defb 008h                        ; 1fad     08              
     defb 013h                        ; 1fae     13              
     defb 026h                        ; 1faf     26              
+
+sprite_alien_y_1:
     defb 000h                        ; 1fb0     00              
     defb 060h                        ; 1fb1     60              
     defb 010h                        ; 1fb2     10              
@@ -6310,6 +6359,8 @@ l1fa9h:
     defb 03ah                        ; 1fbd     3a              
     defb 019h                        ; 1fbe     19              
     defb 000h                        ; 1fbf     00              
+
+sprite_char_query:
     defb 000h                        ; 1fc0     00              
     defb 020h                        ; 1fc1     20              
     defb 040h                        ; 1fc2     40              
@@ -6318,8 +6369,22 @@ l1fa9h:
     defb 020h                        ; 1fc5     20              
     defb 000h                        ; 1fc6     00              
     defb 000h                        ; 1fc7     00              
+
     defb 000h                        ; 1fc8     00              
-l1fc9h:                                                         
+
+                                     ; Splash screen animation structure 3
+                                     ; 00   Image form (increments each draw)
+                                     ; 00   Delta X
+                                     ; FF   Delta Y is -1
+                                     ; B8   X coordinate
+                                     ; FF   Y starting coordiante
+                                     ; 1F80 Base image (small alien with Y)
+                                     ; 10   Size of image (16 bytes)
+                                     ; 97   Target Y coordiante
+                                     ; 00   Reached Y flag
+                                     ; 1F80 Base iamge (small alien with Y)
+                                     ;
+splash_animation_struct_3:                                                         
     defb 000h                        ; 1fc9     00              
     defb 000h                        ; 1fca     00              
     defb 0ffh                        ; 1fcb     ff              
@@ -6332,7 +6397,20 @@ l1fc9h:
     defb 000h                        ; 1fd2     00              
     defb 080h                        ; 1fd3     80              
     defb 01fh                        ; 1fd4     1f              
-l1fd5h:                                                         
+
+                                     ; Splash screen animation structure 4
+                                     ; 00   Image form (increments each draw)
+                                     ; 00   Delta X
+                                     ; 01   Delta Y is 1
+                                     ; D0   X coordinate
+                                     ; 22   Y starting coordiante
+                                     ; 1C20 Base image (small alien)
+                                     ; 10   Size of image (16 bytes)
+                                     ; 94   Target Y coordiante
+                                     ; 00   Reached Y flag
+                                     ; 1C20 Base iamge (small alien)
+                                     ;
+splash_animation_struct_4:                                                         
     defb 000h                        ; 1fd5     00              
     defb 000h                        ; 1fd6     00              
     defb 001h                        ; 1fd7     01              
@@ -6345,7 +6423,9 @@ l1fd5h:
     defb 000h                        ; 1fde     00              
     defb 020h                        ; 1fdf     20              
     defb 01ch                        ; 1fe0     1c              
-    defb 028h                        ; 1fe1     28              
+
+msg_two_players_two_coins:
+    defb 028h                        ; 1fe1     28               
     defb 01ch                        ; 1fe2     1c              
     defb 026h                        ; 1fe3     26              
     defb 00fh                        ; 1fe4     0f              
@@ -6363,7 +6443,8 @@ l1fd5h:
     defb 008h                        ; 1ff0     08              
     defb 00dh                        ; 1ff1     0d              
     defb 012h                        ; 1ff2     12              
-l1ff3h:                                                         
+
+msg_push:                                                         
     defb 00fh                        ; 1ff3     0f              
     defb 014h                        ; 1ff4     14              
     defb 012h                        ; 1ff5     12              
@@ -6376,6 +6457,7 @@ l1ff3h:
     defb 008h                        ; 1ffc     08              
     defb 008h                        ; 1ffd     08              
     defb 000h                        ; 1ffe     00              
+
 g_end:                                                          
     nop                              ; 1fff     00              
                                                                 
