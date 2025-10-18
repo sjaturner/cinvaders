@@ -104,7 +104,7 @@ l008ch:
     jp nc,l0082h                     ; 00a2     d2 82 00         ;  Not in demo mode ... done
 l00a5h:                                                         
     ld hl,02020h                     ; 00a5     21 20 20         ;  Game object table (skip player-object at 2010)
-    call sub_024bh                   ; 00a8     cd 4b 02         ;  Process all game objects (except player object)
+    call keep_processing_game_objs   ; 00a8     cd 4b 02         ;  Process all game objects (except player object)
     call cursor_next_alien           ; 00ab     cd 41 01         ;  Advance cursor to next alien (move the alien if it is last one)
     jp l0082h                        ; 00ae     c3 82 00         ;  Restore and return
 sub_00b1h:                                                      
@@ -132,7 +132,7 @@ l00c8h:
 l00d3h:                                                         
     ld (rack_direction),a            ; 00d3     32 0d 20         ;  Store rack direction
     ret                              ; 00d6     c9               ;  Done
-sub_00d7h:                                                      
+init_racks_direction:                                                      
     ld a,002h                        ; 00d7     3e 02            ;  Set ...
     ld (p1ref_alien_dx),a            ; 00d9     32 fb 21         ;  ... player 1 and 2 ...
     ld (p2ref_alien_dx),a            ; 00dc     32 fb 22         ;  ... alien delta to 2 (right 2 pixels)
@@ -331,7 +331,7 @@ add_delta:
 sub_01e4h:                                                      
 copy_rammirror:                                                 
     ld b,0c0h                        ; 01e4     06 c0            ;  Number of bytes
-sub_01e6h:                                                      
+copy_rom_to_ram:                                                      
     ld de,rammirror                  ; 01e6     11 00 1b         ;  RAM mirror in ROM
     ld hl,wait_on_draw               ; 01e9     21 00 20         ;  Start of RAM
     jp block_copy                    ; 01ec     c3 32 1a         ;  Copy [DE]->[HL] and return
@@ -401,7 +401,7 @@ l0242h:
 sub_0248h:                                                      
 run_game_objs:                                                  
     ld hl,02010h                     ; 0248     21 10 20         ;  First game object (active player)
-sub_024bh:                                                      
+keep_processing_game_objs:                                                      
     ld a,(hl)                        ; 024b     7e               ;  Have we reached the ...
     cp 0ffh                          ; 024c     fe ff            ;  ... end of the object list?
     ret z                            ; 024e     c8               ;  Yes ... done
@@ -432,7 +432,7 @@ l026fh:
     pop hl                           ; 026f     e1               ;  Restore pointer to xx04
     ld de,l000ch                     ; 0270     11 0c 00         ;  Offset to next ...
     add hl,de                        ; 0273     19               ;  ... game task (C+4=10)
-    jp sub_024bh                     ; 0274     c3 4b 02         ;  Do next game task
+    jp keep_processing_game_objs     ; 0274     c3 4b 02         ;  Do next game task
 l0277h:                                                         
     dec b                            ; 0277     05               ;  Decrement ...
     inc b                            ; 0278     04               ;  ... two ...
@@ -446,7 +446,7 @@ l027dh:
 l0281h:                                                         
     ld de,l0010h                     ; 0281     11 10 00         ;  Next ...
     add hl,de                        ; 0284     19               ;  ... object descriptor
-    jp sub_024bh                     ; 0285     c3 4b 02         ;  Keep processing game objects
+    jp keep_processing_game_objs     ; 0285     c3 4b 02         ;  Keep processing game objects
 l0288h:                                                         
     dec (hl)                         ; 0288     35               ;  Decrement the xx02 counter
     dec hl                           ; 0289     2b               ;  Back up to ...
@@ -489,10 +489,10 @@ l0288h:
     ld sp,02400h                     ; 02d0     31 00 24         ;  We aren't going to return
     ei                               ; 02d3     fb               ;  Enable interrupts (we just dropped the ISR context)
     call dsable_game_tasks           ; 02d4     cd d7 19         ;  Disable game tasks
-    call sub_092eh                   ; 02d7     cd 2e 09         ;  Get number of ships for active player
+    call get_num_ships_active_player ; 02d7     cd 2e 09         ;  Get number of ships for active player
     and a                            ; 02da     a7               ;  Any left?
     jp z,l166dh                      ; 02db     ca 6d 16         ;  No ... handle game over for player
-    call sub_18e7h                   ; 02de     cd e7 18         ;  Get player-alive status pointer
+    call get_player_alive_ptr        ; 02de     cd e7 18         ;  Get player-alive status pointer
     ld a,(hl)                        ; 02e1     7e               ;  Is player ...
     and a                            ; 02e2     a7               ;  ... alive?
     jp z,l032ch                      ; 02e3     ca 2c 03         ;  Yes ... remove a ship from player's stash and reenter game loop
@@ -506,7 +506,7 @@ l02edh:
     jp c,l0332h                      ; 02f2     da 32 03         ;  Yes ... go store player 1 shields and come back to 02F8
     call remember_shields2           ; 02f5     cd 0e 02         ;  No ... go store player 2 shields
 l02f8h:                                                         
-    call sub_0878h                   ; 02f8     cd 78 08         ;  Get ref-alien info and pointer to storage
+    call get_alien_ptr_etc           ; 02f8     cd 78 08         ;  Get ref-alien info and pointer to storage
     ld (hl),e                        ; 02fb     73               ;  Hold the ...
     inc hl                           ; 02fc     23               ;  ... ref-alien ...
     ld (hl),d                        ; 02fd     72               ;  ... screen coordinates
@@ -896,7 +896,7 @@ l05c1h:
     jp nz,shot_blowing_up            ; 05cc     c2 44 06         ;  Go do shot-is-blowing-up sequence
     inc hl                           ; 05cf     23               ;  2074 step count
     inc (hl)                         ; 05d0     34               ;  Count the steps (used for fire rate)
-    call sub_0675h                   ; 05d1     cd 75 06         ;  Erase shot
+    call erase_alien_shot_explosion  ; 05d1     cd 75 06         ;  Erase shot
     ld a,(a_shot_image_lsb)          ; 05d4     3a 79 20         ;  Get LSB of the image pointer
     add a,003h                       ; 05d7     c6 03            ;  Next set of images
     ld hl,shot_pic_end               ; 05d9     21 7f 20         ;  End of image
@@ -910,7 +910,7 @@ l05e2h:
     ld a,(alien_shot_delta)          ; 05e9     3a 7e 20         ;  Get alien shot delta
     add a,b                          ; 05ec     80               ;  Add to shots coordinate
     ld (alien_shot_yr),a             ; 05ed     32 7b 20         ;  New shot Y coordinate
-    call sub_066ch                   ; 05f0     cd 6c 06         ;  Draw the alien shot
+    call draw_alien_shot             ; 05f0     cd 6c 06         ;  Draw the alien shot
     ld a,(alien_shot_yr)             ; 05f3     3a 7b 20         ;  Shot's Y coordinate
     cp 015h                          ; 05f6     fe 15            ;  Still in the active playfield?
     jp c,l0612h                      ; 05f8     da 12 06         ;  No ... end it
@@ -966,7 +966,7 @@ shot_blowing_up:
     ld a,(hl)                        ; 0648     7e               ;  Get the value
     cp 003h                          ; 0649     fe 03            ;  First tick, 4, we draw the explosion
     jp nz,l0667h                     ; 064b     c2 67 06         ;  After that just wait
-    call sub_0675h                   ; 064e     cd 75 06         ;  Erase the shot
+    call erase_alien_shot_explosion  ; 064e     cd 75 06         ;  Erase the shot
     ld hl,sprite_ashot_explode       ; 0651     21 dc 1c         ;  Alien shot ...
     ld (a_shot_image_lsb),hl         ; 0654     22 79 20         ;  ... explosion sprite
     ld hl,0207ch                     ; 0657     21 7c 20         ;  Alien shot Y
@@ -977,16 +977,16 @@ shot_blowing_up:
     dec (hl)                         ; 065e     35               ;  ... explosion
     ld a,006h                        ; 065f     3e 06            ;  Alien shot descriptor ...
     ld (alien_shot_size),a           ; 0661     32 7d 20         ;  ... size 6
-    jp sub_066ch                     ; 0664     c3 6c 06         ;  Draw alien shot explosion
+    jp draw_alien_shot               ; 0664     c3 6c 06         ;  Draw alien shot explosion
 l0667h:                                                         
     and a                            ; 0667     a7               ;  Have we reached 0?
     ret nz                           ; 0668     c0               ;  No ... keep waiting
-    jp sub_0675h                     ; 0669     c3 75 06         ;  Erase the explosion and out
-sub_066ch:                                                      
+    jp erase_alien_shot_explosion    ; 0669     c3 75 06         ;  Erase the explosion and out
+draw_alien_shot:                                                      
     ld hl,a_shot_image_lsb           ; 066c     21 79 20         ;  Alien shot descriptor
     call read_desc                   ; 066f     cd 3b 1a         ;  Read 5 byte structure
     jp draw_spr_collision            ; 0672     c3 91 14         ;  Draw shot and out
-sub_0675h:                                                      
+erase_alien_shot_explosion:                                                      
     ld hl,a_shot_image_lsb           ; 0675     21 79 20         ;  Alien shot descriptor
     call read_desc                   ; 0678     cd 3b 1a         ;  Read 5 byte structure
     jp erase_shifted                 ; 067b     c3 52 14         ;  Erase the shot and out
@@ -1012,7 +1012,7 @@ l067eh:
     cp 008h                          ; 06a1     fe 08            ;  Less than ...
     jp c,l050fh                      ; 06a3     da 0f 05         ;  ... 8 ... no saucer
     ld (hl),001h                     ; 06a6     36 01            ;  (2084) The saucer is on the screen
-    call sub_073ch                   ; 06a8     cd 3c 07         ;  Draw the flying saucer
+    call draw_saucer                 ; 06a8     cd 3c 07         ;  Draw the flying saucer
 l06abh:                                                         
     ld de,saucer_pri_pic_msb         ; 06ab     11 8a 20         ;  Saucer's Y coordinate
     call comp_yto_beam               ; 06ae     cd 06 1a         ;  Compare to beam position
@@ -1027,7 +1027,7 @@ l06abh:
     inc hl                           ; 06bf     23               ;  ... delta Y
     add a,(hl)                       ; 06c0     86               ;  Move saucer
     ld (saucer_pri_pic_msb),a        ; 06c1     32 8a 20         ;  New coordinate
-    call sub_073ch                   ; 06c4     cd 3c 07         ;  Draw the flying saucer
+    call draw_saucer                 ; 06c4     cd 3c 07         ;  Draw the flying saucer
     ld hl,saucer_pri_pic_msb         ; 06c7     21 8a 20         ;  Saucer's structure
     ld a,(hl)                        ; 06ca     7e               ;  Y coordinate
     cp 028h                          ; 06cb     fe 28            ;  Too low? End of screen?
@@ -1058,11 +1058,11 @@ l06d6h:
     nop                              ; 06f7     00               ;  **
     nop                              ; 06f8     00               ;  **
 l06f9h:                                                         
-    call sub_0742h                   ; 06f9     cd 42 07         ;  Covert pixel pos from descriptor to HL screen and shift
+    call get_saucer_descriptor                   ; 06f9     cd 42 07         ;  Covert pixel pos from descriptor to HL screen and shift
     call clear_small_sprite          ; 06fc     cd cb 14         ;  Clear a one byte sprite at HL
     ld hl,saucer_start               ; 06ff     21 83 20         ;  Saucer structure
     ld b,00ah                        ; 0702     06 0a            ;  10 bytes in saucer structure
-    call sub_075fh                   ; 0704     cd 5f 07         ;  Re-initialize saucer structure
+    call reinit_saucer               ; 0704     cd 5f 07         ;  Re-initialize saucer structure
 l0707h:                                                         
     ld b,0feh                        ; 0707     06 fe            ;  Turn off UFO ...
     jp sound_bits3off                ; 0709     c3 dc 19         ;  ... sound and out
@@ -1092,12 +1092,12 @@ l0728h:
     add hl,hl                        ; 0731     29               ;  *8
     add hl,hl                        ; 0732     29               ;  *16
     ld (score_delta_lsb),hl          ; 0733     22 f2 20         ;  Add score for hitting saucer (015 becomes 150 in BCD).
-    call sub_0742h                   ; 0736     cd 42 07         ;  Get the flying saucer score descriptor
+    call get_saucer_descriptor       ; 0736     cd 42 07         ;  Get the flying saucer score descriptor
     jp l08f1h                        ; 0739     c3 f1 08         ;  Print the three-byte score and out
-sub_073ch:                                                      
-    call sub_0742h                   ; 073c     cd 42 07         ;  Draw the ...
+draw_saucer:                                                      
+    call get_saucer_descriptor       ; 073c     cd 42 07         ;  Draw the ...
     jp draw_simp_sprite              ; 073f     c3 39 14         ;  ... flying saucer
-sub_0742h:                                                      
+get_saucer_descriptor:                                                      
     ld hl,saucer_pri_loc_lsb         ; 0742     21 87 20         ;  Read flying saucer ...
     call read_desc                   ; 0745     cd 3b 1a         ;  ... structure
     jp conv_to_scr                   ; 0748     c3 47 1a         ;  Convert pixel number to screen and shift and out
@@ -1107,11 +1107,11 @@ l074bh:
     ld a,(hl)                        ; 0750     7e               ;  OR ...
     or b                             ; 0751     b0               ;  ... in ...
     ld (hl),a                        ; 0752     77               ;  ... saucer-hit sound
-    call sub_1770h                   ; 0753     cd 70 17         ;  Turn off fleet sound and start saucer-hit
+    call fleet_sound_off             ; 0753     cd 70 17         ;  Turn off fleet sound and start saucer-hit
     ld hl,sprite_saucer_blowup       ; 0756     21 7c 1d         ;  Sprite for saucer blowing up
     ld (saucer_pri_loc_lsb),hl       ; 0759     22 87 20         ;  Store it in structure
-    jp sub_073ch                     ; 075c     c3 3c 07         ;  Draw the flying saucer
-sub_075fh:                                                      
+    jp draw_saucer                   ; 075c     c3 3c 07         ;  Draw the flying saucer
+reinit_saucer:                                                      
     ld de,data_for_saucer            ; 075f     11 83 1b         ;  Data for saucer (702 sets count to 0A)
     jp block_copy                    ; 0762     c3 32 1a         ;  Reset saucer object data
 l0765h:                                                         
@@ -1120,7 +1120,7 @@ wait_for_start:
     ld (wait_start_loop),a           ; 0767     32 93 20         ;  ... have started to wait
     ld sp,02400h                     ; 076a     31 00 24         ;  Reset stack
     ei                               ; 076d     fb               ;  Enable interrupts
-    call sub_1979h                   ; 076e     cd 79 19         ;  Suspend game tasks
+    call suspend_game_tasks          ; 076e     cd 79 19         ;  Suspend game tasks
     call clear_play_field            ; 0771     cd d6 09         ;  Clear center window
     ld hl,03013h                     ; 0774     21 13 30         ;  Screen coordinates
     ld de,msg_push                   ; 0777     11 f3 1f         ;  "PRESS" or maybe "PUSH "
@@ -1138,10 +1138,10 @@ l077fh:
     and 004h                         ; 0793     e6 04            ;  1Player start button?
     jp z,l077fh                      ; 0795     ca 7f 07         ;  No ... wait for button or credit
 l0798h:                                                         
-new_game:                                                       
+new_one_player_game:                                                       
     ld b,099h                        ; 0798     06 99            ;  Essentially a -1 for DAA
     xor a                            ; 079a     af               ;  Clear two player flag
-l079bh:                                                         
+new_game:                                                         
     ld (two_players),a               ; 079b     32 ce 20         ;  Set flag for 1 or 2 players
     ld a,(num_coins)                 ; 079e     3a eb 20         ;  Number of credits
     add a,b                          ; 07a1     80               ;  Take away credits
@@ -1151,10 +1151,10 @@ l079bh:
     ld hl,a_first                    ; 07a9     21 00 00         ;  Score of 0000
     ld (p1scor_l),hl                 ; 07ac     22 f8 20         ;  Clear player-1 score
     ld (p2scor_l),hl                 ; 07af     22 fc 20         ;  Clear player-2 score
-    call sub_1925h                   ; 07b2     cd 25 19         ;  Print player-1 score
-    call sub_192bh                   ; 07b5     cd 2b 19         ;  Print player-2 score
+    call print_player_one_score      ; 07b2     cd 25 19         ;  Print player-1 score
+    call print_player_two_score      ; 07b5     cd 2b 19         ;  Print player-2 score
     call dsable_game_tasks           ; 07b8     cd d7 19         ;  Disable game tasks
-    ld hl,draw_alien+1               ; 07bb     21 01 01         ;  Two bytes 1, 1
+    ld hl,00101h                     ; 07bb     21 01 01         ;  Two bytes 1, 1
     ld a,h                           ; 07be     7c               ;  1 to A
     ld (game_mode),a                 ; 07bf     32 ef 20         ;  20EF=1 ... game mode
     ld (player1alive),hl             ; 07c2     22 e7 20         ;  20E7 and 20E8 both one ... players 1 and 2 are alive
@@ -1165,7 +1165,7 @@ l079bh:
     call get_ships_per_cred          ; 07d1     cd d1 08         ;  Get number of ships from DIP settings
     ld (p1ships_rem),a               ; 07d4     32 ff 21         ;  Player-1 ships
     ld (p2ships_rem),a               ; 07d7     32 ff 22         ;  Player-2 ships
-    call sub_00d7h                   ; 07da     cd d7 00         ;  Set player-1 and player-2 alien racks going right
+    call init_racks_direction        ; 07da     cd d7 00         ;  Set player-1 and player-2 alien racks going right
     xor a                            ; 07dd     af               ;  Make a 0
     ld (p1rack_cnt),a                ; 07de     32 fe 21         ;  Player 1 is on first rack of aliens
     ld (p2rack_cnt),a                ; 07e1     32 fe 22         ;  Player 2 is on first rack of aliens
@@ -1182,7 +1182,7 @@ l07f9h:
     nop                              ; 07ff     00               ;  % Why?
     xor a                            ; 0800     af               ;  Make a 0
     ld (isr_splash_task),a           ; 0801     32 c1 20         ;  Disable isr splash-task animation
-l0804h:                                                         
+top_of_game_loop:                                                         
     call draw_bottom_line            ; 0804     cd cf 01         ;  Draw line across screen under player
     ld a,(player_data_msb)           ; 0807     3a 67 20         ;  Current player
     rrca                             ; 080a     0f               ;  Right bit tells all
@@ -1204,10 +1204,10 @@ l081fh:
     and a                            ; 082e     a7               ;  All aliens gone?
     jp z,l09efh                      ; 082f     ca ef 09         ;  Yes ... end of turn
     call ashot_reload_rate           ; 0832     cd 0e 17         ;  Update alien-shot-rate based on player's score
-    call sub_0935h                   ; 0835     cd 35 09         ;  Check (and handle) extra ship award
+    call do_extra_ship_awards        ; 0835     cd 35 09         ;  Check (and handle) extra ship award
     call speed_shots                 ; 0838     cd d8 08         ;  Adjust alien shot speed
     call shot_sound                  ; 083b     cd 2c 17         ;  Shot sound on or off with 2025
-    call sub_0a59h                   ; 083e     cd 59 0a         ;  Check if player is hit
+    call flag_player_hit             ; 083e     cd 59 0a         ;  Check if player is hit
     jp z,l0849h                      ; 0841     ca 49 08         ;  No hit ... jump handler
     ld b,004h                        ; 0844     06 04            ;  Player hit sound
     call sound_bits3on               ; 0846     cd fa 18         ;  Make explosion sound
@@ -1226,17 +1226,17 @@ l0857h:
     in a,(001h)                      ; 085f     db 01            ;  Read player controls
     rrca                             ; 0861     0f               ;  Test ...
     rrca                             ; 0862     0f               ;  ... bit 2
-    jp c,l086dh                      ; 0863     da 6d 08         ;  2 player button pressed ... do it
+    jp c,new_two_player_game         ; 0863     da 6d 08         ;  2 player button pressed ... do it
     rrca                             ; 0866     0f               ;  Test bit 3
-    jp c,new_game                    ; 0867     da 98 07         ;  One player start ... do it
+    jp c,new_one_player_game         ; 0867     da 98 07         ;  One player start ... do it
     jp l077fh                        ; 086a     c3 7f 07         ;  Keep waiting on credit or button
-l086dh:                                                         
+new_two_player_game:                                                         
     ld a,001h                        ; 086d     3e 01            ;  Flag 2 player game
-    jp l079bh                        ; 086f     c3 9b 07         ;  Continue normal startup
+    jp new_game                        ; 086f     c3 9b 07         ;  Continue normal startup
 l0872h:                                                         
     call restore_shields1            ; 0872     cd 1a 02         ;  Restore shields for player 1
     jp l0814h                        ; 0875     c3 14 08         ;  Continue in game loop
-sub_0878h:                                                      
+get_alien_ptr_etc:                                                      
     ld a,(ref_alien_dxr)             ; 0878     3a 08 20         ;  Alien deltaY
     ld b,a                           ; 087b     47               ;  Hold it
     ld hl,(ref_alien_yr)             ; 087c     2a 09 20         ;  Alien coordinates
@@ -1270,7 +1270,7 @@ l08a9h:
     ret z                            ; 08ad     c8               ;  Yes ... done
     and 004h                         ; 08ae     e6 04            ;  Every 4 ISRs ...
     jp nz,l08bch                     ; 08b0     c2 bc 08         ;  ... flash the player's score
-    call sub_09cah                   ; 08b3     cd ca 09         ;  Get the score descriptor for the active player
+    call get_player_score_descriptor ; 08b3     cd ca 09         ;  Get the score descriptor for the active player
     call draw_score                  ; 08b6     cd 31 19         ;  Draw the score
     jp l08a9h                        ; 08b9     c3 a9 08         ;  Back to the top of the wait loop
 l08bch:                                                         
@@ -1347,12 +1347,12 @@ l0929h:
     dec hl                           ; 0929     2b               ;  Decrement the ...
     ld (till_saucer_lsb),hl          ; 092a     22 91 20         ;  ... time-to-saucer
     ret                              ; 092d     c9               ;  Done
-sub_092eh:                                                      
+get_num_ships_active_player:                                                      
     call get_player_data_ptr         ; 092e     cd 11 16         ;  HL points to player data
     ld l,0ffh                        ; 0931     2e ff            ;  Last byte = numbe of ships
     ld a,(hl)                        ; 0933     7e               ;  Get number of ships
     ret                              ; 0934     c9               ;  Done
-sub_0935h:                                                      
+do_extra_ship_awards:                                                      
     call cur_ply_alive               ; 0935     cd 10 19         ;  Get descriptor of sorts
     dec hl                           ; 0938     2b               ;  Back up ...
     dec hl                           ; 0939     2b               ;  ... two bytes
@@ -1365,12 +1365,12 @@ sub_0935h:
     jp z,l0948h                      ; 0943     ca 48 09         ;  0=1500
     ld b,010h                        ; 0946     06 10            ;  Awarded at 1000
 l0948h:                                                         
-    call sub_09cah                   ; 0948     cd ca 09         ;  Get score descriptor for active player
+    call get_player_score_descriptor ; 0948     cd ca 09         ;  Get score descriptor for active player
     inc hl                           ; 094b     23               ;  MSB of score ...
     ld a,(hl)                        ; 094c     7e               ;  ... to accumulator
     cp b                             ; 094d     b8               ;  Time for an extra ship?
     ret c                            ; 094e     d8               ;  No ... out
-    call sub_092eh                   ; 094f     cd 2e 09         ;  Get pointer to number of ships
+    call get_num_ships_active_player ; 094f     cd 2e 09         ;  Get pointer to number of ships
     inc (hl)                         ; 0952     34               ;  Bump number of ships
     ld a,(hl)                        ; 0953     7e               ;  Get the new total
     push af                          ; 0954     f5               ;  Hang onto it for a bit
@@ -1385,7 +1385,7 @@ l0958h:
     call draw_simp_sprite            ; 0963     cd 39 14         ;  Draw the sprite
     pop af                           ; 0966     f1               ;  Restore the count
     inc a                            ; 0967     3c               ;  +1
-    call sub_1a8bh                   ; 0968     cd 8b 1a         ;  Print the number of ships
+    call print_num_ships_in_acc      ; 0968     cd 8b 1a         ;  Print the number of ships
     call cur_ply_alive               ; 096b     cd 10 19         ;  Get descriptor for active player of some sort
     dec hl                           ; 096e     2b               ;  Back up ...
     dec hl                           ; 096f     2b               ;  ... two bytes
@@ -1406,7 +1406,7 @@ alien_score_value:
     ret                              ; 0987     c9               ;  ... return HL points to value 30
 sub_0988h:                                                      
 adjust_score_code:                                              
-    call sub_09cah                   ; 0988     cd ca 09         ;  Get score structure for active player
+    call get_player_score_descriptor ; 0988     cd ca 09         ;  Get score structure for active player
     ld a,(adjust_score_data)         ; 098b     3a f1 20         ;  Does the score ...
     and a                            ; 098e     a7               ;  ... need increasing?
     ret z                            ; 098f     c8               ;  No ... done
@@ -1447,16 +1447,16 @@ draw_hex_byte:
     rrca                             ; 09b6     0f               ;  ...
     rrca                             ; 09b7     0f               ;  ... left digit
     and 00fh                         ; 09b8     e6 0f            ;  Mask out lower digit's bits
-    call sub_09c5h                   ; 09ba     cd c5 09         ;  To screen at HL
+    call draw_digit_in_acc                   ; 09ba     cd c5 09         ;  To screen at HL
     pop af                           ; 09bd     f1               ;  Restore digit
     and 00fh                         ; 09be     e6 0f            ;  Mask out upper digit
-    call sub_09c5h                   ; 09c0     cd c5 09         ;  To screen
+    call draw_digit_in_acc                   ; 09c0     cd c5 09         ;  To screen
     pop de                           ; 09c3     d1               ;  Restore
     ret                              ; 09c4     c9               ;  Done
-sub_09c5h:                                                      
+draw_digit_in_acc:                                                      
     add a,01ah                       ; 09c5     c6 1a            ;  Bump to number characters
     jp draw_char                     ; 09c7     c3 ff 08         ;  Continue ...
-sub_09cah:                                                      
+get_player_score_descriptor:                                                      
     ld a,(player_data_msb)           ; 09ca     3a 67 20         ;  Get active player
     rrca                             ; 09cd     0f               ;  Test for player
     ld hl,p1scor_l                   ; 09ce     21 f8 20         ;  Player 1 score descriptor
@@ -1481,7 +1481,7 @@ l09e8h:
     jp c,l09d9h                      ; 09eb     da d9 09         ;  No ... keep going
     ret                              ; 09ee     c9               ;  Done
 l09efh:                                                         
-    call sub_0a3ch                   ; 09ef     cd 3c 0a        
+    call check_player_collision      ; 09ef     cd 3c 0a        
     xor a                            ; 09f2     af               ;  Suspend ...
     ld (suspend_play),a              ; 09f3     32 e9 20         ;  ... ISR game tasks
     call clear_play_field            ; 09f6     cd d6 09         ;  Clear playfield
@@ -1516,13 +1516,13 @@ l0a13h:
     ld (sound_port5),a               ; 0a27     32 98 20         ;  ... first sound
     call draw_shield_pl2             ; 0a2a     cd f5 01         ;  Draw shields for player 2
     call init_aliens_p2              ; 0a2d     cd 04 19         ;  Initalize aliens for player 2
-    jp l0804h                        ; 0a30     c3 04 08         ;  Continue at top of game loop
+    jp top_of_game_loop              ; 0a30     c3 04 08         ;  Continue at top of game loop
 l0a33h:                                                         
     call draw_shield_pl1             ; 0a33     cd ef 01         ;  Draw shields for player 1
     call init_aliens                 ; 0a36     cd c0 01         ;  Initialize aliens for player 1
-    jp l0804h                        ; 0a39     c3 04 08         ;  Continue at top of game loop
-sub_0a3ch:                                                      
-    call sub_0a59h                   ; 0a3c     cd 59 0a         ;  Check player collision
+    jp top_of_game_loop              ; 0a39     c3 04 08         ;  Continue at top of game loop
+check_player_collision:                                                      
+    call flag_player_hit             ; 0a3c     cd 59 0a         ;  Check player collision
     jp nz,l0a52h                     ; 0a3f     c2 52 0a         ;  Player is not alive ... skip delay
     ld a,030h                        ; 0a42     3e 30            ;  Half second delay
     ld (isr_delay),a                 ; 0a44     32 c0 20         ;  Set ISR timer
@@ -1530,16 +1530,16 @@ l0a47h:
     ld a,(isr_delay)                 ; 0a47     3a c0 20         ;  Has timer expired?
     and a                            ; 0a4a     a7               ;  Check exipre
     ret z                            ; 0a4b     c8               ;  Out if done
-    call sub_0a59h                   ; 0a4c     cd 59 0a         ;  Check player collision
+    call flag_player_hit             ; 0a4c     cd 59 0a         ;  Check player collision
     jp z,l0a47h                      ; 0a4f     ca 47 0a         ;  No collision ... wait on timer
 l0a52h:                                                         
-    call sub_0a59h                   ; 0a52     cd 59 0a         ;  Wait for ...
+    call flag_player_hit             ; 0a52     cd 59 0a         ;  Wait for ...
     jp nz,l0a52h                     ; 0a55     c2 52 0a         ;  ... collision to end
     ret                              ; 0a58     c9               ;  Done
-sub_0a59h:                                                      
+flag_player_hit:                                                      
     ld a,(player_alive)              ; 0a59     3a 15 20         ;  Active player hit flag
     cp 0ffh                          ; 0a5c     fe ff            ;  All FFs means player is OK
-    ret                              ; 0a5e     c9               ;  Out
+    ret                              ; 0a5e     c9               ;  Out - zero flag is not hit because cmp is a subtract
 sub_0a5fh:                                                      
 score_for_alien:                                                
     ld a,(game_mode)                 ; 0a5f     3a ef 20         ;  Are we in ...
@@ -1592,7 +1592,7 @@ l0a9eh:
 l0aabh:                                                         
 splash_squiggly:                                                
     ld hl,02050h                     ; 0aab     21 50 20         ;  Pointer to game-object 4 timer
-    jp sub_024bh                     ; 0aae     c3 4b 02         ;  Process squiggly-shot in demo mode
+    jp keep_processing_game_objs     ; 0aae     c3 4b 02         ;  Process squiggly-shot in demo mode
 sub_0ab1h:                                                      
 one_sec_delay:                                                  
     ld a,040h                        ; 0ab1     3e 40            ;  Delay of 64 (tad over 1 sec)
@@ -1615,7 +1615,7 @@ isrspl_tasks:
     rrca                             ; 0aca     0f               ;  Shooting extra "C" with squiggly shot?
     jp c,splash_squiggly             ; 0acb     da ab 0a         ;  4: Yes ... go shoot extra "C" in splash
     ret                              ; 0ace     c9               ;  No task to do
-sub_0acfh:                                                      
+print_to_mid_screen:                                                      
     ld hl,02b14h                     ; 0acf     21 14 2b         ;  Near center of screen
     ld c,00fh                        ; 0ad2     0e 0f            ;  15 bytes in message
     jp print_message_del             ; 0ad4     c3 93 0a         ;  Print and out
@@ -1636,7 +1636,7 @@ l0aeah:
     xor a                            ; 0aea     af               ;  Make a 0
     out (003h),a                     ; 0aeb     d3 03            ;  Turn off sound
     out (005h),a                     ; 0aed     d3 05            ;  Turn off sound
-    call sub_1982h                   ; 0aef     cd 82 19         ;  Turn off ISR splash-task
+    call control_isr_splash_from_acc ; 0aef     cd 82 19         ;  Turn off ISR splash-task
     ei                               ; 0af2     fb               ;  Enable interrupts (using them for delays)
     call one_sec_delay               ; 0af3     cd b1 0a         ;  One second delay
     ld a,(splash_animate)            ; 0af6     3a ec 20         ;  Splash screen type
@@ -1648,7 +1648,7 @@ l0aeah:
     call print_message_del           ; 0b05     cd 93 0a         ;  Print the "PLAy"
     ld de,msg_space_invaders         ; 0b08     11 af 1d         ;  "SPACE  INVADERS" message
 l0b0bh:                                                         
-    call sub_0acfh                   ; 0b0b     cd cf 0a         ;  Print to middle-ish of screen
+    call print_to_mid_screen         ; 0b0b     cd cf 0a         ;  Print to middle-ish of screen
     call one_sec_delay               ; 0b0e     cd b1 0a         ;  One second delay
     call draw_adv_table              ; 0b11     cd 15 18         ;  Draw "SCORE ADVANCE TABLE" with print delay
     call two_sec_delay               ; 0b14     cd b6 0a         ;  Two second delay
@@ -1688,20 +1688,20 @@ l0b5dh:
     call draw_bottom_line            ; 0b6e     cd cf 01         ;  Draw playfield line
 l0b71h:                                                         
     call plr_fire_or_demo            ; 0b71     cd 18 16         ;  In demo ... process demo movement and always fire
-    call sub_0bf1h                   ; 0b74     cd f1 0b         ;  Check player shot and aliens bumping edges of screen and hidden message
+    call check_player_shot_bump_hid  ; 0b74     cd f1 0b         ;  Check player shot and aliens bumping edges of screen and hidden message
     out (006h),a                     ; 0b77     d3 06            ;  Feed watchdog
-    call sub_0a59h                   ; 0b79     cd 59 0a         ;  Has demo player been hit?
+    call flag_player_hit             ; 0b79     cd 59 0a         ;  Has demo player been hit?
     jp z,l0b71h                      ; 0b7c     ca 71 0b         ;  No ... continue game
     xor a                            ; 0b7f     af               ;  Remove player shot ...
     ld (plyr_shot_status),a          ; 0b80     32 25 20         ;  ... from activity
 l0b83h:                                                         
-    call sub_0a59h                   ; 0b83     cd 59 0a         ;  Wait for demo player ...
+    call flag_player_hit             ; 0b83     cd 59 0a         ;  Wait for demo player ...
     jp nz,l0b83h                     ; 0b86     c2 83 0b         ;  ... to stop exploding
 l0b89h:                                                         
     xor a                            ; 0b89     af               ;  Turn off ...
     ld (isr_splash_task),a           ; 0b8a     32 c1 20         ;  ... splash animation
     call one_sec_delay               ; 0b8d     cd b1 0a         ;  One second delay
-    call sub_1988h                   ; 0b90     cd 88 19         ;  ** Something else at one time? Jump straight to clear-play-field
+    call clear_playfield_taito_msg   ; 0b90     cd 88 19         ;  ** Something else at one time? Jump straight to clear-play-field
     ld c,00ch                        ; 0b93     0e 0c            ;  Message size
     ld hl,02c11h                     ; 0b95     21 11 2c         ;  Screen coordinates
     ld de,msg_insert_coin            ; 0b98     11 90 1f         ;  "INSERT  COIN"
@@ -1715,12 +1715,12 @@ l0b89h:
 l0baeh:                                                         
     ld bc,coord_msg_one_or_two_play  ; 0bae     01 9c 1f         ;  "<1 OR 2 PLAYERS>  "
     call read_pri_struct             ; 0bb1     cd 56 18         ;  Load the screen,pointer
-    call sub_184ch                   ; 0bb4     cd 4c 18         ;  Print the message
+    call print_msg_slow              ; 0bb4     cd 4c 18         ;  Print the message
     in a,(002h)                      ; 0bb7     db 02            ;  Display coin info (bit 7) ...
     rlca                             ; 0bb9     07               ;  ... on demo screen?
     jp c,l0bc3h                      ; 0bba     da c3 0b         ;  1 means no ... skip it
     ld bc,coord_msg_one_play_one_coi ; 0bbd     01 a0 1f         ;  "*1 PLAYER  1 COIN "
-    call sub_183ah                   ; 0bc0     cd 3a 18         ;  Load the descriptor
+    call slow_print_descrs           ; 0bc0     cd 3a 18         ;  Load the descriptor
 l0bc3h:                                                         
     call two_sec_delay               ; 0bc3     cd b6 0a         ;  Print TWO descriptors worth
     ld a,(splash_animate)            ; 0bc6     3a ec 20         ;  Doing splash ...
@@ -1742,7 +1742,7 @@ l0be8h:
     ld de,msg_play_normal            ; 0be8     11 ab 1d         ;  "PLAY" with normal 'Y'
     call print_message_del           ; 0beb     cd 93 0a         ;  Print it
     jp l0b0bh                        ; 0bee     c3 0b 0b         ;  Continue with splash (HL will be pointing to next message)
-sub_0bf1h:                                                      
+check_player_shot_bump_hid:                                                      
     call plyr_shot_and_bump          ; 0bf1     cd 0a 19         ;  Check if player is shot and aliens bumping the edge of screen
     jp check_hidden_mes              ; 0bf4     c3 9a 19         ;  Check for hidden-message display sequence
 a_end:                                                          
@@ -4121,7 +4121,7 @@ rack_bump:
     and a                            ; 159a     a7               ;  Moving right?
     jp nz,l15b7h                     ; 159b     c2 b7 15         ;  No ... handle moving left
     ld hl,03ea4h                     ; 159e     21 a4 3e         ;  Line down the right edge of playfield
-    call sub_15c5h                   ; 15a1     cd c5 15         ;  Check line down the edge
+    call check_column                ; 15a1     cd c5 15         ;  Check line down the edge
     ret nc                           ; 15a4     d0               ;  Nothing is there ... return
     ld b,0feh                        ; 15a5     06 fe            ;  Delta X of -2
     ld a,001h                        ; 15a7     3e 01            ;  Rack now moving right
@@ -4134,12 +4134,12 @@ l15a9h:
     ret                              ; 15b6     c9               ;  Done
 l15b7h:                                                         
     ld hl,02524h                     ; 15b7     21 24 25         ;  Line down the left edge of playfield
-    call sub_15c5h                   ; 15ba     cd c5 15         ;  Check line down the edge
+    call check_column                ; 15ba     cd c5 15         ;  Check line down the edge
     ret nc                           ; 15bd     d0               ;  Nothing is there ... return
-    call sub_18f1h                   ; 15be     cd f1 18         ;  Get moving-right delta X value of 2 (3 if just one alien left)
+    call get_delta_x                 ; 15be     cd f1 18         ;  Get moving-right delta X value of 2 (3 if just one alien left)
     xor a                            ; 15c1     af               ;  Rack now moving left
     jp l15a9h                        ; 15c2     c3 a9 15         ;  Set rack direction
-sub_15c5h:                                                      
+check_column:                                                      
     ld b,017h                        ; 15c5     06 17            ;  Checking 23 bytes in a line up the screen from near the bottom
 l15c7h:                                                         
     ld a,(hl)                        ; 15c7     7e               ;  Get screen memory
@@ -4253,11 +4253,11 @@ l166bh:
     ret                              ; 166c     c9               ;  Done
 l166dh:                                                         
     xor a                            ; 166d     af               ;  0
-    call sub_1a8bh                   ; 166e     cd 8b 1a         ;  Print ZERO ships remain
+    call print_num_ships_in_acc      ; 166e     cd 8b 1a         ;  Print ZERO ships remain
 l1671h:                                                         
     call cur_ply_alive               ; 1671     cd 10 19         ;  Get active-flag ptr for current player
     ld (hl),000h                     ; 1674     36 00            ;  Flag player is dead
-    call sub_09cah                   ; 1676     cd ca 09         ;  Get score descriptor for current player
+    call get_player_score_descriptor                   ; 1676     cd ca 09         ;  Get score descriptor for current player
     inc hl                           ; 1679     23               ;  Point to high two digits
     ld de,020f5h                     ; 167a     11 f5 20         ;  Current high score upper two digits
     ld a,(de)                        ; 167d     1a               ;  Is player score greater ...
@@ -4298,7 +4298,7 @@ l16b7h:
     ld a,b                           ; 16b7     78               ;  To A
     call draw_char                   ; 16b8     cd ff 08         ;  Print player number
     call one_sec_delay               ; 16bb     cd b1 0a         ;  Short delay
-    call sub_18e7h                   ; 16be     cd e7 18         ;  Get current player "alive" flag
+    call get_player_alive_ptr        ; 16be     cd e7 18         ;  Get current player "alive" flag
     ld a,(hl)                        ; 16c1     7e               ;  Is player ...
     and a                            ; 16c2     a7               ;  ... alive?
     jp z,l16c9h                      ; 16c3     ca c9 16         ;  No ... skip to "GAME OVER" sequence
@@ -4324,18 +4324,18 @@ l16eeh:
     call player_shot_hit             ; 16ee     cd d8 14         ;  Player's shot collision detection
     ld b,004h                        ; 16f1     06 04            ;  Player has been hit ...
     call sound_bits3on               ; 16f3     cd fa 18         ;  ... sound
-    call sub_0a59h                   ; 16f6     cd 59 0a         ;  Has flag been set?
+    call flag_player_hit             ; 16f6     cd 59 0a         ;  Has flag been set?
     jp nz,l16eeh                     ; 16f9     c2 ee 16         ;  No ... wait for the flag
     call dsable_game_tasks           ; 16fc     cd d7 19         ;  Disable ISR game tasks
     ld hl,02701h                     ; 16ff     21 01 27         ;  Player's stash of ships
-    call sub_19fah                   ; 1702     cd fa 19         ;  Erase the stash of shps
+    call erase_ship_stash            ; 1702     cd fa 19         ;  Erase the stash of shps
     xor a                            ; 1705     af               ;  Print ...
-    call sub_1a8bh                   ; 1706     cd 8b 1a         ;  ... a zero (number of ships)
+    call print_num_ships_in_acc      ; 1706     cd 8b 1a         ;  ... a zero (number of ships)
     ld b,0fbh                        ; 1709     06 fb            ;  Turn off ...
     jp l196bh                        ; 170b     c3 6b 19         ;  ... player shot sound
 sub_170eh:                                                      
 ashot_reload_rate:                                              
-    call sub_09cah                   ; 170e     cd ca 09         ;  Get score descriptor for active player
+    call get_player_score_descriptor ; 170e     cd ca 09         ;  Get score descriptor for active player
     inc hl                           ; 1711     23               ;  MSB value
     ld a,(hl)                        ; 1712     7e               ;  Get the MSB value
     ld de,score_msb_table            ; 1713     11 b8 1c         ;  Score MSB table
@@ -4394,7 +4394,7 @@ time_fleet_sound:
     ret                              ; 176c     c9               ;  Done
 sub_176dh:                                                      
     ld a,(sound_port5)               ; 176d     3a 98 20         ;  Current sound port 3 value
-sub_1770h:                                                      
+fleet_sound_off:                                                      
     and 030h                         ; 1770     e6 30            ;  Mask off fleet movement sounds
     out (005h),a                     ; 1772     d3 05            ;  Set sounds
     ret                              ; 1774     c9               ;  Out
@@ -4404,7 +4404,7 @@ fleet_delay_ex_ship:
     and a                            ; 1778     a7               ;  ... fleet movement sound?
     jp z,l17aah                      ; 1779     ca aa 17         ;  No ... skip to extra-man timing
     ld hl,table_number_of_aliens     ; 177c     21 11 1a         ;  Number of aliens list coupled ...
-    ld de,table_associated_delay                     ; 177f     11 21 1a         ;  ... with delay list
+    ld de,table_associated_delay     ; 177f     11 21 1a         ;  ... with delay list
     ld a,(num_aliens)                ; 1782     3a 82 20         ;  Get the number of aliens on the screen
 l1785h:                                                         
     cp (hl)                          ; 1785     be               ;  Compare it to the first list value
@@ -4504,24 +4504,24 @@ draw_adv_table:
     ld bc,table_coord_sprite_score   ; 1825     01 be 1d         ;  Coordinate/sprite for drawing table
 l1828h:                                                         
     call read_pri_struct             ; 1828     cd 56 18         ;  Get HL=coordinate, DE=image
-    jp c,l1837h                      ; 182b     da 37 18         ;  Move on if done
-    call sub_1844h                   ; 182e     cd 44 18         ;  Draw 16-byte sprite
+    jp c,; 182b     da 37 18         ;  Move on if done
+    call draw_wide_sprite            ; 182e     cd 44 18         ;  Draw 16-byte sprite
     jp l1828h                        ; 1831     c3 28 18         ;  Do all in table
     call one_sec_delay               ; 1834     cd b1 0a         ;  One second delay
 l1837h:                                                         
     ld bc,table_coord_msg_score      ; 1837     01 cf 1d         ;  Coordinate/message for drawing table
-sub_183ah:                                                      
+slow_print_descrs:                                                      
     call read_pri_struct             ; 183a     cd 56 18         ;  Get HL=coordinate, DE=message
     ret c                            ; 183d     d8               ;  Out if done
-    call sub_184ch                   ; 183e     cd 4c 18         ;  Print message
-    jp sub_183ah                     ; 1841     c3 3a 18         ;  Do all in table
-sub_1844h:                                                      
+    call print_msg_slow              ; 183e     cd 4c 18         ;  Print message
+    jp slow_print_descrs                     ; 1841     c3 3a 18         ;  Do all in table
+draw_wide_sprite:                                                      
     push bc                          ; 1844     c5               ;  Hold BC
     ld b,010h                        ; 1845     06 10            ;  16 bytes
     call draw_simp_sprite            ; 1847     cd 39 14         ;  Draw simple
     pop bc                           ; 184a     c1               ;  Restore BC
     ret                              ; 184b     c9               ;  Out
-sub_184ch:                                                      
+print_msg_slow:                                                      
     push bc                          ; 184c     c5               ;  Hold BC
     ld a,(temp206c)                  ; 184d     3a 6c 20         ;  Count of 10 ...
     ld c,a                           ; 1850     4f               ;  ... to C
@@ -4605,20 +4605,20 @@ l18d4h:
 init:                                                           
     ld sp,02400h                     ; 18d4     31 00 24         ;  Set stack pointer just below screen
     ld b,000h                        ; 18d7     06 00            ;  Count 256 bytes
-    call sub_01e6h                   ; 18d9     cd e6 01         ;  Copy ROM to RAM
+    call copy_rom_to_ram             ; 18d9     cd e6 01         ;  Copy ROM to RAM
     call draw_status                 ; 18dc     cd 56 19         ;  Print scores and credits
 l18dfh:                                                         
     ld a,008h                        ; 18df     3e 08            ;  Set alien ...
     ld (a_shot_reload_rate),a        ; 18e1     32 cf 20         ;  ... shot reload rate
     jp l0aeah                        ; 18e4     c3 ea 0a         ;  Top of splash screen loop
-sub_18e7h:                                                      
+get_player_alive_ptr:                                                      
     ld a,(player_data_msb)           ; 18e7     3a 67 20         ;  Player data MSB
     ld hl,player1alive               ; 18ea     21 e7 20         ;  Alive flags (player 1 and 2)
     rrca                             ; 18ed     0f               ;  Bit 1=1 for player 1
     ret nc                           ; 18ee     d0               ;  Player 2 ... we have it ... out
     inc hl                           ; 18ef     23               ;  Player 1's flag
     ret                              ; 18f0     c9               ;  Done
-sub_18f1h:                                                      
+get_delta_x:                                                      
     ld b,002h                        ; 18f1     06 02            ;  Rack moving right delta X
     ld a,(num_aliens)                ; 18f3     3a 82 20         ;  Number of aliens on screen
     dec a                            ; 18f6     3d               ;  Just one left?
@@ -4654,10 +4654,10 @@ draw_score_head:
     ld hl,0241eh                     ; 191c     21 1e 24         ;  Screen coordinates
     ld de,msg_score_header           ; 191f     11 e4 1a         ;  Score header message
     jp print_message                 ; 1922     c3 f3 08         ;  Print score header
-sub_1925h:                                                      
+print_player_one_score:                                                      
     ld hl,p1scor_l                   ; 1925     21 f8 20         ;  Player 1 score descriptor
     jp draw_score                    ; 1928     c3 31 19         ;  Print score
-sub_192bh:                                                      
+print_player_two_score:                                                      
     ld hl,p2scor_l                   ; 192b     21 fc 20         ;  Player 2 score descriptor
     jp draw_score                    ; 192e     c3 31 19         ;  Print score
 sub_1931h:                                                      
@@ -4671,7 +4671,7 @@ draw_score:
     ld h,(hl)                        ; 1937     66               ;  Get coordiante MSB
     ld l,a                           ; 1938     6f               ;  Set LSB
     jp print4digits                  ; 1939     c3 ad 09         ;  Print 4 digits in DE
-sub_193ch:                                                      
+print_credit_label:                                                      
     ld c,007h                        ; 193c     0e 07            ;  7 bytes in message
     ld hl,03501h                     ; 193e     21 01 35         ;  Screen coordinates
     ld de,msg_credit                 ; 1941     11 a9 1f         ;  Message = "CREDIT "
@@ -4689,10 +4689,10 @@ sub_1956h:
 draw_status:                                                    
     call clear_screen                ; 1956     cd 5c 1a         ;  Clear the screen
     call draw_score_head             ; 1959     cd 1a 19         ;  Print score header
-    call sub_1925h                   ; 195c     cd 25 19         ;  Print player 1 score
-    call sub_192bh                   ; 195f     cd 2b 19         ;  Print player 2 score
+    call print_player_one_score      ; 195c     cd 25 19         ;  Print player 1 score
+    call print_player_two_score      ; 195f     cd 2b 19         ;  Print player 2 score
     call print_hi_score              ; 1962     cd 50 19         ;  Print hi score
-    call sub_193ch                   ; 1965     cd 3c 19         ;  Print credit lable
+    call print_credit_label          ; 1965     cd 3c 19         ;  Print credit lable
     jp draw_num_credits              ; 1968     c3 47 19         ;  Number of credits
 l196bh:                                                         
     call sound_bits3off              ; 196b     cd dc 19         ;  From 170B with B=FB. Turn off player shot sound
@@ -4701,20 +4701,20 @@ l1971h:
     ld a,001h                        ; 1971     3e 01            ;  Set flag that ...
     ld (invaded),a                   ; 1973     32 6d 20         ;  ... aliens reached bottom of screen
     jp l16e6h                        ; 1976     c3 e6 16         ;  End of round
-sub_1979h:                                                      
+suspend_game_tasks:                                                      
     call dsable_game_tasks           ; 1979     cd d7 19         ;  Disable ISR game tasks
     call draw_num_credits            ; 197c     cd 47 19         ;  Display number of credits on screen
-    jp sub_193ch                     ; 197f     c3 3c 19         ;  Print message "CREDIT"
-sub_1982h:                                                      
+    jp print_credit_label            ; 197f     c3 3c 19         ;  Print message "CREDIT"
+control_isr_splash_from_acc:                                                      
     ld (isr_splash_task),a           ; 1982     32 c1 20         ;  Set ISR splash task
     ret                              ; 1985     c9               ;  Done
     adc a,e                          ; 1986     8b               ;  Points to print TAITO CORPORATION message ... not sure why
     add hl,de                        ; 1987     19              
-sub_1988h:                                                      
+clear_playfield_taito_msg:                                                      
     jp clear_play_field              ; 1988     c3 d6 09         ;  Clear playfield and out
     ld hl,02803h                     ; 198b     21 03 28         ;  Screen coordinates
-    ld de,d_end                      ; 198e     11 be 19         ;  Message "*TAITO CORPORATION*"
-    ld c,013h                        ; 1991     0e 13            ;  Messgae length
+    ld de,msg_taito_corporation      ; 198e     11 be 19         ;  Message "*TAITO CORPORATION*"
+    ld c,013h                        ; 1991     0e 13            ;  Message length
     jp print_message                 ; 1993     c3 f3 08         ;  Print message
     nop                              ; 1996     00               ;  ** Why?
     nop                              ; 1997     00              
@@ -4744,6 +4744,7 @@ d_end:
                                                                 
 ; BLOCK 'e' (start 0x19be end 0x19d1)                           
 e_first:                                                        
+msg_taito_corporation:
     defb 028h                        ; 19be     28              
     defb 013h                        ; 19bf     13              
     defb 000h                        ; 19c0     00              
@@ -4787,7 +4788,7 @@ sound_bits3off:
 sub_19e6h:                                                      
 draw_num_ships:                                                 
     ld hl,02701h                     ; 19e6     21 01 27         ;  Screen coordinates
-    jp z,sub_19fah                   ; 19e9     ca fa 19         ;  None in reserve ... skip display
+    jp z,erase_ship_stash            ; 19e9     ca fa 19         ;  None in reserve ... skip display
 l19ech:                                                         
     ld de,sprite_player              ; 19ec     11 60 1c         ;  Player sprite
     ld b,010h                        ; 19ef     06 10            ;  16 rows
@@ -4796,12 +4797,12 @@ l19ech:
     ld a,c                           ; 19f5     79               ;  Restore remaining
     dec a                            ; 19f6     3d               ;  All done?
     jp nz,l19ech                     ; 19f7     c2 ec 19         ;  No ... keep going
-sub_19fah:                                                      
+erase_ship_stash:                                                      
     ld b,010h                        ; 19fa     06 10            ;  16 rows
     call clear_small_sprite          ; 19fc     cd cb 14         ;  Clear 1byte sprite at HL
     ld a,h                           ; 19ff     7c               ;  Get Y coordinate
     cp 035h                          ; 1a00     fe 35            ;  At edge?
-    jp nz,sub_19fah                  ; 1a02     c2 fa 19         ;  No ... do all
+    jp nz,erase_ship_stash           ; 1a02     c2 fa 19         ;  No ... do all
     ret                              ; 1a05     c9               ;  Out
 sub_1a06h:                                                      
 comp_yto_beam:                                                  
@@ -4928,7 +4929,7 @@ l1a6bh:
     ret                              ; 1a7e     c9              
 sub_1a7fh:                                                      
 remove_ship:                                                    
-    call sub_092eh                   ; 1a7f     cd 2e 09         ;  Get last byte from player data
+    call get_num_ships_active_player ; 1a7f     cd 2e 09         ;  Get last byte from player data
     and a                            ; 1a82     a7               ;  Is it 0?
     ret z                            ; 1a83     c8               ;  Skip
     push af                          ; 1a84     f5               ;  Preserve number remaining
@@ -4936,10 +4937,10 @@ remove_ship:
     ld (hl),a                        ; 1a86     77               ;  New number of ships
     call draw_num_ships              ; 1a87     cd e6 19         ;  Draw the line of ships
     pop af                           ; 1a8a     f1               ;  Restore number
-sub_1a8bh:                                                      
+print_num_ships_in_acc:                                                      
     ld hl,02501h                     ; 1a8b     21 01 25         ;  Screen coordinates
     and 00fh                         ; 1a8e     e6 0f            ;  Make sure it is a digit
-    jp sub_09c5h                     ; 1a90     c3 c5 09         ;  Print number remaining
+    jp draw_digit_in_acc                     ; 1a90     c3 c5 09         ;  Print number remaining
 i_end:                                                          
                                                                 
 ; BLOCK 'g' (start 0x1a93 end 0x1fff)                           
@@ -6477,6 +6478,7 @@ alien_pos_lsb:                 equ 0200bh                        ; 0200bh 0200b 
 rack_direction:                equ 0200dh                        ; 0200dh 0200d                                                                 defb 000h ; 1b0d 00  
 rack_down_delta:               equ 0200eh                        ; 0200eh 0200e                                                                 defb 0f8h ; 1b0e f8  
                                                                  ; 0200fh 0200f                                                                 defb 000h ; 1b0f 00  
+
                                                                  ; 02010h 02010    ; @ first game object active player                          defb 000h ; 1b10 00  restore_player_struct:                                      
 obj0timer_lsb:                 equ 02011h                        ; 02011h 02011                                                                 defb 080h ; 1b11 80  
 obj0timer_extra:               equ 02012h                        ; 02012h 02012                                                                 defb 000h ; 1b12 00  
@@ -6493,6 +6495,7 @@ player_xr:                     equ 0201bh                        ; 0201bh 0201b 
 next_demo_cmd:                 equ 0201dh                        ; 0201dh 0201d                                                                 defb 001h ; 1b1d 01  
 hid_mess_seq:                  equ 0201eh                        ; 0201eh 0201e                                                                 defb 000h ; 1b1e 00  
                                                                  ; 0201fh 0201f                                                                 defb 000h ; 1b1f 00  
+
                                                                  ; 02020h 02020    ; @ game object table                                        defb 000h ; 1b20 00  
                                                                  ; 02021h 02021                                                                 defb 000h ; 1b21 00  
                                                                  ; 02022h 02022                                                                 defb 000h ; 1b22 00  
@@ -6509,6 +6512,7 @@ shot_delta_x:                  equ 0202ch                        ; 0202ch 0202c 
 fire_bounce:                   equ 0202dh                        ; 0202dh 0202d                                                                 defb 000h ; 1b2d 00  
                                                                  ; 0202eh 0202e                                                                 defb 0ffh ; 1b2e ff  
                                                                  ; 0202fh 0202f                                                                 defb 0ffh ; 1b2f ff  
+
                                                                  ; 02030h 02030    ; @ reload object structure from rom                         defb 000h ; 1b30 00  l1b30h:                                                     
                                                                  ; 02031h 02031                                                                 defb 000h ; 1b31 00  
 obj2timer_extra:               equ 02032h                        ; 02032h 02032                                                                 defb 002h ; 1b32 02  l1b32h:                                                     
@@ -6525,6 +6529,7 @@ rol_shot_cfir_lsb:             equ 02038h                        ; 02038h 02038 
                                                                  ; 0203dh 0203d                                                                 defb 000h ; 1b3d 00  
                                                                  ; 0203eh 0203e                                                                 defb 000h ; 1b3e 00  
                                                                  ; 0203fh 0203f                                                                 defb 003h ; 1b3f 03  
+
                                                                  ; 02040h 02040    ; @ reload object structure from rom                         defb 000h ; 1b40 00  l1b40h:                                                     
                                                                  ; 02041h 02041                                                                 defb 000h ; 1b41 00  
                                                                  ; 02042h 02042                                                                 defb 000h ; 1b42 00  
@@ -6541,6 +6546,7 @@ plu_shot_cfir_lsb:             equ 02048h                        ; 02048h 02048 
                                                                  ; 0204dh 0204d                                                                 defb 000h ; 1b4d 00  
                                                                  ; 0204eh 0204e                                                                 defb 000h ; 1b4e 00  
                                                                  ; 0204fh 0204f                                                                 defb 003h ; 1b4f 03  
+
                                                                  ; 02050h 02050    ; squiggly shot ram info                                     defb 000h ; 1b50 00  l1b50h:                                                     
                                                                  ; 02051h 02051                                                                 defb 000h ; 1b51 00  
                                                                  ; 02052h 02052                                                                 defb 000h ; 1b52 00  
@@ -6557,6 +6563,7 @@ squ_shot_cfir_lsb:             equ 02058h                        ; 02058h 02058 
                                                                  ; 0205dh 0205d                                                                 defb 000h ; 1b5d 00  
                                                                  ; 0205eh 0205e                                                                 defb 000h ; 1b5e 00  
                                                                  ; 0205fh 0205f                                                                 defb 003h ; 1b5f 03  
+
                                                                  ; 02060h 02060                                                                 defb 0ffh ; 1b60 ff  
 collision:                     equ 02061h                        ; 02061h 02061                                                                 defb 000h ; 1b61 00  
                                                                  ; 02062h 02062    ; e ; descriptor ; exploding alien                           defb 0c0h ; 1b62 c0  
