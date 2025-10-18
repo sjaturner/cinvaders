@@ -284,7 +284,7 @@ move_ref_alien:
     ld c,(hl)                        ; 01ab     4e               ;  Load DX into C
     ld (hl),000h                     ; 01ac     36 00            ;  Set DX to 0
     call add_delta                   ; 01ae     cd d9 01         ;  Move alien
-    ld hl,02005h                     ; 01b1     21 05 20         ;  Alien animation frame number
+    ld hl,alien_ani_frame_number     ; 01b1     21 05 20         ;  Alien animation frame number
     ld a,(hl)                        ; 01b4     7e               ;  Toggle ...
     inc a                            ; 01b5     3c               ;  ... animation ...
     and 001h                         ; 01b6     e6 01            ;  ... number between ...
@@ -5164,7 +5164,7 @@ l1b48h:
     defb 000h                        ; 1b4d     00              
     defb 000h                        ; 1b4e     00              
     defb 003h                        ; 1b4f     03              
-l1b50h:                                                         
+l1b50h:                                                         ; squiggly shot rom info
     defb 000h                        ; 1b50     00              
     defb 000h                        ; 1b51     00              
     defb 000h                        ; 1b52     00              
@@ -5280,7 +5280,7 @@ l1bb0h:
     defb 000h                        ; 1bbc     00              
     defb 000h                        ; 1bbd     00              
     defb 000h                        ; 1bbe     00              
-    defb 000h                        ; 1bbf     00              
+    defb 000h                        ; 1bbf     00               ; last byte of ram mirror
 l1bc0h:                                                         
     defb 000h                        ; 1bc0     00              
     defb 010h                        ; 1bc1     10              
@@ -6461,104 +6461,771 @@ msg_push:
 g_end:                                                          
     nop                              ; 1fff     00              
                                                                 
-wait_on_draw:                  equ 02000h                       
-alien_is_exploding:            equ 02002h                       
-exp_alien_timer:               equ 02003h                       
-alien_row:                     equ 02004h                       
-alien_cur_index:               equ 02006h                       
-ref_alien_dyr:                 equ 02007h                       
-ref_alien_dxr:                 equ 02008h                       
-ref_alien_yr:                  equ 02009h                       
-ref_alien_xr:                  equ 0200ah                       
-alien_pos_lsb:                 equ 0200bh                       
-rack_direction:                equ 0200dh                       
-rack_down_delta:               equ 0200eh                       
-obj0timer_lsb:                 equ 02011h                       
-obj0timer_extra:               equ 02012h                       
-player_alive:                  equ 02015h                       
-plyr_spr_pic_l:                equ 02018h                       
-player_yr:                     equ 0201ah                       
-player_xr:                     equ 0201bh                       
-next_demo_cmd:                 equ 0201dh                       
-hid_mess_seq:                  equ 0201eh                       
-plyr_shot_status:              equ 02025h                       
-obj1coor_yr:                   equ 02029h                       
-obj1coor_xr:                   equ 0202ah                       
-shot_delta_x:                  equ 0202ch                       
-fire_bounce:                   equ 0202dh                       
-obj2timer_extra:               equ 02032h                       
-rol_shot_step_cnt:             equ 02036h                       
-rol_shot_cfir_lsb:             equ 02038h                       
-plu_shot_step_cnt:             equ 02046h                       
-plu_shot_cfir_lsb:             equ 02048h                       
-squ_shot_status:               equ 02055h                       
-squ_shot_step_cnt:             equ 02056h                       
-squ_shot_cfir_lsb:             equ 02058h                       
-collision:                     equ 02061h                       
-exp_alien_yr:                  equ 02064h                       
-player_data_msb:               equ 02067h                       
-player_ok:                     equ 02068h                       
-enable_alien_fire:             equ 02069h                       
-alien_fire_delay:              equ 0206ah                       
-temp206c:                      equ 0206ch                       
-invaded:                       equ 0206dh                       
-skip_plunger:                  equ 0206eh                       
-other_shot1:                   equ 02070h                       
-other_shot2:                   equ 02071h                       
-vblank_status:                 equ 02072h                       
-a_shot_status:                 equ 02073h                       
-a_shot_cfir_lsb:               equ 02076h                       
-a_shot_blow_cnt:               equ 02078h                       
-a_shot_image_lsb:              equ 02079h                       
-alien_shot_yr:                 equ 0207bh                       
-alien_shot_size:               equ 0207dh                       
-alien_shot_delta:              equ 0207eh                       
-shot_pic_end:                  equ 0207fh                       
-shot_sync:                     equ 02080h                       
-tmp2081:                       equ 02081h                       
-num_aliens:                    equ 02082h                       
-saucer_start:                  equ 02083h                       
-saucer_active:                 equ 02084h                       
-saucer_hit:                    equ 02085h                       
-saucer_pri_loc_lsb:            equ 02087h                       
-saucer_pri_pic_msb:            equ 0208ah                       
-sau_score_lsb:                 equ 0208dh                       
-shot_count_lsb:                equ 0208fh                       
-till_saucer_lsb:               equ 02091h                       
-wait_start_loop:               equ 02093h                       
-sound_port3:                   equ 02094h                       
-change_fleet_snd:              equ 02095h                       
-fleet_snd_reload:              equ 02097h                       
-sound_port5:                   equ 02098h                       
-extra_hold:                    equ 02099h                       
-tilt:                          equ 0209ah                       
-fleet_snd_hold:                equ 0209bh                       
-isr_delay:                     equ 020c0h                       
-isr_splash_task:               equ 020c1h                       
-splash_an_form:                equ 020c2h                       
-splash_image_lsb:              equ 020c7h                       
-splash_target_y:               equ 020cah                       
-splash_reached:                equ 020cbh                       
-splash_im_rest_lsb:            equ 020cch                       
-two_players:                   equ 020ceh                       
-a_shot_reload_rate:            equ 020cfh                       
-player1ex:                     equ 020e5h                       
-player1alive:                  equ 020e7h                       
-suspend_play:                  equ 020e9h                       
-coin_switch:                   equ 020eah                       
-num_coins:                     equ 020ebh                       
-splash_animate:                equ 020ech                       
-demo_cmd_ptr_lsb:              equ 020edh                       
-game_mode:                     equ 020efh                       
-adjust_score_data:             equ 020f1h                       
-score_delta_lsb:               equ 020f2h                       
-p1scor_l:                      equ 020f8h                       
-p2scor_l:                      equ 020fch                       
-p1ref_alien_dx:                equ 021fbh                       
-p1ref_alien_y:                 equ 021fch                       
-p1rack_cnt:                    equ 021feh                       
-p1ships_rem:                   equ 021ffh                       
-p2ref_alien_dx:                equ 022fbh                       
-p2ref_alien_yr:                equ 022fch                       
-p2rack_cnt:                    equ 022feh                       
-p2ships_rem:                   equ 022ffh                       
+wait_on_draw:                  equ 02000h                        ; 02000h 02000    ; from here is copied from rom at rammirror                  defb 001h ; 1b00 01  rammirror:                                                  
+                                                                 ; 02001h 02001                                                                 defb 000h ; 1b01 00  
+alien_is_exploding:            equ 02002h                        ; 02002h 02002                                                                 defb 000h ; 1b02 00  
+exp_alien_timer:               equ 02003h                        ; 02003h 02003                                                                 defb 010h ; 1b03 10  
+alien_row:                     equ 02004h                        ; 02004h 02004                                                                 defb 000h ; 1b04 00  
+alien_ani_frame_number:        equ 02005h                        ; 02005h 02005    ; alien animation frame number                               defb 000h ; 1b05 00  
+alien_cur_index:               equ 02006h                        ; 02006h 02006                                                                 defb 000h ; 1b06 00  
+ref_alien_dyr:                 equ 02007h                        ; 02007h 02007                                                                 defb 000h ; 1b07 00  
+ref_alien_dxr:                 equ 02008h                        ; 02008h 02008                                                                 defb 002h ; 1b08 02  
+ref_alien_yr:                  equ 02009h                        ; 02009h 02009                                                                 defb 078h ; 1b09 78  
+ref_alien_xr:                  equ 0200ah                        ; 0200ah 0200a                                                                 defb 038h ; 1b0a 38  
+alien_pos_lsb:                 equ 0200bh                        ; 0200bh 0200b                                                                 defb 078h ; 1b0b 78  
+                                                                 ; 0200ch 0200c                                                                 defb 038h ; 1b0c 38  
+rack_direction:                equ 0200dh                        ; 0200dh 0200d                                                                 defb 000h ; 1b0d 00  
+rack_down_delta:               equ 0200eh                        ; 0200eh 0200e                                                                 defb 0f8h ; 1b0e f8  
+                                                                 ; 0200fh 0200f                                                                 defb 000h ; 1b0f 00  
+                                                                 ; 02010h 02010    ; @ first game object active player                          defb 000h ; 1b10 00  restore_player_struct:                                      
+obj0timer_lsb:                 equ 02011h                        ; 02011h 02011                                                                 defb 080h ; 1b11 80  
+obj0timer_extra:               equ 02012h                        ; 02012h 02012                                                                 defb 000h ; 1b12 00  
+                                                                 ; 02013h 02013                                                                 defb 08eh ; 1b13 8e  
+                                                                 ; 02014h 02014                                                                 defb 002h ; 1b14 02  
+player_alive:                  equ 02015h                        ; 02015h 02015                                                                 defb 0ffh ; 1b15 ff  
+                                                                 ; 02016h 02016                                                                 defb 005h ; 1b16 05  
+                                                                 ; 02017h 02017                                                                 defb 00ch ; 1b17 0c  
+plyr_spr_pic_l:                equ 02018h                        ; 02018h 02018    e ; descriptor                                               defb 060h ; 1b18 60  
+                                                                 ; 02019h 02019    d                                                            defb 01ch ; 1b19 1c  
+player_yr:                     equ 0201ah                        ; 0201ah 0201a    l                                                            defb 020h ; 1b1a 20  
+player_xr:                     equ 0201bh                        ; 0201bh 0201b    h                                                            defb 030h ; 1b1b 30  
+                                                                 ; 0201ch 0201c    b                                                            defb 010h ; 1b1c 10  
+next_demo_cmd:                 equ 0201dh                        ; 0201dh 0201d                                                                 defb 001h ; 1b1d 01  
+hid_mess_seq:                  equ 0201eh                        ; 0201eh 0201e                                                                 defb 000h ; 1b1e 00  
+                                                                 ; 0201fh 0201f                                                                 defb 000h ; 1b1f 00  
+                                                                 ; 02020h 02020    ; @ game object table                                        defb 000h ; 1b20 00  
+                                                                 ; 02021h 02021                                                                 defb 000h ; 1b21 00  
+                                                                 ; 02022h 02022                                                                 defb 000h ; 1b22 00  
+                                                                 ; 02023h 02023                                                                 defb 0bbh ; 1b23 bb  
+                                                                 ; 02024h 02024                                                                 defb 003h ; 1b24 03  
+plyr_shot_status:              equ 02025h                        ; 02025h 02025                                                                 defb 000h ; 1b25 00  shot_struct:                                                
+                                                                 ; 02026h 02026                                                                 defb 010h ; 1b26 10  
+                                                                 ; 02027h 02027    e ; descriptor                                               defb 090h ; 1b27 90  
+                                                                 ; 02028h 02028    d                                                            defb 01ch ; 1b28 1c  
+obj1coor_yr:                   equ 02029h                        ; 02029h 02029    l                                                            defb 028h ; 1b29 28  
+obj1coor_xr:                   equ 0202ah                        ; 0202ah 0202a    h                                                            defb 030h ; 1b2a 30  
+                                                                 ; 0202bh 0202b    b                                                            defb 001h ; 1b2b 01  
+shot_delta_x:                  equ 0202ch                        ; 0202ch 0202c                                                                 defb 004h ; 1b2c 04  
+fire_bounce:                   equ 0202dh                        ; 0202dh 0202d                                                                 defb 000h ; 1b2d 00  
+                                                                 ; 0202eh 0202e                                                                 defb 0ffh ; 1b2e ff  
+                                                                 ; 0202fh 0202f                                                                 defb 0ffh ; 1b2f ff  
+                                                                 ; 02030h 02030    ; @ reload object structure from rom                         defb 000h ; 1b30 00  l1b30h:                                                     
+                                                                 ; 02031h 02031                                                                 defb 000h ; 1b31 00  
+obj2timer_extra:               equ 02032h                        ; 02032h 02032                                                                 defb 002h ; 1b32 02  l1b32h:                                                     
+                                                                 ; 02033h 02033                                                                 defb 076h ; 1b33 76  
+                                                                 ; 02034h 02034                                                                 defb 004h ; 1b34 04  
+                                                                 ; 02035h 02035    ; @ rolling shot data structure                              defb 000h ; 1b35 00  
+rol_shot_step_cnt:             equ 02036h                        ; 02036h 02036                                                                 defb 000h ; 1b36 00  
+                                                                 ; 02037h 02037                                                                 defb 000h ; 1b37 00  
+rol_shot_cfir_lsb:             equ 02038h                        ; 02038h 02038                                                                 defb 000h ; 1b38 00  
+                                                                 ; 02039h 02039                                                                 defb 000h ; 1b39 00  
+                                                                 ; 0203ah 0203a                                                                 defb 004h ; 1b3a 04  
+                                                                 ; 0203bh 0203b                                                                 defb 0eeh ; 1b3b ee  
+                                                                 ; 0203ch 0203c                                                                 defb 01ch ; 1b3c 1c  
+                                                                 ; 0203dh 0203d                                                                 defb 000h ; 1b3d 00  
+                                                                 ; 0203eh 0203e                                                                 defb 000h ; 1b3e 00  
+                                                                 ; 0203fh 0203f                                                                 defb 003h ; 1b3f 03  
+                                                                 ; 02040h 02040    ; @ reload object structure from rom                         defb 000h ; 1b40 00  l1b40h:                                                     
+                                                                 ; 02041h 02041                                                                 defb 000h ; 1b41 00  
+                                                                 ; 02042h 02042                                                                 defb 000h ; 1b42 00  
+                                                                 ; 02043h 02043                                                                 defb 0b6h ; 1b43 b6  
+                                                                 ; 02044h 02044                                                                 defb 004h ; 1b44 04  
+                                                                 ; 02045h 02045    ; @ plunger shot data structure                              defb 000h ; 1b45 00  
+plu_shot_step_cnt:             equ 02046h                        ; 02046h 02046                                                                 defb 000h ; 1b46 00  
+                                                                 ; 02047h 02047                                                                 defb 001h ; 1b47 01  
+plu_shot_cfir_lsb:             equ 02048h                        ; 02048h 02048                                                                 defb 000h ; 1b48 00  l1b48h:                                                     
+                                                                 ; 02049h 02049                                                                 defb 01dh ; 1b49 1d  
+                                                                 ; 0204ah 0204a                                                                 defb 004h ; 1b4a 04  
+                                                                 ; 0204bh 0204b                                                                 defb 0e2h ; 1b4b e2  
+                                                                 ; 0204ch 0204c                                                                 defb 01ch ; 1b4c 1c  
+                                                                 ; 0204dh 0204d                                                                 defb 000h ; 1b4d 00  
+                                                                 ; 0204eh 0204e                                                                 defb 000h ; 1b4e 00  
+                                                                 ; 0204fh 0204f                                                                 defb 003h ; 1b4f 03  
+                                                                 ; 02050h 02050    ; squiggly shot ram info                                     defb 000h ; 1b50 00  l1b50h:                                                     
+                                                                 ; 02051h 02051                                                                 defb 000h ; 1b51 00  
+                                                                 ; 02052h 02052                                                                 defb 000h ; 1b52 00  
+                                                                 ; 02053h 02053                                                                 defb 082h ; 1b53 82  
+                                                                 ; 02054h 02054                                                                 defb 006h ; 1b54 06  
+squ_shot_status:               equ 02055h                        ; 02055h 02055                                                                 defb 000h ; 1b55 00  
+squ_shot_step_cnt:             equ 02056h                        ; 02056h 02056                                                                 defb 000h ; 1b56 00  
+                                                                 ; 02057h 02057                                                                 defb 001h ; 1b57 01  
+squ_shot_cfir_lsb:             equ 02058h                        ; 02058h 02058                                                                 defb 006h ; 1b58 06  l1b58h:                                                     
+                                                                 ; 02059h 02059                                                                 defb 01dh ; 1b59 1d  
+                                                                 ; 0205ah 0205a                                                                 defb 004h ; 1b5a 04  
+                                                                 ; 0205bh 0205b                                                                 defb 0d0h ; 1b5b d0  
+                                                                 ; 0205ch 0205c                                                                 defb 01ch ; 1b5c 1c  
+                                                                 ; 0205dh 0205d                                                                 defb 000h ; 1b5d 00  
+                                                                 ; 0205eh 0205e                                                                 defb 000h ; 1b5e 00  
+                                                                 ; 0205fh 0205f                                                                 defb 003h ; 1b5f 03  
+                                                                 ; 02060h 02060                                                                 defb 0ffh ; 1b60 ff  
+collision:                     equ 02061h                        ; 02061h 02061                                                                 defb 000h ; 1b61 00  
+                                                                 ; 02062h 02062    ; e ; descriptor ; exploding alien                           defb 0c0h ; 1b62 c0  
+                                                                 ; 02063h 02063    ; d                                                          defb 01ch ; 1b63 1c  
+exp_alien_yr:                  equ 02064h                        ; 02064h 02064    ; l                                                          defb 000h ; 1b64 00  
+                                                                 ; 02065h 02065    ; h                                                          defb 000h ; 1b65 00  
+                                                                 ; 02066h 02066    ; b                                                          defb 010h ; 1b66 10  
+player_data_msb:               equ 02067h                        ; 02067h 02067                                                                 defb 021h ; 1b67 21  
+player_ok:                     equ 02068h                        ; 02068h 02068                                                                 defb 001h ; 1b68 01  
+enable_alien_fire:             equ 02069h                        ; 02069h 02069                                                                 defb 000h ; 1b69 00  
+alien_fire_delay:              equ 0206ah                        ; 0206ah 0206a                                                                 defb 030h ; 1b6a 30  
+                                                                 ; 0206bh 0206b    ; flag if only one alien left                                defb 000h ; 1b6b 00  
+temp206c:                      equ 0206ch                        ; 0206ch 0206c                                                                 defb 012h ; 1b6c 12  
+invaded:                       equ 0206dh                        ; 0206dh 0206d                                                                 defb 000h ; 1b6d 00  
+skip_plunger:                  equ 0206eh                        ; 0206eh 0206e                                                                 defb 000h ; 1b6e 00  
+                                                                 ; 0206fh 0206f                                                                 defb 000h ; 1b6f 00  
+other_shot1:                   equ 02070h                        ; 02070h 02070                                                                 defb 00fh ; 1b70 0f  msg_play_player_one:                                        
+other_shot2:                   equ 02071h                        ; 02071h 02071                                                                 defb 00bh ; 1b71 0b  
+vblank_status:                 equ 02072h                        ; 02072h 02072                                                                 defb 000h ; 1b72 00  
+a_shot_status:                 equ 02073h                        ; 02073h 02073                                                                 defb 018h ; 1b73 18  
+                                                                 ; 02074h 02074                                                                 defb 026h ; 1b74 26  
+                                                                 ; 02075h 02075                                                                 defb 00fh ; 1b75 0f  
+a_shot_cfir_lsb:               equ 02076h                        ; 02076h 02076                                                                 defb 00bh ; 1b76 0b  
+                                                                 ; 02077h 02077                                                                 defb 000h ; 1b77 00  
+a_shot_blow_cnt:               equ 02078h                        ; 02078h 02078                                                                 defb 018h ; 1b78 18  
+a_shot_image_lsb:              equ 02079h                        ; 02079h 02079    ; e ; descriptor                                             defb 004h ; 1b79 04  
+                                                                 ; 0207ah 0207a    ; d                                                          defb 011h ; 1b7a 11  
+alien_shot_yr:                 equ 0207bh                        ; 0207bh 0207b    ; l                                                          defb 024h ; 1b7b 24  
+                                                                 ; 0207ch 0207c    ; h  ; @ alien shot y? coordinate                            defb 01bh ; 1b7c 1b  
+alien_shot_size:               equ 0207dh                        ; 0207dh 0207d    ; b                                                          defb 025h ; 1b7d 25  
+alien_shot_delta:              equ 0207eh                        ; 0207eh 0207e                                                                 defb 0fch ; 1b7e fc  
+shot_pic_end:                  equ 0207fh                        ; 0207fh 0207f                                                                 defb 000h ; 1b7f 00  
+shot_sync:                     equ 02080h                        ; 02080h 02080                                                                 defb 001h ; 1b80 01  
+tmp2081:                       equ 02081h                        ; 02081h 02081                                                                 defb 0ffh ; 1b81 ff  
+num_aliens:                    equ 02082h                        ; 02082h 02082                                                                 defb 0ffh ; 1b82 ff  
+saucer_start:                  equ 02083h                        ; 02083h 02083                                                                 defb 000h ; 1b83 00  data_for_saucer: +                                          
+saucer_active:                 equ 02084h                        ; 02084h 02084                                                                 defb 000h ; 1b84 00                   |                 
+saucer_hit:                    equ 02085h                        ; 02085h 02085                                                                 defb 000h ; 1b85 00                   |                 
+                                                                 ; 02086h 02086                                                                 defb 020h ; 1b86 20                   |                 
+saucer_pri_loc_lsb:            equ 02087h                        ; 02087h 02087    ; e ; descriptor                                             defb 064h ; 1b87 64                   |                 
+                                                                 ; 02088h 02088    ; d                                                          defb 01dh ; 1b88 1d                   |                 
+                                                                 ; 02089h 02089    ; l                                                          defb 0d0h ; 1b89 d0                   |                 
+saucer_pri_pic_msb:            equ 0208ah                        ; 0208ah 0208a    ; h                                                          defb 029h ; 1b8a 29                   |                 
+                                                                 ; 0208bh 0208b    ; b                                                          defb 018h ; 1b8b 18                   |                 
+                                                                 ; 0208ch 0208c                                                                 defb 002h ; 1b8c 02                   +                 
+sau_score_lsb:                 equ 0208dh                        ; 0208dh 0208d                                                                 defb 054h ; 1b8d 54                                     
+                                                                 ; 0208eh 0208e                                                                 defb 01dh ; 1b8e 1d                                     
+shot_count_lsb:                equ 0208fh                        ; 0208fh 0208f                                                                 defb 000h ; 1b8f 00                                     
+                                                                 ; 02090h 02090                                                                 defb 008h ; 1b90 08                                     
+till_saucer_lsb:               equ 02091h                        ; 02091h 02091                                                                 defb 000h ; 1b91 00                                     
+                                                                 ; 02092h 02092                                                                 defb 006h ; 1b92 06                                     
+wait_start_loop:               equ 02093h                        ; 02093h 02093                                                                 defb 000h ; 1b93 00                                     
+sound_port3:                   equ 02094h                        ; 02094h 02094                                                                 defb 000h ; 1b94 00                                     
+change_fleet_snd:              equ 02095h                        ; 02095h 02095                                                                 defb 001h ; 1b95 01                                     
+                                                                 ; 02096h 02096    ; @ current time on fleet sound                              defb 040h ; 1b96 40                                     
+fleet_snd_reload:              equ 02097h                        ; 02097h 02097                                                                 defb 000h ; 1b97 00                                     
+sound_port5:                   equ 02098h                        ; 02098h 02098                                                                 defb 001h ; 1b98 01                                     
+extra_hold:                    equ 02099h                        ; 02099h 02099                                                                 defb 000h ; 1b99 00                                     
+tilt:                          equ 0209ah                        ; 0209ah 0209a                                                                 defb 000h ; 1b9a 00                                     
+fleet_snd_hold:                equ 0209bh                        ; 0209bh 0209b                                                                 defb 010h ; 1b9b 10                                     
+                                                                 ; 0209ch 0209c                                                                 defb 09eh ; 1b9c 9e  
+                                                                 ; 0209dh 0209d                                                                 defb 000h ; 1b9d 00  
+                                                                 ; 0209eh 0209e                                                                 defb 020h ; 1b9e 20  
+                                                                 ; 0209fh 0209f                                                                 defb 01ch ; 1b9f 1c  
+                                                                 ; 020a0h 020a0                                                                 defb 000h ; 1ba0 00  
+                                                                 ; 020a1h 020a1                                                                 defb 003h ; 1ba1 03  
+                                                                 ; 020a2h 020a2                                                                 defb 004h ; 1ba2 04  
+                                                                 ; 020a3h 020a3                                                                 defb 078h ; 1ba3 78  
+                                                                 ; 020a4h 020a4                                                                 defb 014h ; 1ba4 14  
+                                                                 ; 020a5h 020a5                                                                 defb 013h ; 1ba5 13  
+                                                                 ; 020a6h 020a6                                                                 defb 008h ; 1ba6 08  
+                                                                 ; 020a7h 020a7                                                                 defb 01ah ; 1ba7 1a  
+                                                                 ; 020a8h 020a8                                                                 defb 03dh ; 1ba8 3d  
+                                                                 ; 020a9h 020a9                                                                 defb 068h ; 1ba9 68  
+                                                                 ; 020aah 020aa                                                                 defb 0fch ; 1baa fc  
+                                                                 ; 020abh 020ab                                                                 defb 0fch ; 1bab fc  
+                                                                 ; 020ach 020ac                                                                 defb 068h ; 1bac 68  
+                                                                 ; 020adh 020ad                                                                 defb 03dh ; 1bad 3d  
+                                                                 ; 020aeh 020ae                                                                 defb 01ah ; 1bae 1a  
+                                                                 ; 020afh 020af                                                                 defb 000h ; 1baf 00  
+                                                                 ; 020b0h 020b0                                                                 defb 000h ; 1bb0 00  l1bb0h:                                                     
+                                                                 ; 020b1h 020b1                                                                 defb 000h ; 1bb1 00  
+                                                                 ; 020b2h 020b2                                                                 defb 001h ; 1bb2 01  
+                                                                 ; 020b3h 020b3                                                                 defb 0b8h ; 1bb3 b8  
+                                                                 ; 020b4h 020b4                                                                 defb 098h ; 1bb4 98  
+                                                                 ; 020b5h 020b5                                                                 defb 0a0h ; 1bb5 a0  
+                                                                 ; 020b6h 020b6                                                                 defb 01bh ; 1bb6 1b  
+                                                                 ; 020b7h 020b7                                                                 defb 010h ; 1bb7 10  
+                                                                 ; 020b8h 020b8                                                                 defb 0ffh ; 1bb8 ff  
+                                                                 ; 020b9h 020b9                                                                 defb 000h ; 1bb9 00  
+                                                                 ; 020bah 020ba                                                                 defb 0a0h ; 1bba a0  
+                                                                 ; 020bbh 020bb                                                                 defb 01bh ; 1bbb 1b  
+                                                                 ; 020bch 020bc                                                                 defb 000h ; 1bbc 00  
+                                                                 ; 020bdh 020bd                                                                 defb 000h ; 1bbd 00  
+                                                                 ; 020beh 020be                                                                 defb 000h ; 1bbe 00  
+                                                                 ; 020bfh 020bf    ; up to here is copied from rom at rammirror                 defb 000h ; 1bbf 00  ; last byte of ram mirror                                   
+isr_delay:                     equ 020c0h                        ; 020c0h 020c0    
+isr_splash_task:               equ 020c1h                        ; 020c1h 020c1    
+splash_an_form:                equ 020c2h                        ; 020c2h 020c2    +
+                                                                 ; 020c3h 020c3    |                              
+                                                                 ; 020c4h 020c4    |                              
+                                                                 ; 020c5h 020c5    | @ xy image descriptor
+                                                                 ; 020c6h 020c6    |                              
+splash_image_lsb:              equ 020c7h                        ; 020c7h 020c7    |                                  
+                                                                 ; 020c8h 020c8    |                              
+                                                                 ; 020c9h 020c9    |                              
+splash_target_y:               equ 020cah                        ; 020cah 020ca    |                                  
+splash_reached:                equ 020cbh                        ; 020cbh 020cb    |                                  
+splash_im_rest_lsb:            equ 020cch                        ; 020cch 020cc    |                                  
+                                                                 ; 020cdh 020cd    +                              
+two_players:                   equ 020ceh                        ; 020ceh 020ce                                       
+a_shot_reload_rate:            equ 020cfh                        ; 020cfh 020cf                                       
+                                                                 ; 020d0h 020d0                                   
+                                                                 ; 020d1h 020d1                                   
+                                                                 ; 020d2h 020d2                                   
+                                                                 ; 020d3h 020d3
+                                                                 ; 020d4h 020d4
+                                                                 ; 020d5h 020d5
+                                                                 ; 020d6h 020d6
+                                                                 ; 020d7h 020d7
+                                                                 ; 020d8h 020d8
+                                                                 ; 020d9h 020d9
+                                                                 ; 020dah 020da
+                                                                 ; 020dbh 020db
+                                                                 ; 020dch 020dc
+                                                                 ; 020ddh 020dd
+                                                                 ; 020deh 020de
+                                                                 ; 020dfh 020df
+                                                                 ; 020e0h 020e0
+                                                                 ; 020e1h 020e1
+                                                                 ; 020e2h 020e2
+                                                                 ; 020e3h 020e3
+                                                                 ; 020e4h 020e4
+player1ex:                     equ 020e5h                        ; 020e5h 020e5    
+                                                                 ; 020e6h 020e6
+player1alive:                  equ 020e7h                        ; 020e7h 020e7    
+                                                                 ; 020e8h 020e8
+suspend_play:                  equ 020e9h                        ; 020e9h 020e9    
+coin_switch:                   equ 020eah                        ; 020eah 020ea    
+num_coins:                     equ 020ebh                        ; 020ebh 020eb    
+splash_animate:                equ 020ech                        ; 020ech 020ec    
+demo_cmd_ptr_lsb:              equ 020edh                        ; 020edh 020ed    
+                                                                 ; 020eeh 020ee
+game_mode:                     equ 020efh                        ; 020efh 020ef    
+                                                                 ; 020f0h 020f0
+adjust_score_data:             equ 020f1h                        ; 020f1h 020f1    
+score_delta_lsb:               equ 020f2h                        ; 020f2h 020f2    
+                                                                 ; 020f3h 020f3    ; @ pointer to score delta msb
+                                                                 ; 020f4h 020f4    ; @ hi score descriptor
+                                                                 ; 020f5h 020f5    ; @ current hi score upper two digits
+                                                                 ; 020f6h 020f6
+                                                                 ; 020f7h 020f7
+p1scor_l:                      equ 020f8h                        ; 020f8h 020f8    
+                                                                 ; 020f9h 020f9
+                                                                 ; 020fah 020fa
+                                                                 ; 020fbh 020fb
+p2scor_l:                      equ 020fch                        ; 020fch 020fc    
+                                                                 ; 020fdh 020fd
+                                                                 ; 020feh 020fe
+                                                                 ; 020ffh 020ff
+                                                                 ; 02100h 02100     ; @ start of alien structure this is the last alien @ player one data area start?
+                                                                 ; 02101h 02101
+                                                                 ; 02102h 02102
+                                                                 ; 02103h 02103
+                                                                 ; 02104h 02104
+                                                                 ; 02105h 02105
+                                                                 ; 02106h 02106
+                                                                 ; 02107h 02107
+                                                                 ; 02108h 02108
+                                                                 ; 02109h 02109
+                                                                 ; 0210ah 0210a
+                                                                 ; 0210bh 0210b
+                                                                 ; 0210ch 0210c
+                                                                 ; 0210dh 0210d
+                                                                 ; 0210eh 0210e
+                                                                 ; 0210fh 0210f
+                                                                 ; 02110h 02110
+                                                                 ; 02111h 02111
+                                                                 ; 02112h 02112
+                                                                 ; 02113h 02113
+                                                                 ; 02114h 02114
+                                                                 ; 02115h 02115
+                                                                 ; 02116h 02116
+                                                                 ; 02117h 02117
+                                                                 ; 02118h 02118
+                                                                 ; 02119h 02119
+                                                                 ; 0211ah 0211a
+                                                                 ; 0211bh 0211b
+                                                                 ; 0211ch 0211c
+                                                                 ; 0211dh 0211d
+                                                                 ; 0211eh 0211e
+                                                                 ; 0211fh 0211f
+                                                                 ; 02120h 02120
+                                                                 ; 02121h 02121
+                                                                 ; 02122h 02122
+                                                                 ; 02123h 02123
+                                                                 ; 02124h 02124
+                                                                 ; 02125h 02125
+                                                                 ; 02126h 02126
+                                                                 ; 02127h 02127
+                                                                 ; 02128h 02128
+                                                                 ; 02129h 02129
+                                                                 ; 0212ah 0212a
+                                                                 ; 0212bh 0212b
+                                                                 ; 0212ch 0212c
+                                                                 ; 0212dh 0212d
+                                                                 ; 0212eh 0212e
+                                                                 ; 0212fh 0212f
+                                                                 ; 02130h 02130
+                                                                 ; 02131h 02131
+                                                                 ; 02132h 02132
+                                                                 ; 02133h 02133
+                                                                 ; 02134h 02134
+                                                                 ; 02135h 02135
+                                                                 ; 02136h 02136
+                                                                 ; 02137h 02137
+                                                                 ; 02138h 02138
+                                                                 ; 02139h 02139
+                                                                 ; 0213ah 0213a
+                                                                 ; 0213bh 0213b
+                                                                 ; 0213ch 0213c
+                                                                 ; 0213dh 0213d
+                                                                 ; 0213eh 0213e
+                                                                 ; 0213fh 0213f
+                                                                 ; 02140h 02140
+                                                                 ; 02141h 02141
+                                                                 ; 02142h 02142     ; @ player one shield buffer
+                                                                 ; 02143h 02143
+                                                                 ; 02144h 02144
+                                                                 ; 02145h 02145
+                                                                 ; 02146h 02146
+                                                                 ; 02147h 02147
+                                                                 ; 02148h 02148
+                                                                 ; 02149h 02149
+                                                                 ; 0214ah 0214a
+                                                                 ; 0214bh 0214b
+                                                                 ; 0214ch 0214c
+                                                                 ; 0214dh 0214d
+                                                                 ; 0214eh 0214e
+                                                                 ; 0214fh 0214f
+                                                                 ; 02150h 02150
+                                                                 ; 02151h 02151
+                                                                 ; 02152h 02152
+                                                                 ; 02153h 02153
+                                                                 ; 02154h 02154
+                                                                 ; 02155h 02155
+                                                                 ; 02156h 02156
+                                                                 ; 02157h 02157
+                                                                 ; 02158h 02158
+                                                                 ; 02159h 02159
+                                                                 ; 0215ah 0215a
+                                                                 ; 0215bh 0215b
+                                                                 ; 0215ch 0215c
+                                                                 ; 0215dh 0215d
+                                                                 ; 0215eh 0215e
+                                                                 ; 0215fh 0215f
+                                                                 ; 02160h 02160
+                                                                 ; 02161h 02161
+                                                                 ; 02162h 02162
+                                                                 ; 02163h 02163
+                                                                 ; 02164h 02164
+                                                                 ; 02165h 02165
+                                                                 ; 02166h 02166
+                                                                 ; 02167h 02167
+                                                                 ; 02168h 02168
+                                                                 ; 02169h 02169
+                                                                 ; 0216ah 0216a
+                                                                 ; 0216bh 0216b
+                                                                 ; 0216ch 0216c
+                                                                 ; 0216dh 0216d
+                                                                 ; 0216eh 0216e
+                                                                 ; 0216fh 0216f
+                                                                 ; 02170h 02170
+                                                                 ; 02171h 02171
+                                                                 ; 02172h 02172
+                                                                 ; 02173h 02173
+                                                                 ; 02174h 02174
+                                                                 ; 02175h 02175
+                                                                 ; 02176h 02176
+                                                                 ; 02177h 02177
+                                                                 ; 02178h 02178
+                                                                 ; 02179h 02179
+                                                                 ; 0217ah 0217a
+                                                                 ; 0217bh 0217b
+                                                                 ; 0217ch 0217c
+                                                                 ; 0217dh 0217d
+                                                                 ; 0217eh 0217e
+                                                                 ; 0217fh 0217f
+                                                                 ; 02180h 02180
+                                                                 ; 02181h 02181
+                                                                 ; 02182h 02182
+                                                                 ; 02183h 02183
+                                                                 ; 02184h 02184
+                                                                 ; 02185h 02185
+                                                                 ; 02186h 02186
+                                                                 ; 02187h 02187
+                                                                 ; 02188h 02188
+                                                                 ; 02189h 02189
+                                                                 ; 0218ah 0218a
+                                                                 ; 0218bh 0218b
+                                                                 ; 0218ch 0218c
+                                                                 ; 0218dh 0218d
+                                                                 ; 0218eh 0218e
+                                                                 ; 0218fh 0218f
+                                                                 ; 02190h 02190
+                                                                 ; 02191h 02191
+                                                                 ; 02192h 02192
+                                                                 ; 02193h 02193
+                                                                 ; 02194h 02194
+                                                                 ; 02195h 02195
+                                                                 ; 02196h 02196
+                                                                 ; 02197h 02197
+                                                                 ; 02198h 02198
+                                                                 ; 02199h 02199
+                                                                 ; 0219ah 0219a
+                                                                 ; 0219bh 0219b
+                                                                 ; 0219ch 0219c
+                                                                 ; 0219dh 0219d
+                                                                 ; 0219eh 0219e
+                                                                 ; 0219fh 0219f
+                                                                 ; 021a0h 021a0
+                                                                 ; 021a1h 021a1
+                                                                 ; 021a2h 021a2
+                                                                 ; 021a3h 021a3
+                                                                 ; 021a4h 021a4
+                                                                 ; 021a5h 021a5
+                                                                 ; 021a6h 021a6
+                                                                 ; 021a7h 021a7
+                                                                 ; 021a8h 021a8
+                                                                 ; 021a9h 021a9
+                                                                 ; 021aah 021aa
+                                                                 ; 021abh 021ab
+                                                                 ; 021ach 021ac
+                                                                 ; 021adh 021ad
+                                                                 ; 021aeh 021ae
+                                                                 ; 021afh 021af
+                                                                 ; 021b0h 021b0
+                                                                 ; 021b1h 021b1
+                                                                 ; 021b2h 021b2
+                                                                 ; 021b3h 021b3
+                                                                 ; 021b4h 021b4
+                                                                 ; 021b5h 021b5
+                                                                 ; 021b6h 021b6
+                                                                 ; 021b7h 021b7
+                                                                 ; 021b8h 021b8
+                                                                 ; 021b9h 021b9
+                                                                 ; 021bah 021ba
+                                                                 ; 021bbh 021bb
+                                                                 ; 021bch 021bc
+                                                                 ; 021bdh 021bd
+                                                                 ; 021beh 021be
+                                                                 ; 021bfh 021bf
+                                                                 ; 021c0h 021c0
+                                                                 ; 021c1h 021c1
+                                                                 ; 021c2h 021c2
+                                                                 ; 021c3h 021c3
+                                                                 ; 021c4h 021c4
+                                                                 ; 021c5h 021c5
+                                                                 ; 021c6h 021c6
+                                                                 ; 021c7h 021c7
+                                                                 ; 021c8h 021c8
+                                                                 ; 021c9h 021c9
+                                                                 ; 021cah 021ca
+                                                                 ; 021cbh 021cb
+                                                                 ; 021cch 021cc
+                                                                 ; 021cdh 021cd
+                                                                 ; 021ceh 021ce
+                                                                 ; 021cfh 021cf
+                                                                 ; 021d0h 021d0
+                                                                 ; 021d1h 021d1
+                                                                 ; 021d2h 021d2
+                                                                 ; 021d3h 021d3
+                                                                 ; 021d4h 021d4
+                                                                 ; 021d5h 021d5
+                                                                 ; 021d6h 021d6
+                                                                 ; 021d7h 021d7
+                                                                 ; 021d8h 021d8
+                                                                 ; 021d9h 021d9
+                                                                 ; 021dah 021da
+                                                                 ; 021dbh 021db
+                                                                 ; 021dch 021dc
+                                                                 ; 021ddh 021dd
+                                                                 ; 021deh 021de
+                                                                 ; 021dfh 021df
+                                                                 ; 021e0h 021e0
+                                                                 ; 021e1h 021e1
+                                                                 ; 021e2h 021e2
+                                                                 ; 021e3h 021e3
+                                                                 ; 021e4h 021e4
+                                                                 ; 021e5h 021e5
+                                                                 ; 021e6h 021e6
+                                                                 ; 021e7h 021e7
+                                                                 ; 021e8h 021e8
+                                                                 ; 021e9h 021e9
+                                                                 ; 021eah 021ea
+                                                                 ; 021ebh 021eb
+                                                                 ; 021ech 021ec
+                                                                 ; 021edh 021ed
+                                                                 ; 021eeh 021ee
+                                                                 ; 021efh 021ef
+                                                                 ; 021f0h 021f0
+                                                                 ; 021f1h 021f1
+                                                                 ; 021f2h 021f2
+                                                                 ; 021f3h 021f3
+                                                                 ; 021f4h 021f4
+                                                                 ; 021f5h 021f5
+                                                                 ; 021f6h 021f6
+                                                                 ; 021f7h 021f7
+                                                                 ; 021f8h 021f8
+                                                                 ; 021f9h 021f9
+                                                                 ; 021fah 021fa
+p1ref_alien_dx:                equ 021fbh                        ; 021fbh 021fb    
+p1ref_alien_y:                 equ 021fch                        ; 021fch 021fc    
+                                                                 ; 021fdh 021fd
+p1rack_cnt:                    equ 021feh                        ; 021feh 021fe    
+p1ships_rem:                   equ 021ffh                        ; 021ffh 021ff    
+                                                                 ; 02200h 02200     ; @ player two data area
+                                                                 ; 02201h 02201
+                                                                 ; 02202h 02202
+                                                                 ; 02203h 02203
+                                                                 ; 02204h 02204
+                                                                 ; 02205h 02205
+                                                                 ; 02206h 02206
+                                                                 ; 02207h 02207
+                                                                 ; 02208h 02208
+                                                                 ; 02209h 02209
+                                                                 ; 0220ah 0220a
+                                                                 ; 0220bh 0220b
+                                                                 ; 0220ch 0220c
+                                                                 ; 0220dh 0220d
+                                                                 ; 0220eh 0220e
+                                                                 ; 0220fh 0220f
+                                                                 ; 02210h 02210
+                                                                 ; 02211h 02211
+                                                                 ; 02212h 02212
+                                                                 ; 02213h 02213
+                                                                 ; 02214h 02214
+                                                                 ; 02215h 02215
+                                                                 ; 02216h 02216
+                                                                 ; 02217h 02217
+                                                                 ; 02218h 02218
+                                                                 ; 02219h 02219
+                                                                 ; 0221ah 0221a
+                                                                 ; 0221bh 0221b
+                                                                 ; 0221ch 0221c
+                                                                 ; 0221dh 0221d
+                                                                 ; 0221eh 0221e
+                                                                 ; 0221fh 0221f
+                                                                 ; 02220h 02220
+                                                                 ; 02221h 02221
+                                                                 ; 02222h 02222
+                                                                 ; 02223h 02223
+                                                                 ; 02224h 02224
+                                                                 ; 02225h 02225
+                                                                 ; 02226h 02226
+                                                                 ; 02227h 02227
+                                                                 ; 02228h 02228
+                                                                 ; 02229h 02229
+                                                                 ; 0222ah 0222a
+                                                                 ; 0222bh 0222b
+                                                                 ; 0222ch 0222c
+                                                                 ; 0222dh 0222d
+                                                                 ; 0222eh 0222e
+                                                                 ; 0222fh 0222f
+                                                                 ; 02230h 02230
+                                                                 ; 02231h 02231
+                                                                 ; 02232h 02232
+                                                                 ; 02233h 02233
+                                                                 ; 02234h 02234
+                                                                 ; 02235h 02235
+                                                                 ; 02236h 02236
+                                                                 ; 02237h 02237
+                                                                 ; 02238h 02238
+                                                                 ; 02239h 02239
+                                                                 ; 0223ah 0223a
+                                                                 ; 0223bh 0223b
+                                                                 ; 0223ch 0223c
+                                                                 ; 0223dh 0223d
+                                                                 ; 0223eh 0223e
+                                                                 ; 0223fh 0223f
+                                                                 ; 02240h 02240
+                                                                 ; 02241h 02241
+                                                                 ; 02242h 02242     ; @ player two shield buffer
+                                                                 ; 02243h 02243
+                                                                 ; 02244h 02244
+                                                                 ; 02245h 02245
+                                                                 ; 02246h 02246
+                                                                 ; 02247h 02247
+                                                                 ; 02248h 02248
+                                                                 ; 02249h 02249
+                                                                 ; 0224ah 0224a
+                                                                 ; 0224bh 0224b
+                                                                 ; 0224ch 0224c
+                                                                 ; 0224dh 0224d
+                                                                 ; 0224eh 0224e
+                                                                 ; 0224fh 0224f
+                                                                 ; 02250h 02250
+                                                                 ; 02251h 02251
+                                                                 ; 02252h 02252
+                                                                 ; 02253h 02253
+                                                                 ; 02254h 02254
+                                                                 ; 02255h 02255
+                                                                 ; 02256h 02256
+                                                                 ; 02257h 02257
+                                                                 ; 02258h 02258
+                                                                 ; 02259h 02259
+                                                                 ; 0225ah 0225a
+                                                                 ; 0225bh 0225b
+                                                                 ; 0225ch 0225c
+                                                                 ; 0225dh 0225d
+                                                                 ; 0225eh 0225e
+                                                                 ; 0225fh 0225f
+                                                                 ; 02260h 02260
+                                                                 ; 02261h 02261
+                                                                 ; 02262h 02262
+                                                                 ; 02263h 02263
+                                                                 ; 02264h 02264
+                                                                 ; 02265h 02265
+                                                                 ; 02266h 02266
+                                                                 ; 02267h 02267
+                                                                 ; 02268h 02268
+                                                                 ; 02269h 02269
+                                                                 ; 0226ah 0226a
+                                                                 ; 0226bh 0226b
+                                                                 ; 0226ch 0226c
+                                                                 ; 0226dh 0226d
+                                                                 ; 0226eh 0226e
+                                                                 ; 0226fh 0226f
+                                                                 ; 02270h 02270
+                                                                 ; 02271h 02271
+                                                                 ; 02272h 02272
+                                                                 ; 02273h 02273
+                                                                 ; 02274h 02274
+                                                                 ; 02275h 02275
+                                                                 ; 02276h 02276
+                                                                 ; 02277h 02277
+                                                                 ; 02278h 02278
+                                                                 ; 02279h 02279
+                                                                 ; 0227ah 0227a
+                                                                 ; 0227bh 0227b
+                                                                 ; 0227ch 0227c
+                                                                 ; 0227dh 0227d
+                                                                 ; 0227eh 0227e
+                                                                 ; 0227fh 0227f
+                                                                 ; 02280h 02280
+                                                                 ; 02281h 02281
+                                                                 ; 02282h 02282
+                                                                 ; 02283h 02283
+                                                                 ; 02284h 02284
+                                                                 ; 02285h 02285
+                                                                 ; 02286h 02286
+                                                                 ; 02287h 02287
+                                                                 ; 02288h 02288
+                                                                 ; 02289h 02289
+                                                                 ; 0228ah 0228a
+                                                                 ; 0228bh 0228b
+                                                                 ; 0228ch 0228c
+                                                                 ; 0228dh 0228d
+                                                                 ; 0228eh 0228e
+                                                                 ; 0228fh 0228f
+                                                                 ; 02290h 02290
+                                                                 ; 02291h 02291
+                                                                 ; 02292h 02292
+                                                                 ; 02293h 02293
+                                                                 ; 02294h 02294
+                                                                 ; 02295h 02295
+                                                                 ; 02296h 02296
+                                                                 ; 02297h 02297
+                                                                 ; 02298h 02298
+                                                                 ; 02299h 02299
+                                                                 ; 0229ah 0229a
+                                                                 ; 0229bh 0229b
+                                                                 ; 0229ch 0229c
+                                                                 ; 0229dh 0229d
+                                                                 ; 0229eh 0229e
+                                                                 ; 0229fh 0229f
+                                                                 ; 022a0h 022a0
+                                                                 ; 022a1h 022a1
+                                                                 ; 022a2h 022a2
+                                                                 ; 022a3h 022a3
+                                                                 ; 022a4h 022a4
+                                                                 ; 022a5h 022a5
+                                                                 ; 022a6h 022a6
+                                                                 ; 022a7h 022a7
+                                                                 ; 022a8h 022a8
+                                                                 ; 022a9h 022a9
+                                                                 ; 022aah 022aa
+                                                                 ; 022abh 022ab
+                                                                 ; 022ach 022ac
+                                                                 ; 022adh 022ad
+                                                                 ; 022aeh 022ae
+                                                                 ; 022afh 022af
+                                                                 ; 022b0h 022b0
+                                                                 ; 022b1h 022b1
+                                                                 ; 022b2h 022b2
+                                                                 ; 022b3h 022b3
+                                                                 ; 022b4h 022b4
+                                                                 ; 022b5h 022b5
+                                                                 ; 022b6h 022b6
+                                                                 ; 022b7h 022b7
+                                                                 ; 022b8h 022b8
+                                                                 ; 022b9h 022b9
+                                                                 ; 022bah 022ba
+                                                                 ; 022bbh 022bb
+                                                                 ; 022bch 022bc
+                                                                 ; 022bdh 022bd
+                                                                 ; 022beh 022be
+                                                                 ; 022bfh 022bf
+                                                                 ; 022c0h 022c0
+                                                                 ; 022c1h 022c1
+                                                                 ; 022c2h 022c2
+                                                                 ; 022c3h 022c3
+                                                                 ; 022c4h 022c4
+                                                                 ; 022c5h 022c5
+                                                                 ; 022c6h 022c6
+                                                                 ; 022c7h 022c7
+                                                                 ; 022c8h 022c8
+                                                                 ; 022c9h 022c9
+                                                                 ; 022cah 022ca
+                                                                 ; 022cbh 022cb
+                                                                 ; 022cch 022cc
+                                                                 ; 022cdh 022cd
+                                                                 ; 022ceh 022ce
+                                                                 ; 022cfh 022cf
+                                                                 ; 022d0h 022d0
+                                                                 ; 022d1h 022d1
+                                                                 ; 022d2h 022d2
+                                                                 ; 022d3h 022d3
+                                                                 ; 022d4h 022d4
+                                                                 ; 022d5h 022d5
+                                                                 ; 022d6h 022d6
+                                                                 ; 022d7h 022d7
+                                                                 ; 022d8h 022d8
+                                                                 ; 022d9h 022d9
+                                                                 ; 022dah 022da
+                                                                 ; 022dbh 022db
+                                                                 ; 022dch 022dc
+                                                                 ; 022ddh 022dd
+                                                                 ; 022deh 022de
+                                                                 ; 022dfh 022df
+                                                                 ; 022e0h 022e0
+                                                                 ; 022e1h 022e1
+                                                                 ; 022e2h 022e2
+                                                                 ; 022e3h 022e3
+                                                                 ; 022e4h 022e4
+                                                                 ; 022e5h 022e5
+                                                                 ; 022e6h 022e6
+                                                                 ; 022e7h 022e7
+                                                                 ; 022e8h 022e8
+                                                                 ; 022e9h 022e9
+                                                                 ; 022eah 022ea
+                                                                 ; 022ebh 022eb
+                                                                 ; 022ech 022ec
+                                                                 ; 022edh 022ed
+                                                                 ; 022eeh 022ee
+                                                                 ; 022efh 022ef
+                                                                 ; 022f0h 022f0
+                                                                 ; 022f1h 022f1
+                                                                 ; 022f2h 022f2
+                                                                 ; 022f3h 022f3
+                                                                 ; 022f4h 022f4
+                                                                 ; 022f5h 022f5
+                                                                 ; 022f6h 022f6
+                                                                 ; 022f7h 022f7
+                                                                 ; 022f8h 022f8
+                                                                 ; 022f9h 022f9
+                                                                 ; 022fah 022fa
+p2ref_alien_dx:                equ 022fbh                        ; 022fbh 022fb    
+p2ref_alien_yr:                equ 022fch                        ; 022fch 022fc    
+                                                                 ; 022fdh 022fd
+p2rack_cnt:                    equ 022feh                        ; 022feh 022fe    
+p2ships_rem:                   equ 022ffh                        ; 022ffh 022ff    
