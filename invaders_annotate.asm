@@ -5,7 +5,7 @@
                                                                 
                                                                 
 ; BLOCK 'a' (start 0x0000 end 0x0bf7)                           
-a_first:                                                        
+:                                                        
     nop                              ; 0000     00               ;  This provides a slot ...
     nop                              ; 0001     00               ;  ... to put in a JP for ...
     nop                              ; 0002     00               ;  ... development
@@ -13,14 +13,15 @@ a_first:
 l0006h:                                                         
     nop                              ; 0006     00               ;  Padding before fixed ISR address
     nop                              ; 0007     00              
+isr_080h:
     push af                          ; 0008     f5               ;  Save ...
     push bc                          ; 0009     c5               ;  ...
     push de                          ; 000a     d5               ;  ...
     push hl                          ; 000b     e5               ;  ... everything
 l000ch:                                                         
-    jp l008ch                        ; 000c     c3 8c 00         ;  Continue ISR at 8C
+    jp isr_08_continues              ; 000c     c3 8c 00         ;  Continue ISR at 8C
     nop                              ; 000f     00               ;  Padding before fixed ISR address
-l0010h:                                                         
+isr_010h:                                                         
     push af                          ; 0010     f5               ;  Save ...
     push bc                          ; 0011     c5               ;  ...
     push de                          ; 0012     d5               ;  ...
@@ -52,7 +53,7 @@ l003fh:
 l0042h:                                                         
     ld a,(suspend_play)              ; 0042     3a e9 20         ;  Are we moving ...
     and a                            ; 0045     a7               ;  ... game objects?
-    jp z,l0082h                      ; 0046     ca 82 00         ;  No ... restore registers and out
+    jp z,isr_restore_regs_exit       ; 0046     ca 82 00         ;  No ... restore registers and out
     ld a,(game_mode)                 ; 0049     3a ef 20         ;  Are we in ...
     and a                            ; 004c     a7               ;  ... game mode?
     jp nz,l006fh                     ; 004d     c2 6f 00         ;  Yes ... go process game-play things and out
@@ -60,11 +61,11 @@ l0042h:
     and a                            ; 0053     a7               ;  Are there any credits (player standing there)?
     jp nz,l005dh                     ; 0054     c2 5d 00         ;  Yes ... skip any ISR animations for the splash screens
     call isrspl_tasks                ; 0057     cd bf 0a         ;  Process ISR tasks for splash screens
-    jp l0082h                        ; 005a     c3 82 00         ;  Restore registers and out
+    jp isr_restore_regs_exit         ; 005a     c3 82 00         ;  Restore registers and out
 l005dh:                                                         
     ld a,(wait_start_loop)           ; 005d     3a 93 20         ;  Are we in the ...
     and a                            ; 0060     a7               ;  ... "press start" loop?
-    jp nz,l0082h                     ; 0061     c2 82 00         ;  Yes ... restore registers and out
+    jp nz,isr_restore_regs_exit      ; 0061     c2 82 00         ;  Yes ... restore registers and out
     jp wait_for_start                ; 0064     c3 65 07         ;  Start the "press start" loop
 l0067h:                                                         
     ld a,001h                        ; 0067     3e 01            ;  Remember switch ...
@@ -79,7 +80,7 @@ l0072h:
     call run_game_objs               ; 007b     cd 48 02         ;  Process game objects (including player object)
     call time_to_saucer              ; 007e     cd 13 09         ;  Count down time to saucer
     nop                              ; 0081     00               ;  ** Why are we waiting?
-l0082h:                                                         
+isr_restore_regs_exit:                                                         
     pop hl                           ; 0082     e1               ;  Restore ...
     pop de                           ; 0083     d1               ;  ...
     pop bc                           ; 0084     c1               ;  ...
@@ -90,23 +91,23 @@ l0082h:
     nop                              ; 0089     00              
     nop                              ; 008a     00              
     nop                              ; 008b     00              
-l008ch:                                                         
+isr_08_continues:                                                         
     xor a                            ; 008c     af               ;  Flag that tells ...
     ld (vblank_status),a             ; 008d     32 72 20         ;  ... objects on the upper half of screen to draw/move
     ld a,(suspend_play)              ; 0090     3a e9 20         ;  Are we moving ...
     and a                            ; 0093     a7               ;  ... game objects?
-    jp z,l0082h                      ; 0094     ca 82 00         ;  No ... restore and return
+    jp z,isr_restore_regs_exit                      ; 0094     ca 82 00         ;  No ... restore and return
     ld a,(game_mode)                 ; 0097     3a ef 20         ;  Are we in ...
     and a                            ; 009a     a7               ;  ... game mode?
     jp nz,l00a5h                     ; 009b     c2 a5 00         ;  Yes .... process game objects and out
     ld a,(isr_splash_task)           ; 009e     3a c1 20         ;  Splash-animation tasks
     rrca                             ; 00a1     0f               ;  If we are in demo-mode then we'll process the tasks anyway
-    jp nc,l0082h                     ; 00a2     d2 82 00         ;  Not in demo mode ... done
+    jp nc,isr_restore_regs_exit                     ; 00a2     d2 82 00         ;  Not in demo mode ... done
 l00a5h:                                                         
     ld hl,02020h                     ; 00a5     21 20 20         ;  Game object table (skip player-object at 2010)
     call keep_processing_game_objs   ; 00a8     cd 4b 02         ;  Process all game objects (except player object)
     call cursor_next_alien           ; 00ab     cd 41 01         ;  Advance cursor to next alien (move the alien if it is last one)
-    jp l0082h                        ; 00ae     c3 82 00         ;  Restore and return
+    jp isr_restore_regs_exit                        ; 00ae     c3 82 00         ;  Restore and return
 sub_00b1h:                                                      
 init_rack:                                                      
     call get_al_ref_ptr              ; 00b1     cd 86 08         ;  2xFC Get current player's ref-alien position pointer
@@ -654,7 +655,7 @@ l03b0h:
     inc hl                           ; 03f1     23               ;  ... 3
     ld (hl),008h                     ; 03f2     36 08            ;  202B 8 bytes in size of sprite
     call read_ply_shot               ; 03f4     cd 30 04         ;  Read player shot structure
-    jp d_first                         ; 03f7     c3 00 14       ;  Draw sprite and out
+    jp draw_shifted_sprite           ; 03f7     c3 00 14       ;  Draw sprite and out
 l03fah:                                                         
 init_ply_shot:                                                  
     inc a                            ; 03fa     3c               ;  Type is now ...
@@ -663,7 +664,7 @@ init_ply_shot:
     add a,008h                       ; 03ff     c6 08            ;  To center of player
     ld (obj1coor_xr),a               ; 0401     32 2a 20         ;  Shot's Y coordinate
     call read_ply_shot               ; 0404     cd 30 04         ;  Read 5 byte structure
-    jp d_first                         ; 0407     c3 00 14       ;  Draw sprite and out
+    jp draw_shifted_sprite           ; 0407     c3 00 14       ;  Draw sprite and out
 l040ah:                                                         
 move_ply_shot:                                                  
     call read_ply_shot               ; 040a     cd 30 04         ;  Read the shot structure
@@ -1148,7 +1149,7 @@ new_game:
     daa                              ; 07a2     27               ;  Convert back to DAA
     ld (num_coins),a                 ; 07a3     32 eb 20         ;  New credit count
     call draw_num_credits            ; 07a6     cd 47 19         ;  Display number of credits
-    ld hl,a_first                    ; 07a9     21 00 00         ;  Score of 0000
+    ld hl,00000h                     ; 07a9     21 00 00         ;  Score of 0000
     ld (p1scor_l),hl                 ; 07ac     22 f8 20         ;  Clear player-1 score
     ld (p2scor_l),hl                 ; 07af     22 fc 20         ;  Clear player-2 score
     call print_player_one_score      ; 07b2     cd 25 19         ;  Print player-1 score
@@ -1192,7 +1193,7 @@ top_of_game_loop:
 l0814h:                                                         
     call init_rack                   ; 0814     cd b1 00         ;  Initialize alien rack for current player
 l0817h:                                                         
-    call e_end                       ; 0817     cd d1 19         ;  Enable game tasks in ISR
+    call enable_game_tasks           ; 0817     cd d1 19         ;  Enable game tasks in ISR
     ld b,020h                        ; 081a     06 20            ;  Enable ...
     call sound_bits3on               ; 081c     cd fa 18         ;  ... sound amplifier
 l081fh:                                                         
@@ -1748,7 +1749,7 @@ check_player_shot_bump_hid:
 a_end:                                                          
                                                                 
 ; BLOCK 'j' (start 0x0bf7 end 0x0c00)                           
-j_first:                                                        
+msg_taito_cop:                                                        
     defb 013h                        ; 0bf7     13              
     defb 000h                        ; 0bf8     00              
     defb 008h                        ; 0bf9     08              
@@ -4313,7 +4314,7 @@ l16c9h:
     xor a                            ; 16da     af               ;  Now in ...
     ld (game_mode),a                 ; 16db     32 ef 20         ;  ... demo mode
     out (005h),a                     ; 16de     d3 05            ;  All sound off
-    call e_end                       ; 16e0     cd d1 19         ;  Enable ISR game tasks
+    call enable_game_tasks           ; 16e0     cd d1 19         ;  Enable ISR game tasks
     jp l0b89h                        ; 16e3     c3 89 0b         ;  Print credit information and do splash
 l16e6h:                                                         
     ld sp,02400h                     ; 16e6     31 00 24         ;  Reset stack
@@ -4737,7 +4738,7 @@ l19ach:
     cp 034h                          ; 19b0     fe 34            ;  0011_0100 2nd sequence: 1Pstart, 1Pshot, 1Pleft
     ret nz                           ; 19b2     c0               ;  If not second sequence ignore
     ld hl,02e1bh                     ; 19b3     21 1b 2e         ;  Screen coordinates
-    ld de,a_end                      ; 19b6     11 f7 0b         ;  Message = "TAITO COP" (no R)
+    ld de,msg_taito_cop              ; 19b6     11 f7 0b         ;  Message = "TAITO COP" (no R)
     ld c,009h                        ; 19b9     0e 09            ;  Message length
     jp print_message                 ; 19bb     c3 f3 08         ;  Print message and out
 d_end:                                                          
@@ -4863,7 +4864,7 @@ block_copy:
     inc hl                           ; 1a34     23               ;  Next destination
     inc de                           ; 1a35     13               ;  Next source
     dec b                            ; 1a36     05               ;  Count in B
-    jp nz,h_end                      ; 1a37     c2 32 1a         ;  Do all
+    jp nz,block_copy                 ; 1a37     c2 32 1a         ;  Do all
     ret                              ; 1a3a     c9               ;  Done
 sub_1a3bh:                                                      
 read_desc:                                                      
