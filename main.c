@@ -28,12 +28,14 @@ struct cpu_state
 enum
 {
     TRACE(REG8_A),
+    TRACE(REG8_F),
     TRACE(REG8_B),
     TRACE(REG8_C),
     TRACE(REG8_D),
     TRACE(REG8_E),
     TRACE(REG8_H),
     TRACE(REG8_L),
+
     TRACE(FLAG_BIT_C),
     TRACE(FLAG_BIT_N),
     TRACE(FLAG_BIT_PV),
@@ -43,9 +45,35 @@ enum
     TRACES,
 };
 
+char *trace_reg_str(int trace_reg)
+{
+    switch (trace_reg)
+    {
+        case TRACE(REG8_A):
+            return "A";
+        case TRACE(REG8_F):
+            return "F";
+        case TRACE(REG8_B):
+            return "B";
+        case TRACE(REG8_C):
+            return "C";
+        case TRACE(REG8_D):
+            return "D";
+        case TRACE(REG8_E):
+            return "E";
+        case TRACE(REG8_H):
+            return "H";
+        case TRACE(REG8_L):
+            return "L";
+        default:
+            return "?";
+    }
+}
+
 struct setat
 {
     uint16_t inat;
+    uint32_t call;
     uint16_t sub_depth;
 };
 
@@ -63,7 +91,9 @@ struct cpu
     uint16_t inat;
     uint16_t next;
     uint16_t jump;
+    uint32_t call;
     int sub_depth;
+    uint16_t sub_stack[0x100];
     struct setat setat[TRACES];
 };
 
@@ -464,11 +494,79 @@ enum
     FLAG_BIT_S = 1 << FLAG_S,
 };
 
+void get_trace(struct cpu *cpu, int trace_reg)
+{
+    if (cpu->intr)
+    {
+        return;
+    }
+
+    struct setat *setat = cpu->setat + trace_reg;
+
+    if (setat->call == cpu->call)
+    {
+        return; /* The register was set earlier in this call. */
+    }
+
+    if (setat->sub_depth != cpu->sub_depth)
+    {
+        printf("    %s setat:%04x sub_depth:%u getat:%04x sub_depth:%u\n", trace_reg_str(trace_reg), setat->inat, cpu->sub_depth, cpu->cpu_state.regs[REG_PC], cpu->sub_depth);
+    }
+}
+
+void set_trace(struct cpu *cpu, int trace_reg)
+{
+    if (cpu->intr)
+    {
+        return;
+    }
+
+    cpu->setat[trace_reg] = (struct setat) {
+        .inat = cpu->cpu_state.regs[REG_PC],
+        .call = cpu->call,
+        .sub_depth = cpu->sub_depth,
+    };
+}
+
+#define TRACE_MAP(L, U) \
+void get_trace_ ## L(struct cpu *cpu) \
+{ \
+    get_trace(cpu, TRACE_REG8_ ## U); \
+} \
+void set_trace_ ## L(struct cpu *cpu) \
+{ \
+    set_trace(cpu, TRACE_REG8_ ## U); \
+}
+
+TRACE_MAP(a, A)
+TRACE_MAP(f, F)
+TRACE_MAP(b, B)
+TRACE_MAP(c, C)
+TRACE_MAP(d, D)
+TRACE_MAP(e, E)
+TRACE_MAP(h, H)
+TRACE_MAP(l, L)
+
+#define TRACE_NUL(L) \
+void get_trace_ ## L(struct cpu *cpu) \
+{ \
+} \
+void set_trace_ ## L(struct cpu *cpu) \
+{ \
+}
+
+TRACE_NUL(pc_h)
+TRACE_NUL(pc_l)
+TRACE_NUL(sp_h)
+TRACE_NUL(sp_l)
+
 int reg_verbose;
 #define REG_ACCESS(HL, H, L, REG) \
 uint16_t get_ ## HL(struct cpu *cpu, uint16_t addr) \
 { \
     uint16_t ret = cpu->cpu_state.regs[REG]; \
+    get_trace_ ## H(cpu); \
+    get_trace_ ## L(cpu); \
     if (reg_verbose) printf("%s %04x\n", __func__, ret); \
     return ret; \
 } \
@@ -476,6 +574,7 @@ uint16_t get_ ## HL(struct cpu *cpu, uint16_t addr) \
 uint16_t get_ ## H(struct cpu *cpu, uint16_t addr) \
 { \
     uint16_t ret = cpu->cpu_state.regs[REG] >> 8 & 0xff; \
+    get_trace_ ## H(cpu); \
     if (reg_verbose) printf("%s %04x\n", __func__, ret); \
     return ret; \
 } \
@@ -483,6 +582,7 @@ uint16_t get_ ## H(struct cpu *cpu, uint16_t addr) \
 uint16_t get_ ## L(struct cpu *cpu, uint16_t addr) \
 { \
     uint16_t ret = cpu->cpu_state.regs[REG] >> 0 & 0xff; \
+    get_trace_ ## L(cpu); \
     if (reg_verbose) printf("%s %04x\n", __func__, ret); \
     return ret; \
 } \
@@ -490,12 +590,15 @@ uint16_t get_ ## L(struct cpu *cpu, uint16_t addr) \
 void set_ ## HL(struct cpu *cpu, uint16_t addr, uint16_t val) \
 { \
     if (reg_verbose) printf("%s %04x\n", __func__, val); \
+    set_trace_ ## H(cpu); \
+    set_trace_ ## L(cpu); \
     cpu->cpu_state.regs[REG] = val; \
 } \
 \
 void set_ ## H(struct cpu *cpu, uint16_t addr, uint16_t val) \
 { \
     if (reg_verbose) printf("%s %04x\n", __func__, val); \
+    set_trace_ ## H(cpu); \
     cpu->cpu_state.regs[REG] &= 0xff << 0; \
     cpu->cpu_state.regs[REG] |= (0xff & val) << 8; \
 } \
@@ -503,6 +606,7 @@ void set_ ## H(struct cpu *cpu, uint16_t addr, uint16_t val) \
 void set_ ## L(struct cpu *cpu, uint16_t addr, uint16_t val) \
 { \
     if (reg_verbose) printf("%s %04x\n", __func__, val); \
+    set_trace_ ## L(cpu); \
     cpu->cpu_state.regs[REG] &= 0xff << 8; \
     cpu->cpu_state.regs[REG] |= (0xff & val) << 0; \
 }
@@ -523,6 +627,17 @@ REG_ACCESS(de, d, e, REG_DE)
 REG_ACCESS(hl, h, l, REG_HL)
 REG_ACCESS(pc, pc_h, pc_l, REG_PC)
 REG_ACCESS(sp, sp_h, sp_l, REG_SP)
+
+void call(struct cpu *cpu)
+{
+    ++cpu->call;
+    cpu->sub_stack[cpu->sub_depth++] = get_pc(cpu, 0);
+}
+
+void ret(struct cpu *cpu)
+{
+    --cpu->sub_depth;
+}
 
  struct access
  {
@@ -691,12 +806,15 @@ const struct access accesses[] = {
 
 int cond(struct cpu *cpu, int test)
 {
+    if (test == COND_A)
+    {
+        return 1;
+    }
+
     uint8_t f = get_f(cpu, 0);
 
     switch (test)
     {
-        case COND_A: /* Always. */
-            return 1;
         case COND_C:
             return !!(f & FLAG_BIT_C);
         case COND_M:
@@ -995,7 +1113,8 @@ uint32_t step(struct cpu *cpu)
                     cpu->jump = get_pc(cpu, 0);
 
                     cpu->clk += opcode->slow;
-                    ++cpu->sub_depth;
+
+                    call(cpu);
                     return opcode->slow;
                 }
                 break;
@@ -1003,10 +1122,6 @@ uint32_t step(struct cpu *cpu)
 
         case JP:
             {
-                if (op == 0xe9)
-                {
-                    ++cpu->sub_depth;
-                }
                 if (cond(cpu, opcode->cond))
                 {
                     struct access dst = accesses[opcode->dst];
@@ -1017,6 +1132,11 @@ uint32_t step(struct cpu *cpu)
                     cpu->jump = get_pc(cpu, 0);
 
                     cpu->clk += opcode->slow;
+
+                    if (op == 0xe9)
+                    {
+                        call(cpu);
+                    }
                     return opcode->slow;
                 }
                 break;
@@ -1053,7 +1173,7 @@ uint32_t step(struct cpu *cpu)
                     cpu->next = pc + opcode->size;
                     cpu->jump = get_pc(cpu, 0);
 
-                    --cpu->sub_depth;
+                    ret(cpu);
                     cpu->clk += opcode->slow;
                     return opcode->slow;
                 }
@@ -1190,7 +1310,7 @@ void intr(struct cpu *cpu, uint16_t addr)
         cpu->jump = get_pc(cpu, 0);
         set_ie(cpu, 0, 0);
 
-        ++cpu->sub_depth;
+        call(cpu);
     }
 }
 
@@ -1225,80 +1345,43 @@ void run(struct cpu *cpu, int cycles)
     {
         cycles -= step(cpu);
 
-        if (0 && cpu->next != cpu->jump)
+        const struct opcode *opcode = opcodes + cpu->get_mem(cpu, cpu->inat);
+        uint16_t sp = get_sp(cpu, 0);
+        static int last_sub_depth;
+        static uint16_t last_intr;
+        int ie = get_ie(cpu, 0);
+
+        switch (cpu->inat)
         {
-            const struct opcode *opcode = opcodes + cpu->get_mem(cpu, cpu->inat);
-
-            if (0 && opcode->type == JP && opcode->dst == IMM16)
-            {
-            }
-            else
-            {
-                printf("%-20s ", cpu->intr ? "INTERRUPT" : opcode->dasm);
-                uint16_t sp = get_sp(cpu, 0);
-                printf("inat:%04x next:%04x jump:%04x sp:%04x sub_depth:%d ", cpu->inat, cpu->next, cpu->jump, sp, cpu->sub_depth);
-
-                for (int i = -2; i <= 2; ++i)
-                {
-                    printf("%04x ", *(uint16_t *)(cpu->mem + sp + i * 2));
-                }
-
-                if (cpu->jump == *(uint16_t *)(cpu->mem + sp + -1 * 2))
-                {
-                    printf("ret");
-                }
-                else if (cpu->next == *(uint16_t *)(cpu->mem + sp + 0 * 2))
-                {
-                    printf("call");
-                }
-
-                printf("\n");
-                cpu->intr = 0;
-            }
+            case 0x0abc:
+            case 0x01ce:
+                ret(cpu);
         }
-        else
+
+        if (cpu->inat == 0x0087)
         {
-            const struct opcode *opcode = opcodes + cpu->get_mem(cpu, cpu->inat);
-            uint16_t sp = get_sp(cpu, 0);
-            static uint16_t last_sp;
-            static int last_sub_depth;
-            int ie = get_ie(cpu, 0);
-
-            static uint16_t spatinat[0x10000][2];
-            int spanomaly = 0;
-
-            if (ie && spatinat[cpu->inat][ie] != sp)
-            {
-                spanomaly = 1;
-            }
-
-            spatinat[cpu->inat][ie] = sp;
-
-            switch (cpu->inat)
-            {
-                case 0x0abc:
-                case 0x01ce:
-                    --cpu->sub_depth;
-            }
-
-            if (1 || sp != last_sp || last_sub_depth != cpu->sub_depth)
-            {
-                printf("%-32s ", cpu->intr ? "INTERRUPT" : opcode->dasm);
-                cpu->intr = 0;
-
-                printf("inat:%04x next:%04x jump:%04x sp:%04x sub_depth:%d spanomaly:%d ie:%d ", cpu->inat, cpu->next, cpu->jump, sp, cpu->sub_depth, spanomaly, ie);
-
-                for (int i = -2; i <= 2; ++i)
-                {
-                    printf("%04x ", *(uint16_t *)(cpu->mem + sp + i * 2));
-                }
-
-                printf("\n");
-            }
-
-            last_sp = sp;
-            last_sub_depth = cpu->sub_depth;
+            cpu->intr = 0;
         }
+
+        int sub_depth_altered = last_sub_depth != cpu->sub_depth;
+        int interrupt_occurred = !last_intr && cpu->intr;
+        int interrupt_returns = last_intr && !cpu->intr;
+        if (sub_depth_altered)
+        {
+            printf("%-32s %s ", interrupt_occurred ? "INTERRUPT" : opcode->dasm, interrupt_returns ? "IRET" : "    ");
+
+            printf("inat:%04x next:%04x jump:%04x sp:%04x sub_depth:%d ie:%d ", cpu->inat, cpu->next, cpu->jump, sp, cpu->sub_depth, ie);
+
+            for (int i = -2; i <= 2; ++i)
+            {
+                printf("%04x ", *(uint16_t *)(cpu->mem + sp + i * 2));
+            }
+
+            printf("\n");
+        }
+
+        last_sub_depth = cpu->sub_depth;
+        last_intr = cpu->intr;
     }
 }
 
