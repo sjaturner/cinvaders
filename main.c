@@ -93,9 +93,11 @@ struct cpu
     uint16_t next;
     uint16_t jump;
     uint32_t call;
+    int sub_depth_intr;
     int sub_depth;
     uint16_t sub_stack[0x100];
-    struct setat setat[TRACES];
+    struct setat setat[2][TRACES];
+    char coverage[2][0x10000];
 };
 
 uint8_t get_mem(struct cpu *cpu, uint16_t addr);
@@ -497,12 +499,7 @@ enum
 
 void get_trace(struct cpu *cpu, int trace_reg)
 {
-    if (cpu->intr)
-    {
-        return;
-    }
-
-    struct setat *setat = cpu->setat + trace_reg;
+    struct setat *setat = cpu->setat[cpu->intr] + trace_reg;
 
     if (setat->call == cpu->call)
     {
@@ -512,18 +509,22 @@ void get_trace(struct cpu *cpu, int trace_reg)
     if (setat->sub_depth != cpu->sub_depth)
     {
         uint16_t func = cpu->sub_stack[cpu->sub_depth - 1];
-        printf("    %s %c setat:%04x func:%04x sub_depth:%u getat:%04x func:%04x sub_depth:%u\n", trace_reg_str(trace_reg), setat->sub_depth > cpu->sub_depth ? 'R' : 'C', setat->inat, setat->func, setat->sub_depth, cpu->inat, func, cpu->sub_depth);
+        int setat_sub_depth = setat->sub_depth;
+        int cpu_sub_depth = cpu->sub_depth;
+
+        if (cpu->intr)
+        {
+            setat_sub_depth -= cpu->sub_depth_intr;
+            cpu_sub_depth -= cpu->sub_depth_intr;
+        }
+
+        printf("    intr:%d %s %c setat:%04x func:%04x sub_depth:%u getat:%04x func:%04x sub_depth:%u\n", cpu->intr, trace_reg_str(trace_reg), setat_sub_depth > cpu_sub_depth ? 'R' : 'C', setat->inat, setat->func, setat_sub_depth, cpu->inat, func, cpu_sub_depth);
     }
 }
 
 void set_trace(struct cpu *cpu, int trace_reg)
 {
-    if (cpu->intr)
-    {
-        return;
-    }
-
-    cpu->setat[trace_reg] = (struct setat) {
+    cpu->setat[cpu->intr][trace_reg] = (struct setat) {
         .inat = cpu->inat,
         .func = cpu->sub_stack[cpu->sub_depth - 1],
         .call = cpu->call,
@@ -1313,7 +1314,19 @@ void intr(struct cpu *cpu, uint16_t addr)
         cpu->jump = get_pc(cpu, 0);
         set_ie(cpu, 0, 0);
 
+        cpu->sub_depth_intr = cpu->sub_depth;
+
         call(cpu);
+
+        for (int trace_reg = 0; trace_reg < TRACES; ++trace_reg)
+        {
+            cpu->setat[cpu->intr][trace_reg] = (struct setat) {
+                .inat = cpu->inat,
+                .func = cpu->sub_stack[cpu->sub_depth - 1],
+                .call = cpu->call,
+                .sub_depth = cpu->sub_depth,
+            };
+        }
     }
 }
 
@@ -1399,10 +1412,9 @@ void dump(void)
     printf("cpu.cpu_state.ie:%04x\n",           cpu.cpu_state.ie);
 }
 
-char get_mem_trace[0x10000];
 uint8_t get_mem(struct cpu *cpu, uint16_t addr)
 {
-    get_mem_trace[addr] |= 1;
+    cpu->coverage[cpu->intr][addr] = 1;
     return cpu->mem[addr];
 }
 
@@ -1568,14 +1580,10 @@ void get_input()
                         dip1 |= (1 << 4);
                         break;
                     case SDLK_q:
-                        exit(0);
                         printf("\n");
-                        for (unsigned addr = 0; addr < sizeof(get_mem_trace); ++addr)
+                        for (unsigned addr = 0; addr < sizeof(cpu.coverage[0]); ++addr)
                         {
-                            if (get_mem_trace[addr])
-                            {
-                                printf("%04x\n", addr);
-                            }
+                            printf("coverage %04x %d %d %d\n", addr, cpu.coverage[0][addr], cpu.coverage[1][addr], addr);
                         }
                         exit(0);
                         break;
