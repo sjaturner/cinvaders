@@ -518,7 +518,10 @@ void get_trace(struct cpu *cpu, int trace_reg)
             cpu_sub_depth -= cpu->sub_depth_intr;
         }
 
-        printf("    intr:%d %s %c setat:%04x func:%04x sub_depth:%u getat:%04x func:%04x sub_depth:%u\n", cpu->intr, trace_reg_str(trace_reg), setat_sub_depth > cpu_sub_depth ? 'R' : 'C', setat->inat, setat->func, setat_sub_depth, cpu->inat, func, cpu_sub_depth);
+        printf("    intr:%d func:%04x %s %c ", cpu->intr, func, trace_reg_str(trace_reg), setat_sub_depth > cpu_sub_depth ? 'R' : 'C');
+        printf("func:%04x getat:%04x sub_depth:%u ", func, cpu->inat, cpu_sub_depth);
+        printf("func:%04x setat:%04x sub_depth:%u ", setat->func, setat->inat, setat_sub_depth);
+        printf("\n");
     }
 }
 

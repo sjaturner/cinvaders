@@ -96,18 +96,18 @@ isr_08_continues:
     ld (vblank_status),a             ; 008d     32 72 20         ;  ... objects on the upper half of screen to draw/move
     ld a,(suspend_play)              ; 0090     3a e9 20         ;  Are we moving ...
     and a                            ; 0093     a7               ;  ... game objects?
-    jp z,isr_restore_regs_exit                      ; 0094     ca 82 00         ;  No ... restore and return
+    jp z,isr_restore_regs_exit       ; 0094     ca 82 00         ;  No ... restore and return
     ld a,(game_mode)                 ; 0097     3a ef 20         ;  Are we in ...
     and a                            ; 009a     a7               ;  ... game mode?
     jp nz,l00a5h                     ; 009b     c2 a5 00         ;  Yes .... process game objects and out
     ld a,(isr_splash_task)           ; 009e     3a c1 20         ;  Splash-animation tasks
     rrca                             ; 00a1     0f               ;  If we are in demo-mode then we'll process the tasks anyway
-    jp nc,isr_restore_regs_exit                     ; 00a2     d2 82 00         ;  Not in demo mode ... done
+    jp nc,isr_restore_regs_exit      ; 00a2     d2 82 00         ;  Not in demo mode ... done
 l00a5h:                                                         
     ld hl,02020h                     ; 00a5     21 20 20         ;  Game object table (skip player-object at 2010)
     call keep_processing_game_objs   ; 00a8     cd 4b 02         ;  Process all game objects (except player object)
     call cursor_next_alien           ; 00ab     cd 41 01         ;  Advance cursor to next alien (move the alien if it is last one)
-    jp isr_restore_regs_exit                        ; 00ae     c3 82 00         ;  Restore and return
+    jp isr_restore_regs_exit         ; 00ae     c3 82 00         ;  Restore and return
 sub_00b1h:                                                      
 init_rack:                                                      
     call get_al_ref_ptr              ; 00b1     cd 86 08         ;  2xFC Get current player's ref-alien position pointer
@@ -1059,7 +1059,7 @@ l06d6h:
     nop                              ; 06f7     00               ;  **
     nop                              ; 06f8     00               ;  **
 l06f9h:                                                         
-    call get_saucer_descriptor                   ; 06f9     cd 42 07         ;  Covert pixel pos from descriptor to HL screen and shift
+    call get_saucer_descriptor       ; 06f9     cd 42 07         ;  Covert pixel pos from descriptor to HL screen and shift
     call clear_small_sprite          ; 06fc     cd cb 14         ;  Clear a one byte sprite at HL
     ld hl,saucer_start               ; 06ff     21 83 20         ;  Saucer structure
     ld b,00ah                        ; 0702     06 0a            ;  10 bytes in saucer structure
@@ -1233,7 +1233,7 @@ l0857h:
     jp l077fh                        ; 086a     c3 7f 07         ;  Keep waiting on credit or button
 new_two_player_game:                                                         
     ld a,001h                        ; 086d     3e 01            ;  Flag 2 player game
-    jp new_game                        ; 086f     c3 9b 07         ;  Continue normal startup
+    jp new_game                      ; 086f     c3 9b 07         ;  Continue normal startup
 l0872h:                                                         
     call restore_shields1            ; 0872     cd 1a 02         ;  Restore shields for player 1
     jp l0814h                        ; 0875     c3 14 08         ;  Continue in game loop
@@ -1448,10 +1448,10 @@ draw_hex_byte:
     rrca                             ; 09b6     0f               ;  ...
     rrca                             ; 09b7     0f               ;  ... left digit
     and 00fh                         ; 09b8     e6 0f            ;  Mask out lower digit's bits
-    call draw_digit_in_acc                   ; 09ba     cd c5 09         ;  To screen at HL
+    call draw_digit_in_acc           ; 09ba     cd c5 09         ;  To screen at HL
     pop af                           ; 09bd     f1               ;  Restore digit
     and 00fh                         ; 09be     e6 0f            ;  Mask out upper digit
-    call draw_digit_in_acc                   ; 09c0     cd c5 09         ;  To screen
+    call draw_digit_in_acc           ; 09c0     cd c5 09         ;  To screen
     pop de                           ; 09c3     d1               ;  Restore
     ret                              ; 09c4     c9               ;  Done
 draw_digit_in_acc:                                                      
@@ -4505,7 +4505,7 @@ draw_adv_table:
     ld bc,table_coord_sprite_score   ; 1825     01 be 1d         ;  Coordinate/sprite for drawing table
 l1828h:                                                         
     call read_pri_struct             ; 1828     cd 56 18         ;  Get HL=coordinate, DE=image
-    jp c,; 182b     da 37 18         ;  Move on if done
+    jp c,l1837h                      ; 182b     da 37 18         ;  Move on if done
     call draw_wide_sprite            ; 182e     cd 44 18         ;  Draw 16-byte sprite
     jp l1828h                        ; 1831     c3 28 18         ;  Do all in table
     call one_sec_delay               ; 1834     cd b1 0a         ;  One second delay
@@ -4515,7 +4515,7 @@ slow_print_descrs:
     call read_pri_struct             ; 183a     cd 56 18         ;  Get HL=coordinate, DE=message
     ret c                            ; 183d     d8               ;  Out if done
     call print_msg_slow              ; 183e     cd 4c 18         ;  Print message
-    jp slow_print_descrs                     ; 1841     c3 3a 18         ;  Do all in table
+    jp slow_print_descrs             ; 1841     c3 3a 18         ;  Do all in table
 draw_wide_sprite:                                                      
     push bc                          ; 1844     c5               ;  Hold BC
     ld b,010h                        ; 1845     06 10            ;  16 bytes
@@ -4941,7 +4941,7 @@ remove_ship:
 print_num_ships_in_acc:                                                      
     ld hl,02501h                     ; 1a8b     21 01 25         ;  Screen coordinates
     and 00fh                         ; 1a8e     e6 0f            ;  Make sure it is a digit
-    jp draw_digit_in_acc                     ; 1a90     c3 c5 09         ;  Print number remaining
+    jp draw_digit_in_acc             ; 1a90     c3 c5 09         ;  Print number remaining
 i_end:                                                          
                                                                 
 ; BLOCK 'g' (start 0x1a93 end 0x1fff)                           
