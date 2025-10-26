@@ -73,6 +73,7 @@ char *trace_reg_str(int trace_reg)
 struct setat
 {
     uint16_t inat;
+    uint16_t func;
     uint32_t call;
     uint16_t sub_depth;
 };
@@ -510,7 +511,8 @@ void get_trace(struct cpu *cpu, int trace_reg)
 
     if (setat->sub_depth != cpu->sub_depth)
     {
-        printf("    %s setat:%04x sub_depth:%u getat:%04x sub_depth:%u\n", trace_reg_str(trace_reg), setat->inat, cpu->sub_depth, cpu->cpu_state.regs[REG_PC], cpu->sub_depth);
+        uint16_t func = cpu->sub_stack[cpu->sub_depth - 1];
+        printf("    %s %c setat:%04x func:%04x sub_depth:%u getat:%04x func:%04x sub_depth:%u\n", trace_reg_str(trace_reg), setat->sub_depth > cpu->sub_depth ? 'R' : 'C', setat->inat, setat->func, setat->sub_depth, cpu->inat, func, cpu->sub_depth);
     }
 }
 
@@ -522,7 +524,8 @@ void set_trace(struct cpu *cpu, int trace_reg)
     }
 
     cpu->setat[trace_reg] = (struct setat) {
-        .inat = cpu->cpu_state.regs[REG_PC],
+        .inat = cpu->inat,
+        .func = cpu->sub_stack[cpu->sub_depth - 1],
         .call = cpu->call,
         .sub_depth = cpu->sub_depth,
     };
