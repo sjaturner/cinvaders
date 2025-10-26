@@ -4258,7 +4258,7 @@ l166dh:
 l1671h:                                                         
     call cur_ply_alive               ; 1671     cd 10 19         ;  Get active-flag ptr for current player
     ld (hl),000h                     ; 1674     36 00            ;  Flag player is dead
-    call get_player_score_descriptor                   ; 1676     cd ca 09         ;  Get score descriptor for current player
+    call get_player_score_descriptor ; 1676     cd ca 09         ;  Get score descriptor for current player
     inc hl                           ; 1679     23               ;  Point to high two digits
     ld de,020f5h                     ; 167a     11 f5 20         ;  Current high score upper two digits
     ld a,(de)                        ; 167d     1a               ;  Is player score greater ...
