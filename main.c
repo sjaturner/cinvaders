@@ -638,6 +638,11 @@ REG_ACCESS(sp, sp_h, sp_l, REG_SP)
 void call(struct cpu *cpu)
 {
     ++cpu->call;
+
+    if (cpu->sub_depth >= 1)
+    {
+        printf("call intr:%d %04x %04x\n", cpu->intr, cpu->sub_stack[cpu->sub_depth - 1], get_pc(cpu, 0));
+    }
     cpu->sub_stack[cpu->sub_depth++] = get_pc(cpu, 0);
 }
 
