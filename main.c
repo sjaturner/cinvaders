@@ -1,6 +1,7 @@
 #include <assert.h>
-#include <stdio.h>
+#include <inttypes.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -78,6 +79,12 @@ struct setat
     uint16_t sub_depth;
 };
 
+struct sub_elem
+{
+    uint16_t inat;
+    uint64_t clk;
+};
+
 struct cpu
 {
     uint8_t (*get_mem)(struct cpu * cpu, uint16_t addr);
@@ -95,7 +102,7 @@ struct cpu
     uint32_t call;
     int sub_depth_intr;
     int sub_depth;
-    uint16_t sub_stack[0x100];
+    struct sub_elem sub_stack[0x100];
     struct setat setat[2][TRACES];
     char coverage[2][0x10000];
 };
@@ -508,7 +515,7 @@ void get_trace(struct cpu *cpu, int trace_reg)
 
     if (setat->sub_depth != cpu->sub_depth)
     {
-        uint16_t func = cpu->sub_stack[cpu->sub_depth - 1];
+        uint16_t func = cpu->sub_stack[cpu->sub_depth - 1].inat;
         int setat_sub_depth = setat->sub_depth;
         int cpu_sub_depth = cpu->sub_depth;
 
@@ -529,7 +536,7 @@ void set_trace(struct cpu *cpu, int trace_reg)
 {
     cpu->setat[cpu->intr][trace_reg] = (struct setat) {
         .inat = cpu->inat,
-        .func = cpu->sub_stack[cpu->sub_depth - 1],
+        .func = cpu->sub_stack[cpu->sub_depth - 1].inat,
         .call = cpu->call,
         .sub_depth = cpu->sub_depth,
     };
@@ -641,14 +648,20 @@ void call(struct cpu *cpu)
 
     if (cpu->sub_depth >= 1)
     {
-        printf("call intr:%d %04x %04x\n", cpu->intr, cpu->sub_stack[cpu->sub_depth - 1], get_pc(cpu, 0));
+        printf("call intr:%d %04x %04x\n", cpu->intr, cpu->sub_stack[cpu->sub_depth - 1].inat, get_pc(cpu, 0));
     }
-    cpu->sub_stack[cpu->sub_depth++] = get_pc(cpu, 0);
+
+    cpu->sub_stack[cpu->sub_depth++] = (struct sub_elem) {
+        .inat = get_pc(cpu, 0),
+        .clk = cpu->clk,
+    };
 }
 
 void ret(struct cpu *cpu)
 {
     --cpu->sub_depth;
+    struct sub_elem *sub_elem = cpu->sub_stack + cpu->sub_depth;
+    printf("ret intr:%d %04x %04x %" PRId64 "\n", cpu->intr, sub_elem->inat, get_pc(cpu, 0), cpu->clk - sub_elem->clk);
 }
 
  struct access
@@ -1330,7 +1343,7 @@ void intr(struct cpu *cpu, uint16_t addr)
         {
             cpu->setat[cpu->intr][trace_reg] = (struct setat) {
                 .inat = cpu->inat,
-                .func = cpu->sub_stack[cpu->sub_depth - 1],
+                .func = cpu->sub_stack[cpu->sub_depth - 1].inat,
                 .call = cpu->call,
                 .sub_depth = cpu->sub_depth,
             };

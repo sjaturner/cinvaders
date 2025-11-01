@@ -192,9 +192,9 @@ draw_alien:
     jp z,l0136h                      ; 0114     ca 36 01         ;  No alien ... skip drawing alien sprite (but flag done)
     inc hl                           ; 0117     23               ;  HL=2003 Bump descriptor
     inc hl                           ; 0118     23               ;  HL=2004 Point to alien's row
-    ld a,(hl)                        ; 0119     7e               ;  Get alien type
+    ld a,(hl)                        ; 0119     7e               ;  alien_row
     inc hl                           ; 011a     23               ;  HL=2005 Bump descriptor
-    ld b,(hl)                        ; 011b     46               ;  Get animation number
+    ld b,(hl)                        ; 011b     46               ;  read alien_ani_frame_number
     and 0feh                         ; 011c     e6 fe            ;  Translate row to type offset as follows: ...
     rlca                             ; 011e     07               ;  ... 0,1 -> 32 (type 1) ...
     rlca                             ; 011f     07               ;  ... 2,3 -> 16 (type 2) ...
@@ -1574,7 +1574,7 @@ get_player_score_descriptor:
     ret                              ; 09d5     c9               ;  Out
 sub_09d6h:                                                      
 clear_play_field:                                               
-    ld hl,02402h                     ; 09d6     21 02 24         ;  Thrid from left, top of screen
+    ld hl,02402h                     ; 09d6     21 02 24         ;  Third from left, top of screen
 l09d9h:                                                         
     ld (hl),000h                     ; 09d9     36 00            ;  Clear screen byte
     inc hl                           ; 09db     23               ;  Next in row
@@ -4362,7 +4362,7 @@ l1648h:
 l1652h:                                                         
     ld hl,plyr_shot_status           ; 1652     21 25 20         ;  Demo fires ...
     ld (hl),001h                     ; 1655     36 01            ;  ... constantly
-    ld hl,(demo_cmd_ptr_lsb)         ; 1657     2a ed 20         ;  Demo command bufer
+    ld hl,(demo_cmd_ptr_lsb)         ; 1657     2a ed 20         ;  Demo command buffer
     inc hl                           ; 165a     23               ;  Next position
     ld a,l                           ; 165b     7d               ;  Command buffer ...
     cp 07eh                          ; 165c     fe 7e            ;  ... wraps around
@@ -5253,9 +5253,9 @@ rammirror:
     defb 0f8h                        ; 1b0e     f8              
     defb 000h                        ; 1b0f     00              
 restore_player_struct:                                                         
-    defb 000h                        ; 1b10     00              
-    defb 080h                        ; 1b11     80              
-    defb 000h                        ; 1b12     00              
+    defb 000h                        ; 1b10     00              ; timer
+    defb 080h                        ; 1b11     80              ; timer
+    defb 000h                        ; 1b12     00              ; timer
     defb 08eh                        ; 1b13     8e              ; vec?
     defb 002h                        ; 1b14     02              
     defb 0ffh                        ; 1b15     ff              
@@ -5269,10 +5269,10 @@ restore_player_struct:
     defb 001h                        ; 1b1d     01              
     defb 000h                        ; 1b1e     00              
     defb 000h                        ; 1b1f     00              
-    defb 000h                        ; 1b20     00              
-    defb 000h                        ; 1b21     00              
-    defb 000h                        ; 1b22     00              
-    defb 0bbh                        ; 1b23     bb              ; vec?
+    defb 000h                        ; 1b20     00              ; timer
+    defb 000h                        ; 1b21     00              ; timer
+    defb 000h                        ; 1b22     00              ; timer
+    defb 0bbh                        ; 1b23     bb              ; vec game object 1
     defb 003h                        ; 1b24     03              
 shot_struct:                                                         
     defb 000h                        ; 1b25     00              
@@ -5287,11 +5287,11 @@ shot_struct:
     defb 0ffh                        ; 1b2e     ff              
     defb 0ffh                        ; 1b2f     ff              
 l1b30h:                                                         
-    defb 000h                        ; 1b30     00              
-    defb 000h                        ; 1b31     00              
+    defb 000h                        ; 1b30     00              ; timer
+    defb 000h                        ; 1b31     00              ; tuner
 l1b32h:                                                         
-    defb 002h                        ; 1b32     02              
-    defb 076h                        ; 1b33     76              ; vec?
+    defb 002h                        ; 1b32     02              ; timer
+    defb 076h                        ; 1b33     76              ; vec game object 2
     defb 004h                        ; 1b34     04              
     defb 000h                        ; 1b35     00              
     defb 000h                        ; 1b36     00              
@@ -5305,10 +5305,10 @@ l1b32h:
     defb 000h                        ; 1b3e     00              
     defb 003h                        ; 1b3f     03              
 l1b40h:                                                         
-    defb 000h                        ; 1b40     00              
-    defb 000h                        ; 1b41     00              
-    defb 000h                        ; 1b42     00              
-    defb 0b6h                        ; 1b43     b6              
+    defb 000h                        ; 1b40     00              ; timer 
+    defb 000h                        ; 1b41     00              ; timer
+    defb 000h                        ; 1b42     00              ; timer
+    defb 0b6h                        ; 1b43     b6              ; vec game object 3
     defb 004h                        ; 1b44     04              
     defb 000h                        ; 1b45     00              
     defb 000h                        ; 1b46     00              
@@ -5323,10 +5323,10 @@ l1b48h:
     defb 000h                        ; 1b4e     00              
     defb 003h                        ; 1b4f     03              
 l1b50h:                                                         ; squiggly shot rom info
-    defb 000h                        ; 1b50     00              
-    defb 000h                        ; 1b51     00              
-    defb 000h                        ; 1b52     00              
-    defb 082h                        ; 1b53     82              
+    defb 000h                        ; 1b50     00              ; timer
+    defb 000h                        ; 1b51     00              ; timer
+    defb 000h                        ; 1b52     00              ; timer
+    defb 082h                        ; 1b53     82              ; vec game object 4
     defb 006h                        ; 1b54     06              
     defb 000h                        ; 1b55     00              
     defb 000h                        ; 1b56     00              
@@ -5340,7 +5340,7 @@ l1b58h:
     defb 000h                        ; 1b5d     00              
     defb 000h                        ; 1b5e     00              
     defb 003h                        ; 1b5f     03              
-    defb 0ffh                        ; 1b60     ff              
+    defb 0ffh                        ; 1b60     ff              ; game object list end marker, see code at 024c
     defb 000h                        ; 1b61     00              
     defb 0c0h                        ; 1b62     c0              
     defb 01ch                        ; 1b63     1c              
@@ -6425,17 +6425,17 @@ character_set:
     defb 008h                        ; 1f71     08              
     defb 00dh                        ; 1f72     0d              
     defb 026h                        ; 1f73     26              
-    defb 001h                        ; 1f74     01              
-    defb 001h                        ; 1f75     01              
-    defb 000h                        ; 1f76     00              
-    defb 000h                        ; 1f77     00              
-    defb 001h                        ; 1f78     01              
-    defb 000h                        ; 1f79     00              
-    defb 002h                        ; 1f7a     02              
-    defb 001h                        ; 1f7b     01              
-    defb 000h                        ; 1f7c     00              
-    defb 002h                        ; 1f7d     02              
-    defb 001h                        ; 1f7e     01              
+    defb 001h                        ; 1f74     01              ; + demo command buffer starts
+    defb 001h                        ; 1f75     01              ; |    
+    defb 000h                        ; 1f76     00              ; |    
+    defb 000h                        ; 1f77     00              ; |    
+    defb 001h                        ; 1f78     01              ; |    
+    defb 000h                        ; 1f79     00              ; |    
+    defb 002h                        ; 1f7a     02              ; |    
+    defb 001h                        ; 1f7b     01              ; |    
+    defb 000h                        ; 1f7c     00              ; |    
+    defb 002h                        ; 1f7d     02              ; |    
+    defb 001h                        ; 1f7e     01              ; + demo command buffer ends
     defb 000h                        ; 1f7f     00              
 
 sprite_alien_y_0:
@@ -6621,7 +6621,7 @@ g_end:
                                                                 
 wait_on_draw:                  equ 02000h                        ; 02000h 02000    ; from here is copied from rom at rammirror                  defb 001h ; 1b00 01  rammirror:                                                  
                                                                  ; 02001h 02001                                                                 defb 000h ; 1b01 00  
-alien_is_exploding:            equ 02002h                        ; 02002h 02002                                                                 defb 000h ; 1b02 00  
+alien_is_exploding:            equ 02002h                        ; 02002h 02002    ; read sequentially in draw_alien                            defb 000h ; 1b02 00  
 exp_alien_timer:               equ 02003h                        ; 02003h 02003                                                                 defb 010h ; 1b03 10  
 alien_row:                     equ 02004h                        ; 02004h 02004                                                                 defb 000h ; 1b04 00  
 alien_ani_frame_number:        equ 02005h                        ; 02005h 02005    ; alien animation frame number                               defb 000h ; 1b05 00  
@@ -6635,12 +6635,12 @@ alien_pos_lsb:                 equ 0200bh                        ; 0200bh 0200b 
 rack_direction:                equ 0200dh                        ; 0200dh 0200d                                                                 defb 000h ; 1b0d 00  
 rack_down_delta:               equ 0200eh                        ; 0200eh 0200e                                                                 defb 0f8h ; 1b0e f8  
                                                                  ; 0200fh 0200f                                                                 defb 000h ; 1b0f 00  
-
+; game object 0                                                                 
                                                                  ; 02010h 02010    ; @ first game object active player                          defb 000h ; 1b10 00  restore_player_struct:                                      
 obj0timer_lsb:                 equ 02011h                        ; 02011h 02011                                                                 defb 080h ; 1b11 80  
 obj0timer_extra:               equ 02012h                        ; 02012h 02012                                                                 defb 000h ; 1b12 00  
-                                                                 ; 02013h 02013                                                                 defb 08eh ; 1b13 8e  
-                                                                 ; 02014h 02014                                                                 defb 002h ; 1b14 02  
+                                                                 ; 02013h 02013    ; vec lo                                                     defb 08eh ; 1b13 8e  
+                                                                 ; 02014h 02014    ; vec hi                                                     defb 002h ; 1b14 02  
 player_alive:                  equ 02015h                        ; 02015h 02015                                                                 defb 0ffh ; 1b15 ff  
                                                                  ; 02016h 02016                                                                 defb 005h ; 1b16 05  
                                                                  ; 02017h 02017                                                                 defb 00ch ; 1b17 0c  
@@ -6652,12 +6652,12 @@ player_xr:                     equ 0201bh                        ; 0201bh 0201b 
 next_demo_cmd:                 equ 0201dh                        ; 0201dh 0201d                                                                 defb 001h ; 1b1d 01  
 hid_mess_seq:                  equ 0201eh                        ; 0201eh 0201e                                                                 defb 000h ; 1b1e 00  
                                                                  ; 0201fh 0201f                                                                 defb 000h ; 1b1f 00  
-
+; game object 1
                                                                  ; 02020h 02020    ; @ game object table                                        defb 000h ; 1b20 00  
                                                                  ; 02021h 02021                                                                 defb 000h ; 1b21 00  
                                                                  ; 02022h 02022                                                                 defb 000h ; 1b22 00  
-                                                                 ; 02023h 02023                                                                 defb 0bbh ; 1b23 bb  
-                                                                 ; 02024h 02024                                                                 defb 003h ; 1b24 03  
+                                                                 ; 02023h 02023    ; vec lo                                                     defb 0bbh ; 1b23 bb  
+                                                                 ; 02024h 02024    ; vec hi                                                     defb 003h ; 1b24 03  
 plyr_shot_status:              equ 02025h                        ; 02025h 02025                                                                 defb 000h ; 1b25 00  shot_struct:                                                
                                                                  ; 02026h 02026                                                                 defb 010h ; 1b26 10  
                                                                  ; 02027h 02027    e ; descriptor                                               defb 090h ; 1b27 90  
@@ -6669,12 +6669,12 @@ shot_delta_x:                  equ 0202ch                        ; 0202ch 0202c 
 fire_bounce:                   equ 0202dh                        ; 0202dh 0202d                                                                 defb 000h ; 1b2d 00  
                                                                  ; 0202eh 0202e                                                                 defb 0ffh ; 1b2e ff  
                                                                  ; 0202fh 0202f                                                                 defb 0ffh ; 1b2f ff  
-
+; game object 2
                                                                  ; 02030h 02030    ; @ reload object structure from rom                         defb 000h ; 1b30 00  l1b30h:                                                     
                                                                  ; 02031h 02031                                                                 defb 000h ; 1b31 00  
 obj2timer_extra:               equ 02032h                        ; 02032h 02032                                                                 defb 002h ; 1b32 02  l1b32h:                                                     
-                                                                 ; 02033h 02033                                                                 defb 076h ; 1b33 76  
-                                                                 ; 02034h 02034                                                                 defb 004h ; 1b34 04  
+                                                                 ; 02033h 02033    ; vec lo                                                     defb 076h ; 1b33 76  
+                                                                 ; 02034h 02034    ; vec hi                                                     defb 004h ; 1b34 04  
                                                                  ; 02035h 02035    ; @ rolling shot data structure                              defb 000h ; 1b35 00  
 rol_shot_step_cnt:             equ 02036h                        ; 02036h 02036                                                                 defb 000h ; 1b36 00  
                                                                  ; 02037h 02037                                                                 defb 000h ; 1b37 00  
@@ -6686,12 +6686,12 @@ rol_shot_cfir_lsb:             equ 02038h                        ; 02038h 02038 
                                                                  ; 0203dh 0203d                                                                 defb 000h ; 1b3d 00  
                                                                  ; 0203eh 0203e                                                                 defb 000h ; 1b3e 00  
                                                                  ; 0203fh 0203f                                                                 defb 003h ; 1b3f 03  
-
+; game object 3
                                                                  ; 02040h 02040    ; @ reload object structure from rom                         defb 000h ; 1b40 00  l1b40h:                                                     
                                                                  ; 02041h 02041                                                                 defb 000h ; 1b41 00  
                                                                  ; 02042h 02042                                                                 defb 000h ; 1b42 00  
-                                                                 ; 02043h 02043                                                                 defb 0b6h ; 1b43 b6  
-                                                                 ; 02044h 02044                                                                 defb 004h ; 1b44 04  
+                                                                 ; 02043h 02043    ; vec lo                                                     defb 0b6h ; 1b43 b6  
+                                                                 ; 02044h 02044    ; vec hi                                                     defb 004h ; 1b44 04  
                                                                  ; 02045h 02045    ; @ plunger shot data structure                              defb 000h ; 1b45 00  
 plu_shot_step_cnt:             equ 02046h                        ; 02046h 02046                                                                 defb 000h ; 1b46 00  
                                                                  ; 02047h 02047                                                                 defb 001h ; 1b47 01  
@@ -6703,12 +6703,12 @@ plu_shot_cfir_lsb:             equ 02048h                        ; 02048h 02048 
                                                                  ; 0204dh 0204d                                                                 defb 000h ; 1b4d 00  
                                                                  ; 0204eh 0204e                                                                 defb 000h ; 1b4e 00  
                                                                  ; 0204fh 0204f                                                                 defb 003h ; 1b4f 03  
-
+; game object 4
                                                                  ; 02050h 02050    ; squiggly shot ram info                                     defb 000h ; 1b50 00  l1b50h:                                                     
                                                                  ; 02051h 02051                                                                 defb 000h ; 1b51 00  
                                                                  ; 02052h 02052                                                                 defb 000h ; 1b52 00  
-                                                                 ; 02053h 02053                                                                 defb 082h ; 1b53 82  
-                                                                 ; 02054h 02054                                                                 defb 006h ; 1b54 06  
+                                                                 ; 02053h 02053    ; vec lo                                                     defb 082h ; 1b53 82  
+                                                                 ; 02054h 02054    ; vec hi                                                     defb 006h ; 1b54 06  
 squ_shot_status:               equ 02055h                        ; 02055h 02055                                                                 defb 000h ; 1b55 00  
 squ_shot_step_cnt:             equ 02056h                        ; 02056h 02056                                                                 defb 000h ; 1b56 00  
                                                                  ; 02057h 02057                                                                 defb 001h ; 1b57 01  
@@ -6720,8 +6720,9 @@ squ_shot_cfir_lsb:             equ 02058h                        ; 02058h 02058 
                                                                  ; 0205dh 0205d                                                                 defb 000h ; 1b5d 00  
                                                                  ; 0205eh 0205e                                                                 defb 000h ; 1b5e 00  
                                                                  ; 0205fh 0205f                                                                 defb 003h ; 1b5f 03  
-
+; game object table end marker is 0ffh
                                                                  ; 02060h 02060                                                                 defb 0ffh ; 1b60 ff  
+
 collision:                     equ 02061h                        ; 02061h 02061                                                                 defb 000h ; 1b61 00  
                                                                  ; 02062h 02062    ; e ; descriptor ; exploding alien                           defb 0c0h ; 1b62 c0  
                                                                  ; 02063h 02063    ; d                                                          defb 01ch ; 1b63 1c  
