@@ -889,6 +889,58 @@ void set_flags(struct cpu *cpu, const struct opcode *opcode, uint32_t res_val, i
     set_f(cpu, 0, (get_f(cpu, 0) & ~flag_mask) | (flags & flag_mask));
 }
 
+enum
+{
+    SCREEN_ROW_SIZE = 0x20,
+};
+
+uint32_t _draw_simp_sprite_impl(uint8_t *mem, uint16_t counter, uint16_t *char_set, uint16_t *screen_address)
+{
+    printf("%s %u *char_set:%04x *screen_address:%04x\n", __func__, counter, *char_set, *screen_address);
+    if (1)
+    {
+        do
+        {
+            mem[*screen_address] = mem[*char_set];
+            *screen_address += SCREEN_ROW_SIZE;
+            ++*char_set;
+            --counter;
+        } while(counter);
+    }
+    return 0;
+}
+
+uint32_t _draw_simp_sprite(struct cpu *cpu)
+{
+    return _draw_simp_sprite_impl(cpu->mem, get_b(cpu, 0), cpu->cpu_state.regs + REG_DE, cpu->cpu_state.regs + REG_HL);
+}
+
+uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
+    [0x1439] = _draw_simp_sprite,
+};
+
+uint32_t cimpl_wrapper(struct cpu *cpu, uint32_t duration)
+{
+    uint32_t clks = duration;
+    if (cimpl[get_pc(cpu, 0)])
+    {
+        printf("here\n");
+        clks = (cimpl[get_pc(cpu, 0)])(cpu);
+
+        uint16_t sp = get_sp(cpu, 0);
+        uint16_t lo = cpu->get_mem(cpu, sp + 0);
+        uint16_t hi = cpu->get_mem(cpu, sp + 1);
+        set_sp(cpu, 0, sp + 2);
+
+        set_pc(cpu, 0, hi << 8 | lo << 0);
+        cpu->next = get_pc(cpu, 0);
+        cpu->jump = get_pc(cpu, 0);
+
+        ret(cpu);
+    }
+    return clks;
+}
+
 uint32_t step(struct cpu *cpu)
 {
     uint16_t pc = get_pc(cpu, 0);
@@ -1142,7 +1194,7 @@ uint32_t step(struct cpu *cpu)
                     cpu->clk[cpu->intr] += opcode->slow;
 
                     call(cpu);
-                    return opcode->slow;
+                    return cimpl_wrapper(cpu, opcode->slow);
                 }
                 break;
             }
@@ -1165,6 +1217,7 @@ uint32_t step(struct cpu *cpu)
                         call(cpu);
                     }
                     return opcode->slow;
+                    return cimpl_wrapper(cpu, opcode->slow);
                 }
                 break;
             }
@@ -1183,7 +1236,7 @@ uint32_t step(struct cpu *cpu)
                 cpu->jump = get_pc(cpu, 0);
 
                 cpu->clk[cpu->intr] += opcode->slow;
-                return opcode->slow;
+                return cimpl_wrapper(cpu, opcode->slow);
             }
             break;
 
@@ -1200,8 +1253,9 @@ uint32_t step(struct cpu *cpu)
                     cpu->next = pc + opcode->size;
                     cpu->jump = get_pc(cpu, 0);
 
-                    ret(cpu);
                     cpu->clk[cpu->intr] += opcode->slow;
+
+                    ret(cpu);
                     return opcode->slow;
                 }
 
@@ -1330,11 +1384,14 @@ void intr(struct cpu *cpu, uint16_t addr)
         cpu->set_mem(cpu, sp - 2, link >> 0);
         set_sp(cpu, 0, sp - 2);
 
-        set_pc(cpu, 0, addr);
         cpu->intr = 1;
-        cpu->inat = link;
+
+        set_pc(cpu, 0, addr);
         cpu->next = link;
         cpu->jump = get_pc(cpu, 0);
+
+        cpu->inat = link;
+
         set_ie(cpu, 0, 0);
 
         cpu->sub_depth_intr = cpu->sub_depth;
