@@ -82,6 +82,7 @@ struct setat
 struct sub_elem
 {
     uint16_t inat;
+    uint16_t intr;
     uint64_t clk;
 };
 
@@ -92,7 +93,7 @@ struct cpu
     uint8_t (*port_ip)(struct cpu * cpu, uint16_t addr);
     void (*port_op)(struct cpu * cpu, uint16_t addr, uint8_t val);
     struct cpu_state cpu_state;
-    uint64_t clk;
+    uint64_t clk[2];
     uint8_t *mem;
 
     uint16_t intr;
@@ -653,7 +654,8 @@ void call(struct cpu *cpu)
 
     cpu->sub_stack[cpu->sub_depth++] = (struct sub_elem) {
         .inat = get_pc(cpu, 0),
-        .clk = cpu->clk,
+        .intr = cpu->intr,
+        .clk = cpu->clk[cpu->intr],
     };
 }
 
@@ -661,7 +663,7 @@ void ret(struct cpu *cpu)
 {
     --cpu->sub_depth;
     struct sub_elem *sub_elem = cpu->sub_stack + cpu->sub_depth;
-    printf("ret intr:%d %04x %04x %" PRId64 "\n", cpu->intr, sub_elem->inat, get_pc(cpu, 0), cpu->clk - sub_elem->clk);
+    printf("ret intr:%d %04x %04x %" PRId64 "\n", cpu->intr, sub_elem->inat, get_pc(cpu, 0), cpu->clk[sub_elem->intr] - sub_elem->clk);
 }
 
  struct access
@@ -1137,7 +1139,7 @@ uint32_t step(struct cpu *cpu)
                     cpu->next = pc + opcode->size;
                     cpu->jump = get_pc(cpu, 0);
 
-                    cpu->clk += opcode->slow;
+                    cpu->clk[cpu->intr] += opcode->slow;
 
                     call(cpu);
                     return opcode->slow;
@@ -1156,7 +1158,7 @@ uint32_t step(struct cpu *cpu)
                     cpu->next = pc + opcode->size;
                     cpu->jump = get_pc(cpu, 0);
 
-                    cpu->clk += opcode->slow;
+                    cpu->clk[cpu->intr] += opcode->slow;
 
                     if (op == 0xe9)
                     {
@@ -1180,7 +1182,7 @@ uint32_t step(struct cpu *cpu)
                 cpu->next = pc + opcode->size;
                 cpu->jump = get_pc(cpu, 0);
 
-                cpu->clk += opcode->slow;
+                cpu->clk[cpu->intr] += opcode->slow;
                 return opcode->slow;
             }
             break;
@@ -1199,7 +1201,7 @@ uint32_t step(struct cpu *cpu)
                     cpu->jump = get_pc(cpu, 0);
 
                     ret(cpu);
-                    cpu->clk += opcode->slow;
+                    cpu->clk[cpu->intr] += opcode->slow;
                     return opcode->slow;
                 }
 
@@ -1311,7 +1313,7 @@ uint32_t step(struct cpu *cpu)
     cpu->next = get_pc(cpu, 0);
     cpu->jump = get_pc(cpu, 0);
 
-    cpu->clk += opcode->fast;
+    cpu->clk[cpu->intr] += opcode->fast;
     return opcode->fast;
 }
 
