@@ -5,7 +5,7 @@
                                                                 
                                                                 
 ; BLOCK 'a' (start 0x0000 end 0x0bf7)                           
-:                                                        
+a_first:                                                        
     nop                              ; 0000     00               ;  This provides a slot ...
     nop                              ; 0001     00               ;  ... to put in a JP for ...
     nop                              ; 0002     00               ;  ... development
@@ -23,6 +23,7 @@ l000ch:
     jp isr_08_continues              ; 000c     c3 8c 00         ;  Continue ISR at 8C
 
     nop                              ; 000f     00               ;  Padding before fixed ISR address
+l0010h:                                                         
 isr_010h:                                                         
     push af                          ; 0010     f5               ;  Save ...
     push bc                          ; 0011     c5               ;  ...
@@ -418,7 +419,7 @@ l0242h:
 
 sub_0248h:                                                      
 run_game_objs:                                                  
-    ld hl,02010h                     ; 0248     21 10 20         ;  First game object (active player)
+    ld hl,game_object_0              ; 0248     21 10 20         ;  First game object (active player)
 keep_processing_game_objs:                                                      
     ld a,(hl)                        ; 024b     7e               ;  Have we reached the ...
     cp 0ffh                          ; 024c     fe ff            ;  ... end of the object list?
@@ -481,7 +482,7 @@ l0288h:
                                                                  ;  This task is only called at the mid-screen ISR. It ALWAYS does its work here, even though
                                                                  ;  the player can be on the top or bottom of the screen (not rotated).
                                                                  ;
-game_object_0:
+game_object_0_handler:
     pop hl                           ; 028e     e1               ;  Get player object structure 02014h
     inc hl                           ; 028f     23               ;  Point to blow-up status
     ld a,(hl)                        ; 0290     7e               ;  Get player blow-up status
@@ -505,7 +506,7 @@ game_object_0:
     ld b,010h                        ; 02b1     06 10            ;  16 Bytes
     call erase_simple_sprite         ; 02b3     cd 24 14         ;  Erase simple sprite (the player)
     ld hl,02010h                     ; 02b6     21 10 20         ;  Restore player ...
-    ld de,restore_player_struct      ; 02b9     11 10 1b         ;  ... structure ...
+    ld de,game_object_0_init         ; 02b9     11 10 1b         ;  ... structure ...
     ld b,010h                        ; 02bc     06 10            ;  ... from ...
     call block_copy                  ; 02be     cd 32 1a         ;  ... ROM mirror
     ld b,000h                        ; 02c1     06 00            ;  Turn off ...
@@ -662,7 +663,7 @@ l03b0h:
                                                                  ;  
                                                                  ;  This task executes at either mid-screen ISR (if it is on the top half of the non-rotated screen) or
                                                                  ;  at the end-screen ISR (if it is on the bottom half of the screen).
-game_object_1:                                                                 ;
+game_object_1_handler:                                                                 ;
     ld de,obj1coor_xr                ; 03bb     11 2a 20         ;  Object's Yn coordiante vec rom at 1b23 ram at 02023h
     call comp_yto_beam               ; 03be     cd 06 1a         ;  Compare to screen-update location
     pop hl                           ; 03c1     e1               ;  Pointer to task data
@@ -792,9 +793,9 @@ l046eh:
                                                                  ; When the timer is 2 the squiggly-shot/saucer (object 4 ) runs.
                                                                  ; When the timer is 1 the plunger-shot (object 3) runs.
                                                                  ; When the timer is 0 this object, the rolling-shot, runs.
-game_object_2:
+game_object_2_handler:
     pop hl                           ; 0476     e1               ;  Game object data vec rom at 1b33 ram at 02033h
-    ld a,(l1b32h)                    ; 0477     3a 32 1b         ;  Restore delay from ...
+    ld a,(game_object_2_init_timer)  ; 0477     3a 32 1b         ;  Restore delay from ...
     ld (obj2timer_extra),a           ; 047a     32 32 20         ;  ... ROM mirror (value 2)
     ld hl,(rol_shot_cfir_lsb)        ; 047d     2a 38 20         ;  Get pointer to ...
     ld a,l                           ; 0480     7d               ;  ... column-firing table.
@@ -804,7 +805,7 @@ game_object_2:
     ld (rol_shot_cfir_lsb),hl        ; 0486     22 38 20         ;  Store new counter value (run the shot next time)
     ret                              ; 0489     c9               ;  And out
 l048ah:                                                         
-    ld de,02035h                     ; 048a     11 35 20         ;  Rolling-shot data structure
+    ld de,rol_shot_struct            ; 048a     11 35 20         ;  Rolling-shot data structure
     ld a,0f9h                        ; 048d     3e f9            ;  Last picture of "rolling" alien shot
     call to_shot_struct              ; 048f     cd 50 05         ;  Set code to handle rolling-shot
     ld a,(plu_shot_step_cnt)         ; 0492     3a 46 20         ;  Get the plunger-shot step count
@@ -814,10 +815,10 @@ l048ah:
     call handle_alien_shot           ; 049e     cd 63 05         ;  Handle active shot structure
     ld a,(a_shot_blow_cnt)           ; 04a1     3a 78 20         ;  Blow up counter
     and a                            ; 04a4     a7               ;  Test if shot has cycled through blowing up
-    ld hl,02035h                     ; 04a5     21 35 20         ;  Rolling-shot data structure
+    ld hl,rol_shot_struct            ; 04a5     21 35 20         ;  Rolling-shot data structure
     jp nz,from_shot_struct           ; 04a8     c2 5b 05         ;  If shot is still running, copy the updated data and out
-    ld de,l1b30h                     ; 04ab     11 30 1b         ;  Reload ...
-    ld hl,02030h                     ; 04ae     21 30 20         ;  ... object ...
+    ld de,game_object_2_init         ; 04ab     11 30 1b         ;  Reload ...
+    ld hl,game_object_2              ; 04ae     21 30 20         ;  ... object ...
     ld b,010h                        ; 04b1     06 10            ;  ... structure ...
     jp block_copy                    ; 04b3     c3 32 1a         ;  ... from ROM mirror and out
 
@@ -825,7 +826,7 @@ l048ah:
                                                                  ;  Game object 3: Alien plunger-shot
                                                                  ;  This is skipped if there is only one alien left on the screen.
                                                                  ;
-game_object_3:
+game_object_3_handler:
     pop hl                           ; 04b6     e1               ;  Game object data vec rom at 1b43 ram at 02043h 
     ld a,(skip_plunger)              ; 04b7     3a 6e 20         ;  One alien left? Skip plunger shot?
     and a                            ; 04ba     a7               ;  Check
@@ -833,7 +834,7 @@ game_object_3:
     ld a,(shot_sync)                 ; 04bc     3a 80 20         ;  Sync flag (copied from GO-2's timer value)
     cp 001h                          ; 04bf     fe 01            ;  GO-2 and GO-4 are idle?
     ret nz                           ; 04c1     c0               ;  No ... only one shot at a time
-    ld de,02045h                     ; 04c2     11 45 20         ;  Plunger alien shot data structure
+    ld de,plu_shot_struct            ; 04c2     11 45 20         ;  Plunger alien shot data structure
     ld a,0edh                        ; 04c5     3e ed            ;  Last picture of "plunger" alien shot
     call to_shot_struct              ; 04c7     cd 50 05         ;  Copy the plunger alien to the active structure
     ld a,(rol_shot_step_cnt)         ; 04ca     3a 36 20         ;  Step count from rolling-shot
@@ -849,10 +850,10 @@ game_object_3:
 l04e7h:                                                         
     ld a,(a_shot_blow_cnt)           ; 04e7     3a 78 20         ;  Get the blow up timer
     and a                            ; 04ea     a7               ;  Zero means shot is done
-    ld hl,02045h                     ; 04eb     21 45 20         ;  Plunger shot data
+    ld hl,plu_shot_struct            ; 04eb     21 45 20         ;  Plunger shot data
     jp nz,from_shot_struct           ; 04ee     c2 5b 05         ;  If shot is still running, go copy the updated data and out
-    ld de,l1b40h                     ; 04f1     11 40 1b         ;  Reload ...
-    ld hl,02040h                     ; 04f4     21 40 20         ;  ... object ...
+    ld de,game_object_3_init         ; 04f1     11 40 1b         ;  Reload ...
+    ld hl,game_object_3              ; 04f4     21 40 20         ;  ... object ...
     ld b,010h                        ; 04f7     06 10            ;  ... structure ...
     call block_copy                  ; 04f9     cd 32 1a         ;  ... from mirror
     ld a,(num_aliens)                ; 04fc     3a 82 20         ;  Number of aliens on screen
@@ -866,7 +867,7 @@ l0508h:
 
                                                                  ;  Game object 4 when splash screen alien is shooting extra "C" with a squiggly shot
                                                                  ;  Ignore the task data pointer passed on stack                                                                                                      
-game_object_4:                                                   
+game_object_4_handler:                                                   
     pop hl                           ; 050e     e1               
 l050fh:                                                         
     ld de,squ_shot_status            ; 050f     11 55 20         ;  Squiggly shot data structure
@@ -887,8 +888,8 @@ l0534h:
     and a                            ; 0537     a7               ;  0 means blow-up timer expired
     ld hl,squ_shot_status            ; 0538     21 55 20         ;  Squiggly shot data structure
     jp nz,from_shot_struct           ; 053b     c2 5b 05         ;  If shot is still running, go copy the updated data and out
-    ld de,l1b50h                     ; 053e     11 50 1b         ;  Reload
-    ld hl,02050h                     ; 0541     21 50 20         ;  ... object ...
+    ld de,game_object_4_init         ; 053e     11 50 1b         ;  Reload
+    ld hl,game_object_4              ; 0541     21 50 20         ;  ... object ...
     ld b,010h                        ; 0544     06 10            ;  ... structure ...
     call block_copy                  ; 0546     cd 32 1a         ;  ... from mirror
     ld hl,(a_shot_cfir_lsb)          ; 0549     2a 76 20         ;  Copy pointer to column-firing table ...
@@ -1702,7 +1703,7 @@ l0a9eh:
     ret                              ; 0aaa     c9               ;  Out
 l0aabh:                                                         
 splash_squiggly:                                                
-    ld hl,02050h                     ; 0aab     21 50 20         ;  Pointer to game-object 4 timer
+    ld hl,game_object_4              ; 0aab     21 50 20         ;  Pointer to game-object 4 timer
     jp keep_processing_game_objs     ; 0aae     c3 4b 02         ;  Process squiggly-shot in demo mode
 
 sub_0ab1h:                                                      
@@ -3984,11 +3985,11 @@ l1427h:
     jp nz,l1427h                     ; 1435     c2 27 14         ;  Do all rows
     ret                              ; 1438     c9               ;  out
 sub_1439h:                                                      
-@pres c
-@chan af
-@exit b -> 0
-@exit de -> end of sprite
-@exit hl -> screen memory after sprite
+;   @pres c
+;   @chan af
+;   @exit b -> 0
+;   @exit de -> end of sprite
+;   @exit hl -> screen memory after sprite
 draw_simp_sprite:                                               
     push bc                          ; 1439     c5               ;  Preserve counter
     ld a,(de)                        ; 143a     1a               ;  From character set ...
@@ -4716,7 +4717,7 @@ l1898h:
     ld (splash_reached),a            ; 189a     32 cb 20         ;  ... reached location
     ret                              ; 189d     c9               ;  Out
 sub_189eh:                                                      
-    ld hl,02050h                     ; 189e     21 50 20         ;  Task descriptor for game object 4 (squiggly shot)
+    ld hl,game_object_4              ; 189e     21 50 20         ;  Task descriptor for game object 4 (squiggly shot)
     ld de,l1bc0h                     ; 18a1     11 c0 1b         ;  Task info for animate-shot-to-extra-C
     ld b,010h                        ; 18a4     06 10            ;  Block copy ...
     call block_copy                  ; 18a6     cd 32 1a         ;  ... 16 bytes
@@ -5252,7 +5253,7 @@ rammirror:
     defb 000h                        ; 1b0d     00              
     defb 0f8h                        ; 1b0e     f8              
     defb 000h                        ; 1b0f     00              
-restore_player_struct:                                                         
+game_object_0_init:                                                         
     defb 000h                        ; 1b10     00              ; timer
     defb 080h                        ; 1b11     80              ; timer
     defb 000h                        ; 1b12     00              ; timer
@@ -5269,6 +5270,7 @@ restore_player_struct:
     defb 001h                        ; 1b1d     01              
     defb 000h                        ; 1b1e     00              
     defb 000h                        ; 1b1f     00              
+game_object_1_init:
     defb 000h                        ; 1b20     00              ; timer
     defb 000h                        ; 1b21     00              ; timer
     defb 000h                        ; 1b22     00              ; timer
@@ -5286,10 +5288,10 @@ shot_struct:
     defb 000h                        ; 1b2d     00              
     defb 0ffh                        ; 1b2e     ff              
     defb 0ffh                        ; 1b2f     ff              
-l1b30h:                                                         
+game_object_2_init:                                                         
     defb 000h                        ; 1b30     00              ; timer
     defb 000h                        ; 1b31     00              ; tuner
-l1b32h:                                                         
+game_object_2_init_timer:            
     defb 002h                        ; 1b32     02              ; timer
     defb 076h                        ; 1b33     76              ; vec game object 2
     defb 004h                        ; 1b34     04              
@@ -5304,7 +5306,7 @@ l1b32h:
     defb 000h                        ; 1b3d     00              
     defb 000h                        ; 1b3e     00              
     defb 003h                        ; 1b3f     03              
-l1b40h:                                                         
+game_object_3_init:                                                         
     defb 000h                        ; 1b40     00              ; timer 
     defb 000h                        ; 1b41     00              ; timer
     defb 000h                        ; 1b42     00              ; timer
@@ -5322,7 +5324,7 @@ l1b48h:
     defb 000h                        ; 1b4d     00              
     defb 000h                        ; 1b4e     00              
     defb 003h                        ; 1b4f     03              
-l1b50h:                                                         ; squiggly shot rom info
+game_object_4_init:                  ; squiggly shot rom info
     defb 000h                        ; 1b50     00              ; timer
     defb 000h                        ; 1b51     00              ; timer
     defb 000h                        ; 1b52     00              ; timer
@@ -5505,7 +5507,7 @@ l1bc0h:
     defb 01ch                        ; 1bfe     1c              
     defb 039h                        ; 1bff     39              
 sprite_aliens_start_a:                                                         
-sprite_alien_a_0;
+sprite_alien_a_0:
     defb 000h                        ; 1c00     00              
     defb 000h                        ; 1c01     00              
     defb 039h                        ; 1c02     39              
@@ -6636,7 +6638,7 @@ rack_direction:                equ 0200dh                        ; 0200dh 0200d 
 rack_down_delta:               equ 0200eh                        ; 0200eh 0200e                                                                 defb 0f8h ; 1b0e f8  
                                                                  ; 0200fh 0200f                                                                 defb 000h ; 1b0f 00  
 ; game object 0                                                                 
-                                                                 ; 02010h 02010    ; @ first game object active player                          defb 000h ; 1b10 00  restore_player_struct:                                      
+game_object_0:                 equ 02010h                        ; 02010h 02010    ; @ first game object active player                          defb 000h ; 1b10 00  game_object_0_init:                                      
 obj0timer_lsb:                 equ 02011h                        ; 02011h 02011                                                                 defb 080h ; 1b11 80  
 obj0timer_extra:               equ 02012h                        ; 02012h 02012                                                                 defb 000h ; 1b12 00  
                                                                  ; 02013h 02013    ; vec lo                                                     defb 08eh ; 1b13 8e  
@@ -6670,12 +6672,12 @@ fire_bounce:                   equ 0202dh                        ; 0202dh 0202d 
                                                                  ; 0202eh 0202e                                                                 defb 0ffh ; 1b2e ff  
                                                                  ; 0202fh 0202f                                                                 defb 0ffh ; 1b2f ff  
 ; game object 2
-                                                                 ; 02030h 02030    ; @ reload object structure from rom                         defb 000h ; 1b30 00  l1b30h:                                                     
+game_object_2:                 equ 02030h                        ; 02030h 02030    ; @ reload object structure from rom                         defb 000h ; 1b30 00  l1b30h:                                                     
                                                                  ; 02031h 02031                                                                 defb 000h ; 1b31 00  
 obj2timer_extra:               equ 02032h                        ; 02032h 02032                                                                 defb 002h ; 1b32 02  l1b32h:                                                     
                                                                  ; 02033h 02033    ; vec lo                                                     defb 076h ; 1b33 76  
                                                                  ; 02034h 02034    ; vec hi                                                     defb 004h ; 1b34 04  
-                                                                 ; 02035h 02035    ; @ rolling shot data structure                              defb 000h ; 1b35 00  
+rol_shot_struct:               equ 02035h                        ; 02035h 02035    ; @ rolling shot data structure                              defb 000h ; 1b35 00  
 rol_shot_step_cnt:             equ 02036h                        ; 02036h 02036                                                                 defb 000h ; 1b36 00  
                                                                  ; 02037h 02037                                                                 defb 000h ; 1b37 00  
 rol_shot_cfir_lsb:             equ 02038h                        ; 02038h 02038                                                                 defb 000h ; 1b38 00  
@@ -6687,12 +6689,12 @@ rol_shot_cfir_lsb:             equ 02038h                        ; 02038h 02038 
                                                                  ; 0203eh 0203e                                                                 defb 000h ; 1b3e 00  
                                                                  ; 0203fh 0203f                                                                 defb 003h ; 1b3f 03  
 ; game object 3
-                                                                 ; 02040h 02040    ; @ reload object structure from rom                         defb 000h ; 1b40 00  l1b40h:                                                     
+game_object_3:                 equ 02040h                        ; 02040h 02040    ; @ reload object structure from rom                         defb 000h ; 1b40 00  l1b40h:                                                     
                                                                  ; 02041h 02041                                                                 defb 000h ; 1b41 00  
                                                                  ; 02042h 02042                                                                 defb 000h ; 1b42 00  
                                                                  ; 02043h 02043    ; vec lo                                                     defb 0b6h ; 1b43 b6  
                                                                  ; 02044h 02044    ; vec hi                                                     defb 004h ; 1b44 04  
-                                                                 ; 02045h 02045    ; @ plunger shot data structure                              defb 000h ; 1b45 00  
+plu_shot_struct:               equ 02045h                        ; 02045h 02045    ; @ plunger shot data structure                              defb 000h ; 1b45 00  
 plu_shot_step_cnt:             equ 02046h                        ; 02046h 02046                                                                 defb 000h ; 1b46 00  
                                                                  ; 02047h 02047                                                                 defb 001h ; 1b47 01  
 plu_shot_cfir_lsb:             equ 02048h                        ; 02048h 02048                                                                 defb 000h ; 1b48 00  l1b48h:                                                     
@@ -6704,7 +6706,7 @@ plu_shot_cfir_lsb:             equ 02048h                        ; 02048h 02048 
                                                                  ; 0204eh 0204e                                                                 defb 000h ; 1b4e 00  
                                                                  ; 0204fh 0204f                                                                 defb 003h ; 1b4f 03  
 ; game object 4
-                                                                 ; 02050h 02050    ; squiggly shot ram info                                     defb 000h ; 1b50 00  l1b50h:                                                     
+game_object_4:                 equ 02050h                        ; 02050h 02050    ; squiggly shot ram info                                     defb 000h ; 1b50 00  l1b50h:                                                     
                                                                  ; 02051h 02051                                                                 defb 000h ; 1b51 00  
                                                                  ; 02052h 02052                                                                 defb 000h ; 1b52 00  
                                                                  ; 02053h 02053    ; vec lo                                                     defb 082h ; 1b53 82  

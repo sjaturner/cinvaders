@@ -897,16 +897,13 @@ enum
 uint32_t _draw_simp_sprite_impl(uint8_t *mem, uint16_t counter, uint16_t *char_set, uint16_t *screen_address)
 {
     printf("%s %u *char_set:%04x *screen_address:%04x\n", __func__, counter, *char_set, *screen_address);
-    if (1)
+    do
     {
-        do
-        {
-            mem[*screen_address] = mem[*char_set];
-            *screen_address += SCREEN_ROW_SIZE;
-            ++*char_set;
-            --counter;
-        } while(counter);
-    }
+        mem[*screen_address] = mem[*char_set];
+        *screen_address += SCREEN_ROW_SIZE;
+        ++*char_set;
+        --counter;
+    } while(counter);
     return 0;
 }
 
@@ -915,8 +912,41 @@ uint32_t _draw_simp_sprite(struct cpu *cpu)
     return _draw_simp_sprite_impl(cpu->mem, get_b(cpu, 0), cpu->cpu_state.regs + REG_DE, cpu->cpu_state.regs + REG_HL);
 }
 
+uint32_t _block_copy_impl(uint8_t *mem, uint16_t *dst, uint16_t *src, uint8_t *len)
+{
+    printf("%s *dst:%04x *src:%04x *len:%04x\n", __func__, *dst, *src, *len);
+    do
+    {
+        mem[*dst] = mem[*src];
+        ++*dst;
+        ++*src;
+        --*len;
+    } while(*len);
+    return 0;
+}
+
+uint32_t _block_copy(struct cpu *cpu)
+{
+    return _block_copy_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs + REG_DE, (uint8_t *)(cpu->cpu_state.regs + REG_BC) + 1);
+}
+
+uint32_t _draw_char_impl(uint8_t *mem, uint16_t *screen_coord, uint8_t character)
+{
+    uint16_t character_addr = character_set + 8 * character;
+
+    _draw_simp_sprite_impl(mem, 8, &character_addr, screen_coord);
+    return 0;
+}
+
+uint32_t _draw_char(struct cpu *cpu)
+{
+    return _draw_char_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_a(cpu, 0));
+}
+
 uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     [0x1439] = _draw_simp_sprite,
+    [0x1a32] = _block_copy,
+    [0x08ff] = _draw_char,
 };
 
 uint32_t cimpl_wrapper(struct cpu *cpu, uint32_t duration)
@@ -1216,7 +1246,6 @@ uint32_t step(struct cpu *cpu)
                     {
                         call(cpu);
                     }
-                    return opcode->slow;
                     return cimpl_wrapper(cpu, opcode->slow);
                 }
                 break;
@@ -1779,7 +1808,7 @@ int main(int argc, char *argv[])
         }
 
         struct regval regval = {
-            .de = player_sprite,
+            .de = sprite_player,
             .bc = 0x1000,
             .hl = 0x2501,
             .sp = 0x2400,

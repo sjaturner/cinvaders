@@ -1,585 +1,1065 @@
-a_first                      0x0000
-l0006h                       0x0006
-l000ch                       0x000c
-l0010h                       0x0010
-l0020h                       0x0020
-l0030h                       0x0030
-l003eh                       0x003e
-l003fh                       0x003f
-l0042h                       0x0042
-l005dh                       0x005d
-l0067h                       0x0067
-l006fh                       0x006f
-l0072h                       0x0072
-l0082h                       0x0082
-l008ch                       0x008c
-l00a5h                       0x00a5
-sub_00b1h                    0x00b1
-init_rack                    0x00b1
-l00c8h                       0x00c8
-l00d3h                       0x00d3
-sub_00d7h                    0x00d7
-sub_0100h                    0x0100
-draw_alien                   0x0100
-l0136h                       0x0136
-sub_013bh                    0x013b
-sub_0141h                    0x0141
-cursor_next_alien            0x0141
-l0154h                       0x0154
-sub_017ah                    0x017a
-get_alien_coords             0x017a
-l0183h                       0x0183
-l0194h                       0x0194
-l0195h                       0x0195
-sub_01a1h                    0x01a1
-move_ref_alien               0x01a1
-sub_01c0h                    0x01c0
-init_aliens                  0x01c0
-l01c3h                       0x01c3
-l01c5h                       0x01c5
-l01cdh                       0x01cd
-return_two                   0x01cd
-sub_01cfh                    0x01cf
-draw_bottom_line             0x01cf
-sub_01d9h                    0x01d9
-add_delta                    0x01d9
-sub_01e4h                    0x01e4
-copy_rammirror               0x01e4
-sub_01e6h                    0x01e6
-sub_01efh                    0x01ef
-draw_shield_pl1              0x01ef
-sub_01f5h                    0x01f5
-draw_shield_pl2              0x01f5
-l01f8h                       0x01f8
-l01fdh                       0x01fd
-sub_0209h                    0x0209
-remember_shields1            0x0209
-sub_020eh                    0x020e
-remember_shields2            0x020e
-sub_0213h                    0x0213
-restore_shields2             0x0213
-l0214h                       0x0214
-sub_021ah                    0x021a
-restore_shields1             0x021a
-l021bh                       0x021b
-l021eh                       0x021e
-copy_shields                 0x021e
-l0229h                       0x0229
-l0235h                       0x0235
-l0242h                       0x0242
-sub_0248h                    0x0248
-run_game_objs                0x0248
-sub_024bh                    0x024b
-l026fh                       0x026f
-l0277h                       0x0277
-l027dh                       0x027d
-l0281h                       0x0281
-l0288h                       0x0288
-l02edh                       0x02ed
-l02f8h                       0x02f8
-l0312h                       0x0312
-l032ch                       0x032c
-l0332h                       0x0332
-l033bh                       0x033b
-l0346h                       0x0346
-l034ah                       0x034a
-l0363h                       0x0363
-l036fh                       0x036f
-l0381h                       0x0381
-move_player_right            0x0381
-l038eh                       0x038e
-move_player_left             0x038e
-l039bh                       0x039b
-draw_player_die              0x039b
-l03b0h                       0x03b0
-l03fah                       0x03fa
-init_ply_shot                0x03fa
-l040ah                       0x040a
-move_ply_shot                0x040a
-l042ah                       0x042a
-sub_0430h                    0x0430
-read_ply_shot                0x0430
-l0436h                       0x0436
-end_of_blowup                0x0436
-l0453h                       0x0453
-l046eh                       0x046e
-l048ah                       0x048a
-l04e7h                       0x04e7
-l0508h                       0x0508
-l050fh                       0x050f
-l0534h                       0x0534
-sub_0550h                    0x0550
-to_shot_struct               0x0550
-l055bh                       0x055b
-from_shot_struct             0x055b
-sub_0563h                    0x0563
-handle_alien_shot            0x0563
-l0589h                       0x0589
-l0596h                       0x0596
-l05a5h                       0x05a5
-l05b7h                       0x05b7
-l05c1h                       0x05c1
-l05e2h                       0x05e2
-l0600h                       0x0600
-l0612h                       0x0612
-l061bh                       0x061b
-sub_062fh                    0x062f
-find_in_column               0x062f
-l0637h                       0x0637
-l0644h                       0x0644
-shot_blowing_up              0x0644
-l0667h                       0x0667
-sub_066ch                    0x066c
-sub_0675h                    0x0675
-l067eh                       0x067e
-l06abh                       0x06ab
-l06d6h                       0x06d6
-l06f9h                       0x06f9
-l0707h                       0x0707
-l070ch                       0x070c
-l071dh                       0x071d
-l0728h                       0x0728
-sub_073ch                    0x073c
-sub_0742h                    0x0742
-l074bh                       0x074b
-sub_075fh                    0x075f
-l0765h                       0x0765
-wait_for_start               0x0765
-l077fh                       0x077f
-l0798h                       0x0798
-new_game                     0x0798
-l079bh                       0x079b
-l07f9h                       0x07f9
-l0804h                       0x0804
-l0814h                       0x0814
-l0817h                       0x0817
-l081fh                       0x081f
-l0849h                       0x0849
-l0857h                       0x0857
-l086dh                       0x086d
-l0872h                       0x0872
-sub_0878h                    0x0878
-sub_0886h                    0x0886
-get_al_ref_ptr               0x0886
-sub_088dh                    0x088d
-prompt_player                0x088d
-l08a9h                       0x08a9
-l08bch                       0x08bc
-l08cbh                       0x08cb
-sub_08d1h                    0x08d1
-get_ships_per_cred           0x08d1
-sub_08d8h                    0x08d8
-speed_shots                  0x08d8
-l08e4h                       0x08e4
-l08f1h                       0x08f1
-sub_08f3h                    0x08f3
-print_message                0x08f3
-sub_08ffh                    0x08ff
-draw_char                    0x08ff
-sub_0913h                    0x0913
-time_to_saucer               0x0913
-l0929h                       0x0929
-sub_092eh                    0x092e
-sub_0935h                    0x0935
-l0948h                       0x0948
-l0958h                       0x0958
-sub_097ch                    0x097c
-alien_score_value            0x097c
-sub_0988h                    0x0988
-adjust_score_code            0x0988
-l09adh                       0x09ad
-print4digits                 0x09ad
-sub_09b2h                    0x09b2
-draw_hex_byte                0x09b2
-sub_09c5h                    0x09c5
-sub_09cah                    0x09ca
-sub_09d6h                    0x09d6
-clear_play_field             0x09d6
-l09d9h                       0x09d9
-l09e8h                       0x09e8
-l09efh                       0x09ef
-l0a13h                       0x0a13
-l0a33h                       0x0a33
-sub_0a3ch                    0x0a3c
-l0a47h                       0x0a47
-l0a52h                       0x0a52
-sub_0a59h                    0x0a59
-sub_0a5fh                    0x0a5f
-score_for_alien              0x0a5f
-l0a7ch                       0x0a7c
-sub_0a80h                    0x0a80
-animate                      0x0a80
-l0a85h                       0x0a85
-l0a93h                       0x0a93
-print_message_del            0x0a93
-l0a9eh                       0x0a9e
-l0aabh                       0x0aab
-splash_squiggly              0x0aab
-sub_0ab1h                    0x0ab1
-one_sec_delay                0x0ab1
-sub_0ab6h                    0x0ab6
-two_sec_delay                0x0ab6
-l0abbh                       0x0abb
-splash_demo                  0x0abb
-sub_0abfh                    0x0abf
-isrspl_tasks                 0x0abf
-sub_0acfh                    0x0acf
-l0ad7h                       0x0ad7
-wait_on_delay                0x0ad7
-l0adah                       0x0ada
-sub_0ae2h                    0x0ae2
-ini_splash_ani               0x0ae2
-l0aeah                       0x0aea
-l0b0bh                       0x0b0b
-l0b4ah                       0x0b4a
-l0b5dh                       0x0b5d
-l0b71h                       0x0b71
-l0b83h                       0x0b83
-l0b89h                       0x0b89
-l0baeh                       0x0bae
-l0bc3h                       0x0bc3
-l0bdah                       0x0bda
-l0be8h                       0x0be8
-sub_0bf1h                    0x0bf1
-a_end                        0x0bf7
-j_first                      0x0bf7
-j_end                        0x0c00
-b_first                      0x0c00
-b_end                        0x1000
-c_first                      0x1000
-c_end                        0x1400
-d_first                      0x1400
-draw_shifted_sprite          0x1400
-l1405h                       0x1405
-sub_1424h                    0x1424
-erase_simple_sprite          0x1424
-l1427h                       0x1427
-sub_1439h                    0x1439
-draw_simp_sprite             0x1439
-sub_1452h                    0x1452
-erase_shifted                0x1452
-l1455h                       0x1455
-sub_1474h                    0x1474
-cnvt_pix_number              0x1474
-sub_147ch                    0x147c
-remember_shields             0x147c
-l147eh                       0x147e
-sub_1491h                    0x1491
-draw_spr_collision           0x1491
-l1498h                       0x1498
-l14a9h                       0x14a9
-l14bdh                       0x14bd
-sub_14cbh                    0x14cb
-clear_small_sprite           0x14cb
-l14cch                       0x14cc
-sub_14d8h                    0x14d8
-player_shot_hit              0x14d8
-l1504h                       0x1504
-code_bug1                    0x1504
-l1530h                       0x1530
-l1538h                       0x1538
-aexplode_time                0x1538
-l1545h                       0x1545
-l154ah                       0x154a
-sub_1554h                    0x1554
-cnt16s                       0x1554
-l155ah                       0x155a
-sub_1562h                    0x1562
-find_row                     0x1562
-sub_156fh                    0x156f
-find_column                  0x156f
-l1579h                       0x1579
-sub_1581h                    0x1581
-get_alien_stat_ptr           0x1581
-sub_1590h                    0x1590
-wrap_ref                     0x1590
-l1597h                       0x1597
-rack_bump                    0x1597
-l15a9h                       0x15a9
-l15b7h                       0x15b7
-sub_15c5h                    0x15c5
-l15c7h                       0x15c7
-sub_15d3h                    0x15d3
-draw_sprite                  0x15d3
-l15d7h                       0x15d7
-sub_15f3h                    0x15f3
-count_aliens                 0x15f3
-l15f9h                       0x15f9
-l15ffh                       0x15ff
-sub_1611h                    0x1611
-get_player_data_ptr          0x1611
-sub_1618h                    0x1618
-plr_fire_or_demo             0x1618
-l1648h                       0x1648
-l1652h                       0x1652
-l1663h                       0x1663
-l166bh                       0x166b
-l166dh                       0x166d
-l1671h                       0x1671
-l168bh                       0x168b
-l168fh                       0x168f
-l1698h                       0x1698
-l16b7h                       0x16b7
-l16c9h                       0x16c9
-l16e6h                       0x16e6
-l16eeh                       0x16ee
-sub_170eh                    0x170e
-ashot_reload_rate            0x170e
-l171ch                       0x171c
-l1727h                       0x1727
-sub_172ch                    0x172c
-shot_sound                   0x172c
-l1739h                       0x1739
-sub_1740h                    0x1740
-time_fleet_sound             0x1740
-sub_176dh                    0x176d
-sub_1770h                    0x1770
-sub_1775h                    0x1775
-fleet_delay_ex_ship          0x1775
-l1785h                       0x1785
-l178eh                       0x178e
-l17a4h                       0x17a4
-l17aah                       0x17aa
-sub_17c0h                    0x17c0
-read_inputs                  0x17c0
-l17cah                       0x17ca
-sub_17cdh                    0x17cd
-check_handle_tilt            0x17cd
-l17dch                       0x17dc
-sub_1804h                    0x1804
-ctrl_saucer_sound            0x1804
-sub_1815h                    0x1815
-draw_adv_table               0x1815
-l1828h                       0x1828
-l1837h                       0x1837
-sub_183ah                    0x183a
-sub_1844h                    0x1844
-sub_184ch                    0x184c
-sub_1856h                    0x1856
-read_pri_struct              0x1856
-l1868h                       0x1868
-splash_sprite                0x1868
-l1888h                       0x1888
-l1898h                       0x1898
-sub_189eh                    0x189e
-l18b8h                       0x18b8
-l18c0h                       0x18c0
-l18d4h                       0x18d4
-init                         0x18d4
-l18dfh                       0x18df
-sub_18e7h                    0x18e7
-sub_18f1h                    0x18f1
-sub_18fah                    0x18fa
-sound_bits3on                0x18fa
-sub_1904h                    0x1904
-init_aliens_p2               0x1904
-sub_190ah                    0x190a
-plyr_shot_and_bump           0x190a
-sub_1910h                    0x1910
-cur_ply_alive                0x1910
-sub_191ah                    0x191a
-draw_score_head              0x191a
-sub_1925h                    0x1925
-sub_192bh                    0x192b
-sub_1931h                    0x1931
-draw_score                   0x1931
-sub_193ch                    0x193c
-sub_1947h                    0x1947
-draw_num_credits             0x1947
-sub_1950h                    0x1950
-print_hi_score               0x1950
-sub_1956h                    0x1956
-draw_status                  0x1956
-l196bh                       0x196b
-l1971h                       0x1971
-sub_1979h                    0x1979
-sub_1982h                    0x1982
-sub_1988h                    0x1988
-l199ah                       0x199a
-check_hidden_mes             0x199a
-l19ach                       0x19ac
-d_end                        0x19be
-e_first                      0x19be
-e_end                        0x19d1
-f_first                      0x19d1
-enable_game_tasks            0x19d1
-l19d3h                       0x19d3
-sub_19d7h                    0x19d7
-dsable_game_tasks            0x19d7
-sub_19dch                    0x19dc
-sound_bits3off               0x19dc
-sub_19e6h                    0x19e6
-draw_num_ships               0x19e6
-l19ech                       0x19ec
-sub_19fah                    0x19fa
-sub_1a06h                    0x1a06
-comp_yto_beam                0x1a06
-f_end                        0x1a11
-h_first                      0x1a11
-l1a21h                       0x1a21
-h_end                        0x1a32
-i_first                      0x1a32
-block_copy                   0x1a32
-sub_1a3bh                    0x1a3b
-read_desc                    0x1a3b
-sub_1a47h                    0x1a47
-conv_to_scr                  0x1a47
-l1a4ah                       0x1a4a
-sub_1a5ch                    0x1a5c
-clear_screen                 0x1a5c
-l1a5fh                       0x1a5f
-sub_1a69h                    0x1a69
-restore_shields              0x1a69
-l1a6bh                       0x1a6b
-sub_1a7fh                    0x1a7f
-remove_ship                  0x1a7f
-sub_1a8bh                    0x1a8b
-i_end                        0x1a93
-g_first                      0x1a93
-l1a95h                       0x1a95
-l1aa1h                       0x1aa1
-l1aa6h                       0x1aa6
-l1abah                       0x1aba
-l1acfh                       0x1acf
-l1ae4h                       0x1ae4
-l1b00h                       0x1b00
-l1b10h                       0x1b10
-l1b25h                       0x1b25
-l1b30h                       0x1b30
-l1b32h                       0x1b32
-l1b40h                       0x1b40
-l1b48h                       0x1b48
-l1b50h                       0x1b50
-l1b58h                       0x1b58
-l1b70h                       0x1b70
-l1b83h                       0x1b83
-l1bb0h                       0x1bb0
-l1bc0h                       0x1bc0
-l1c00h                       0x1c00
-l1c60h                       0x1c60
-l1c70h                       0x1c70
-l1ca3h                       0x1ca3
-l1cb8h                       0x1cb8
-l1cbch                       0x1cbc
-l1cdch                       0x1cdc
-l1cfah                       0x1cfa
-l1d20h                       0x1d20
-l1d4ch                       0x1d4c
-l1d50h                       0x1d50
-l1d7ch                       0x1d7c
-l1da0h                       0x1da0
-l1da2h                       0x1da2
-l1dabh                       0x1dab
-l1dafh                       0x1daf
-l1dbeh                       0x1dbe
-l1dcfh                       0x1dcf
-l1e00h                       0x1e00
-l1f90h                       0x1f90
-l1f9ch                       0x1f9c
-l1fa0h                       0x1fa0
-l1fa9h                       0x1fa9
-l1fc9h                       0x1fc9
-l1fd5h                       0x1fd5
-l1ff3h                       0x1ff3
-g_end                        0x1fff
-wait_on_draw                 0x2000
-alien_is_exploding           0x2002
-exp_alien_timer              0x2003
-alien_row                    0x2004
-alien_cur_index              0x2006
-ref_alien_dyr                0x2007
-ref_alien_dxr                0x2008
-ref_alien_yr                 0x2009
-ref_alien_xr                 0x200a
-alien_pos_lsb                0x200b
-rack_direction               0x200d
-rack_down_delta              0x200e
-obj0timer_lsb                0x2011
-obj0timer_extra              0x2012
-player_alive                 0x2015
-plyr_spr_pic_l               0x2018
-player_yr                    0x201a
-player_xr                    0x201b
-next_demo_cmd                0x201d
-hid_mess_seq                 0x201e
-plyr_shot_status             0x2025
-obj1coor_yr                  0x2029
-obj1coor_xr                  0x202a
-shot_delta_x                 0x202c
-fire_bounce                  0x202d
-obj2timer_extra              0x2032
-rol_shot_step_cnt            0x2036
-rol_shot_cfir_lsb            0x2038
-plu_shot_step_cnt            0x2046
-plu_shot_cfir_lsb            0x2048
-squ_shot_status              0x2055
-squ_shot_step_cnt            0x2056
-squ_shot_cfir_lsb            0x2058
-collision                    0x2061
-exp_alien_yr                 0x2064
-player_data_msb              0x2067
-player_ok                    0x2068
-enable_alien_fire            0x2069
-alien_fire_delay             0x206a
-temp206c                     0x206c
-invaded                      0x206d
-skip_plunger                 0x206e
-other_shot1                  0x2070
-other_shot2                  0x2071
-vblank_status                0x2072
-a_shot_status                0x2073
-a_shot_cfir_lsb              0x2076
-a_shot_blow_cnt              0x2078
-a_shot_image_lsb             0x2079
-alien_shot_yr                0x207b
-alien_shot_size              0x207d
-alien_shot_delta             0x207e
-shot_pic_end                 0x207f
-shot_sync                    0x2080
-tmp2081                      0x2081
-num_aliens                   0x2082
-saucer_start                 0x2083
-saucer_active                0x2084
-saucer_hit                   0x2085
-saucer_pri_loc_lsb           0x2087
-saucer_pri_pic_msb           0x208a
-sau_score_lsb                0x208d
-shot_count_lsb               0x208f
-till_saucer_lsb              0x2091
-wait_start_loop              0x2093
-sound_port3                  0x2094
-change_fleet_snd             0x2095
-fleet_snd_reload             0x2097
-sound_port5                  0x2098
-extra_hold                   0x2099
-tilt                         0x209a
-fleet_snd_hold               0x209b
-isr_delay                    0x20c0
-isr_splash_task              0x20c1
-splash_an_form               0x20c2
-splash_image_lsb             0x20c7
-splash_target_y              0x20ca
-splash_reached               0x20cb
-splash_im_rest_lsb           0x20cc
-two_players                  0x20ce
-a_shot_reload_rate           0x20cf
-player1ex                    0x20e5
-player1alive                 0x20e7
-suspend_play                 0x20e9
-coin_switch                  0x20ea
-num_coins                    0x20eb
-splash_animate               0x20ec
-demo_cmd_ptr_lsb             0x20ed
-game_mode                    0x20ef
-adjust_score_data            0x20f1
-score_delta_lsb              0x20f2
-p1scor_l                     0x20f8
-p2scor_l                     0x20fc
-p1ref_alien_dx               0x21fb
-p1ref_alien_y                0x21fc
-p1rack_cnt                   0x21fe
-p1ships_rem                  0x21ff
-p2ref_alien_dx               0x22fb
-p2ref_alien_yr               0x22fc
-p2rack_cnt                   0x22fe
-p2ships_rem                  0x22ff
+:                                                        
+    nop                              ; 0000     00               ;  This provides a slot ...
+l0006h:                                                         
+    nop                              ; 0006     00               ;  Padding before fixed ISR address
+isr_008h:
+    push af                          ; 0008     f5               ;  Save ...
+l000ch:                                                         
+    jp isr_08_continues              ; 000c     c3 8c 00         ;  Continue ISR at 8C
+isr_010h:                                                         
+    push af                          ; 0010     f5               ;  Save ...
+l0020h:                                                         
+    in a,(001h)                      ; 0020     db 01            ;  Read coin switch
+l0030h:                                                         
+    cp 099h                          ; 0030     fe 99            ;  99 credits already?
+l003eh:                                                         
+    xor a                            ; 003e     af               ;  Credit switch ...
+l003fh:                                                         
+    ld (coin_switch),a               ; 003f     32 ea 20         ;  ... has opened
+l0042h:                                                         
+    ld a,(suspend_play)              ; 0042     3a e9 20         ;  Are we moving ...
+l005dh:                                                         
+    ld a,(wait_start_loop)           ; 005d     3a 93 20         ;  Are we in the ...
+l0067h:                                                         
+    ld a,001h                        ; 0067     3e 01            ;  Remember switch ...
+l006fh:                                                         
+    call time_fleet_sound            ; 006f     cd 40 17         ;  Time down fleet sound and sets flag if needs new delay value
+l0072h:                                                         
+    ld a,(obj2timer_extra)           ; 0072     3a 32 20         ;  Use rolling shot's timer to sync ...
+isr_restore_regs_exit:                                                         
+    pop hl                           ; 0082     e1               ;  Restore ...
+isr_08_continues:                                                         
+    xor a                            ; 008c     af               ;  Flag that tells ...
+l00a5h:                                                         
+    ld hl,02020h                     ; 00a5     21 20 20         ;  Game object table (skip player-object at 2010)
+sub_00b1h:                                                      
+init_rack:                                                      
+    call get_al_ref_ptr              ; 00b1     cd 86 08         ;  2xFC Get current player's ref-alien position pointer
+l00c8h:                                                         
+    ld (ref_alien_dxr),a             ; 00c8     32 08 20         ;  Store alien deltaY
+l00d3h:                                                         
+    ld (rack_direction),a            ; 00d3     32 0d 20         ;  Store rack direction
+init_racks_direction:                                                      
+    ld a,002h                        ; 00d7     3e 02            ;  Set ...
+sub_0100h:                                                      
+draw_alien:                                                     
+    ld hl,alien_is_exploding         ; 0100     21 02 20         ;  Is there an ...
+l0136h:                                                         
+    xor a                            ; 0136     af               ;  Let the ISR routine ...
+sub_013bh:                                                      
+    ld hl,l0030h                     ; 013b     21 30 00         ;  Offset sprite pointer ...
+sub_0141h:                                                      
+cursor_next_alien:                                              
+    ld a,(player_ok)                 ; 0141     3a 68 20         ;  Is the player ...
+l0154h:                                                         
+    inc a                            ; 0154     3c               ;  Have we drawn all aliens ...
+sub_017ah:                                                      
+get_alien_coords:                                               
+    ld d,000h                        ; 017a     16 00            ;  Row 0
+l0183h:                                                         
+    cp 00bh                          ; 0183     fe 0b            ;  Can we take a full row off of index?
+l0194h:                                                         
+    ld l,b                           ; 0194     68               ;  We have the LSB (the row)
+l0195h:                                                         
+    and a                            ; 0195     a7               ;  Are we in the right column?
+sub_01a1h:                                                      
+move_ref_alien:                                                 
+    dec d                            ; 01a1     15               ;  This decrements with each call to move
+sub_01c0h:                                                      
+init_aliens:                                                    
+    ld hl,02100h                     ; 01c0     21 00 21         ;  Start of alien structures (this is the last alien)
+l01c3h:                                                         
+    ld b,037h                        ; 01c3     06 37            ;  Count to 55 (that's five rows of 11 aliens)
+l01c5h:                                                         
+    ld (hl),001h                     ; 01c5     36 01            ;  Bring alien to live
+l01cdh:                                                         
+return_two:                                                     
+    pop hl                           ; 01cd     e1               ;  Drop return to caller
+sub_01cfh:                                                      
+draw_bottom_line:                                               
+    ld a,001h                        ; 01cf     3e 01            ;  Bit 1 set ... going to draw a 1-pixel stripe down left side
+sub_01d9h:                                                      
+add_delta:                                                      
+    inc hl                           ; 01d9     23               ;  We loaded delta-x already ... skip over it
+sub_01e4h:                                                      
+copy_rammirror:                                                 
+    ld b,0c0h                        ; 01e4     06 c0            ;  Number of bytes
+copy_rom_to_ram:                                                      
+    ld de,rammirror                  ; 01e6     11 00 1b         ;  RAM mirror in ROM
+sub_01efh:                                                      
+draw_shield_pl1:                                                
+    ld hl,02142h                     ; 01ef     21 42 21         ;  Player 1 shield buffer (remember between games in multi-player)
+sub_01f5h:                                                      
+draw_shield_pl2:                                                
+    ld hl,02242h                     ; 01f5     21 42 22         ;  Player 2 shield buffer (remember between games in multi-player)
+l01f8h:                                                         
+    ld c,004h                        ; 01f8     0e 04            ;  Going to draw 4 shields
+l01fdh:                                                         
+    push de                          ; 01fd     d5               ;  Hold the start for the next shield
+sub_0209h:                                                      
+remember_shields1:                                              
+    ld a,001h                        ; 0209     3e 01            ;  Not zero means remember
+sub_020eh:                                                      
+remember_shields2:                                              
+    ld a,001h                        ; 020e     3e 01            ;  Not zero means remember
+sub_0213h:                                                      
+restore_shields2:                                               
+    xor a                            ; 0213     af               ;  Zero means restore
+l0214h:                                                         
+    ld de,02242h                     ; 0214     11 42 22         ;  Player 2 shield buffer (remember between games in multi-player)
+sub_021ah:                                                      
+restore_shields1:                                               
+    xor a                            ; 021a     af               ;  Zero means restore
+l021bh:                                                         
+    ld de,02142h                     ; 021b     11 42 21         ;  Player 1 shield buffer (remember between games in multi-player)
+l021eh:                                                         
+copy_shields:                                                   
+    ld (tmp2081),a                   ; 021e     32 81 20         ;  Remember copy/restore flag
+l0229h:                                                         
+    push af                          ; 0229     f5               ;  Hold shield count
+l0235h:                                                         
+    pop bc                           ; 0235     c1               ;  Get back sprite-size
+l0242h:                                                         
+    call remember_shields            ; 0242     cd 7c 14         ;  Remember player's shields
+sub_0248h:                                                      
+run_game_objs:                                                  
+    ld hl,game_object_0              ; 0248     21 10 20         ;  First game object (active player)
+keep_processing_game_objs:                                                      
+    ld a,(hl)                        ; 024b     7e               ;  Have we reached the ...
+l026fh:                                                         
+    pop hl                           ; 026f     e1               ;  Restore pointer to xx04
+l0277h:                                                         
+    dec b                            ; 0277     05               ;  Decrement ...
+l027dh:                                                         
+    dec b                            ; 027d     05               ;  ... at ...
+l0281h:                                                         
+    ld de,l0010h                     ; 0281     11 10 00         ;  Next ...
+l0288h:                                                         
+    dec (hl)                         ; 0288     35               ;  Decrement the xx02 counter
+game_object_0_handler:
+    pop hl                           ; 028e     e1               ;  Get player object structure 02014h
+l02edh:                                                         
+    ld a,(player_data_msb)           ; 02ed     3a 67 20         ;  Player data MSB
+l02f8h:                                                         
+    call get_alien_ptr_etc           ; 02f8     cd 78 08         ;  Get ref-alien info and pointer to storage
+l0312h:                                                         
+    ld (player_data_msb),a           ; 0312     32 67 20         ;  Change players
+l032ch:                                                         
+    call remove_ship                 ; 032c     cd 7f 1a         ;  Remove a ship and update indicators
+l0332h:                                                         
+    call remember_shields1           ; 0332     cd 09 02         ;  Remember the shields for player 1
+l033bh:                                                         
+    ld hl,player_ok                  ; 033b     21 68 20         ;  Player OK flag
+l0346h:                                                         
+    nop                              ; 0346     00               ;  ** Why?
+l034ah:                                                         
+    ld a,(player_xr)                 ; 034a     3a 1b 20         ;  Current player coordinates
+l0363h:                                                         
+    call read_inputs                 ; 0363     cd c0 17         ;  Read active player controls
+draw_player_and_out:                                                         
+    ld hl,plyr_spr_pic_l             ; 036f     21 18 20         ;  Active player descriptor
+l0381h:                                                         
+move_player_right:                                              
+    ld a,b                           ; 0381     78               ;  Player coordinate
+l038eh:                                                         
+move_player_left:                                               
+    ld a,b                           ; 038e     78               ;  Player coordinate
+l039bh:                                                         
+draw_player_die:                                                
+    inc a                            ; 039b     3c               ;  Toggle blowing-up ...
+l03b0h:                                                         
+    jp nz,l034ah                     ; 03b0     c2 4a 03         ;  Alien shots enabled ... move player's ship, draw it, and out
+game_object_1_handler:                                                                 ;
+    ld de,obj1coor_xr                ; 03bb     11 2a 20         ;  Object's Yn coordiante vec rom at 1b23 ram at 02023h
+l03fah:                                                         
+init_ply_shot:                                                  
+    inc a                            ; 03fa     3c               ;  Type is now ...
+l040ah:                                                         
+move_ply_shot:                                                  
+    call read_ply_shot               ; 040a     cd 30 04         ;  Read the shot structure
+l042ah:                                                         
+    cp 005h                          ; 042a     fe 05            ;  Alien explosion in progress?
+sub_0430h:                                                      
+read_ply_shot:                                                  
+    ld hl,02027h                     ; 0430     21 27 20         ;  Read 5 byte sprite structure for ...
+l0436h:                                                         
+end_of_blowup:                                                  
+    call read_ply_shot               ; 0436     cd 30 04         ;  Read the shot structure
+l0453h:                                                         
+    ld (sau_score_lsb),hl            ; 0453     22 8d 20         ;  New score pointer
+l046eh:                                                         
+    ld hl,saucer_pri_pic_msb         ; 046e     21 8a 20         ;  Saucer descriptor
+game_object_2_handler:
+    pop hl                           ; 0476     e1               ;  Game object data vec rom at 1b33 ram at 02033h
+l048ah:                                                         
+    ld de,rol_shot_struct            ; 048a     11 35 20         ;  Rolling-shot data structure
+game_object_3_handler:
+    pop hl                           ; 04b6     e1               ;  Game object data vec rom at 1b43 ram at 02043h 
+l04e7h:                                                         
+    ld a,(a_shot_blow_cnt)           ; 04e7     3a 78 20         ;  Get the blow up timer
+l0508h:                                                         
+    ld hl,(a_shot_cfir_lsb)          ; 0508     2a 76 20         ;  Set the plunger shot's ...
+game_object_4_handler:                                                   
+    pop hl                           ; 050e     e1               
+l050fh:                                                         
+    ld de,squ_shot_status            ; 050f     11 55 20         ;  Squiggly shot data structure
+l0534h:                                                         
+    ld a,(a_shot_blow_cnt)           ; 0534     3a 78 20         ;  Check to see if squiggly shot is done
+sub_0550h:                                                      
+to_shot_struct:                                                 
+    ld (shot_pic_end),a              ; 0550     32 7f 20         ;  LSB of last byte of last picture in sprite
+l055bh:                                                         
+from_shot_struct:                                               
+    ld de,a_shot_status              ; 055b     11 73 20         ;  Source is the shot-structure
+sub_0563h:                                                      
+handle_alien_shot:                                              
+    ld hl,a_shot_status              ; 0563     21 73 20         ;  Start of active shot structure
+l0589h:                                                         
+    ld a,(other_shot2)               ; 0589     3a 71 20         ;  Get the step count of the 2nd "other shot"
+l0596h:                                                         
+    inc hl                           ; 0596     23               ;  2075
+l05a5h:                                                         
+    call find_in_column              ; 05a5     cd 2f 06         ;  Find alien in target column
+l05b7h:                                                         
+    ld hl,a_shot_status              ; 05b7     21 73 20         ;  Alien shot status
+move_alien_shot:                                                         
+    ld de,0207ch                     ; 05c1     11 7c 20         ;  Alien-shot Y coordinate
+l05e2h:                                                         
+    ld (a_shot_image_lsb),a          ; 05e2     32 79 20         ;  New LSB image pointer
+l0600h:                                                         
+    ld a,(alien_shot_yr)             ; 0600     3a 7b 20         ;  Shot's Y coordinate
+l0612h:                                                         
+    ld a,(a_shot_status)             ; 0612     3a 73 20         ;  Flag to ...
+l061bh:                                                         
+    ld a,(player_xr)                 ; 061b     3a 1b 20         ;  Player's X coordinate
+sub_062fh:                                                      
+find_in_column:                                                 
+    dec c                            ; 062f     0d               ;  Column that is firing
+l0637h:                                                         
+    ld a,(hl)                        ; 0637     7e               ;  Get alien's status
+l0644h:                                                         
+shot_blowing_up:                                                
+    ld hl,a_shot_blow_cnt            ; 0644     21 78 20         ;  Blow up timer
+l0667h:                                                         
+    and a                            ; 0667     a7               ;  Have we reached 0?
+draw_alien_shot:                                                      
+    ld hl,a_shot_image_lsb           ; 066c     21 79 20         ;  Alien shot descriptor
+erase_alien_shot_explosion:                                                      
+    ld hl,a_shot_image_lsb           ; 0675     21 79 20         ;  Alien shot descriptor
+l067eh:                                                         
+    ld (plu_shot_cfir_lsb),hl        ; 067e     22 48 20         ;  From 50B, update ...
+l06abh:                                                         
+    ld de,saucer_pri_pic_msb         ; 06ab     11 8a 20         ;  Saucer's Y coordinate
+l06d6h:                                                         
+    ld b,0feh                        ; 06d6     06 fe            ;  Turn off ...
+l06f9h:                                                         
+    call get_saucer_descriptor       ; 06f9     cd 42 07         ;  Covert pixel pos from descriptor to HL screen and shift
+l0707h:                                                         
+    ld b,0feh                        ; 0707     06 fe            ;  Turn off UFO ...
+l070ch:                                                         
+    ld a,001h                        ; 070c     3e 01            ;  Flag the score ...
+l071dh:                                                         
+    ld a,(de)                        ; 071d     1a               ;  Find ...
+l0728h:                                                         
+    ld a,(hl)                        ; 0728     7e               ;  Get LSB of message (MSB is 2088 which is 1D)
+draw_saucer:                                                      
+    call get_saucer_descriptor       ; 073c     cd 42 07         ;  Draw the ...
+get_saucer_descriptor:                                                      
+    ld hl,saucer_pri_loc_lsb         ; 0742     21 87 20         ;  Read flying saucer ...
+l074bh:                                                         
+    ld b,010h                        ; 074b     06 10            ;  Saucer hit sound bit
+reinit_saucer:                                                      
+    ld de,data_for_saucer            ; 075f     11 83 1b         ;  Data for saucer (702 sets count to 0A)
+l0765h:                                                         
+wait_for_start:                                                 
+    ld a,001h                        ; 0765     3e 01            ;  Tell ISR that we ...
+l077fh:                                                         
+    ld a,(num_coins)                 ; 077f     3a eb 20         ;  Number of credits
+l0798h:                                                         
+new_one_player_game:                                                       
+    ld b,099h                        ; 0798     06 99            ;  Essentially a -1 for DAA
+new_game:                                                         
+    ld (two_players),a               ; 079b     32 ce 20         ;  Set flag for 1 or 2 players
+l07f9h:                                                         
+    call prompt_player               ; 07f9     cd 8d 08         ;  Prompt with "PLAY PLAYER "
+top_of_game_loop:                                                         
+    call draw_bottom_line            ; 0804     cd cf 01         ;  Draw line across screen under player
+l0814h:                                                         
+    call init_rack                   ; 0814     cd b1 00         ;  Initialize alien rack for current player
+l0817h:                                                         
+    call enable_game_tasks           ; 0817     cd d1 19         ;  Enable game tasks in ISR
+l081fh:                                                         
+    call plr_fire_or_demo            ; 081f     cd 18 16         ;  Initiate player shot if button pressed
+l0849h:                                                         
+    call fleet_delay_ex_ship         ; 0849     cd 75 17         ;  Extra-ship sound timer, set fleet-delay, play fleet movement sound
+l0857h:                                                         
+    ld de,msg_one_or_two_players_btn ; 0857     11 ba 1a         ;  "1 OR 2PLAYERS BUTTON"
+new_two_player_game:                                                         
+    ld a,001h                        ; 086d     3e 01            ;  Flag 2 player game
+l0872h:                                                         
+    call restore_shields1            ; 0872     cd 1a 02         ;  Restore shields for player 1
+get_alien_ptr_etc:                                                      
+    ld a,(ref_alien_dxr)             ; 0878     3a 08 20         ;  Alien deltaY
+sub_0886h:                                                      
+get_al_ref_ptr:                                                 
+    ld a,(player_data_msb)           ; 0886     3a 67 20         ;  Player data MSB (21 or 22)
+sub_088dh:                                                      
+prompt_player:                                                  
+    ld hl,02b11h                     ; 088d     21 11 2b         ;  Screen coordinates
+l08a9h:                                                         
+    ld a,(isr_delay)                 ; 08a9     3a c0 20         ;  Get the ISR delay value
+l08bch:                                                         
+    ld b,020h                        ; 08bc     06 20            ;  32 rows (4 characters * 8 bytes each)
+l08cbh:                                                         
+    call clear_small_sprite          ; 08cb     cd cb 14         ;  Clear a one byte sprite at HL
+sub_08d1h:                                                      
+get_ships_per_cred:                                             
+    in a,(002h)                      ; 08d1     db 02            ;  DIP settings
+sub_08d8h:                                                      
+speed_shots:                                                    
+    ld a,(num_aliens)                ; 08d8     3a 82 20         ;  Number of aliens on screen
+l08e4h:                                                         
+    ld a,(two_players)               ; 08e4     3a ce 20         ;  Number of players
+l08f1h:                                                         
+    ld c,003h                        ; 08f1     0e 03            ;  Length of saucer-score message ... fall into print
+sub_08f3h:                                                      
+print_message:                                                  
+    ld a,(de)                        ; 08f3     1a               ;  Get character
+sub_08ffh:                                                      
+draw_char:                                                      
+    ld de,character_set              ; 08ff     11 00 1e         ;  Character set
+sub_0913h:                                                      
+time_to_saucer:                                                 
+    ld a,(ref_alien_yr)              ; 0913     3a 09 20         ;  Reference alien's X coordinate
+l0929h:                                                         
+    dec hl                           ; 0929     2b               ;  Decrement the ...
+get_num_ships_active_player:                                                      
+    call get_player_data_ptr         ; 092e     cd 11 16         ;  HL points to player data
+do_extra_ship_awards:                                                      
+    call cur_ply_alive               ; 0935     cd 10 19         ;  Get descriptor of sorts
+l0948h:                                                         
+    call get_player_score_descriptor ; 0948     cd ca 09         ;  Get score descriptor for active player
+l0958h:                                                         
+    inc h                            ; 0958     24               ;  Bump to ...
+sub_097ch:                                                      
+alien_score_value:                                              
+    ld hl,table_alien_score_val      ; 097c     21 a0 1d         ;  Table for scores for hitting alien
+sub_0988h:                                                      
+adjust_score_code:                                              
+    call get_player_score_descriptor ; 0988     cd ca 09         ;  Get score structure for active player
+l09adh:                                                         
+print4digits:                                                   
+    ld a,d                           ; 09ad     7a               ;  Get first 2 digits of BCD or hex
+sub_09b2h:                                                      
+draw_hex_byte:                                                  
+    push de                          ; 09b2     d5               ;  Preserve
+draw_digit_in_acc:                                                      
+    add a,01ah                       ; 09c5     c6 1a            ;  Bump to number characters
+get_player_score_descriptor:                                                      
+    ld a,(player_data_msb)           ; 09ca     3a 67 20         ;  Get active player
+sub_09d6h:                                                      
+clear_play_field:                                               
+    ld hl,02402h                     ; 09d6     21 02 24         ;  Third from left, top of screen
+l09d9h:                                                         
+    ld (hl),000h                     ; 09d9     36 00            ;  Clear screen byte
+l09e8h:                                                         
+    ld a,h                           ; 09e8     7c               ;  Get Y coordinate
+l09efh:                                                         
+    call check_player_collision      ; 09ef     cd 3c 0a        
+l0a13h:                                                         
+    inc hl                           ; 0a13     23               ;  Find the ...
+l0a33h:                                                         
+    call draw_shield_pl1             ; 0a33     cd ef 01         ;  Draw shields for player 1
+check_player_collision:                                                      
+    call flag_player_hit             ; 0a3c     cd 59 0a         ;  Check player collision
+l0a47h:                                                         
+    ld a,(isr_delay)                 ; 0a47     3a c0 20         ;  Has timer expired?
+l0a52h:                                                         
+    call flag_player_hit             ; 0a52     cd 59 0a         ;  Wait for ...
+flag_player_hit:                                                      
+    ld a,(player_alive)              ; 0a59     3a 15 20         ;  Active player hit flag
+sub_0a5fh:                                                      
+score_for_alien:                                                
+    ld a,(game_mode)                 ; 0a5f     3a ef 20         ;  Are we in ...
+l0a7ch:                                                         
+    ld hl,02062h                     ; 0a7c     21 62 20         ;  Return exploding-alien descriptor
+sub_0a80h:                                                      
+animate:                                                        
+    ld a,002h                        ; 0a80     3e 02            ;  Start simple linear ...
+l0a85h:                                                         
+    out (006h),a                     ; 0a85     d3 06            ;  Feed watchdog
+l0a93h:                                                         
+print_message_del:                                              
+    push de                          ; 0a93     d5               ;  Preserve
+l0a9eh:                                                         
+    ld a,(isr_delay)                 ; 0a9e     3a c0 20         ;  Get counter
+l0aabh:                                                         
+splash_squiggly:                                                
+    ld hl,game_object_4              ; 0aab     21 50 20         ;  Pointer to game-object 4 timer
+sub_0ab1h:                                                      
+one_sec_delay:                                                  
+    ld a,040h                        ; 0ab1     3e 40            ;  Delay of 64 (tad over 1 sec)
+sub_0ab6h:                                                      
+two_sec_delay:                                                  
+    ld a,080h                        ; 0ab6     3e 80            ;  Delay of 80 (tad over 2 sec)
+l0abbh:                                                         
+splash_demo:                                                    
+    pop hl                           ; 0abb     e1               ;  Drop the call to ABF and ...
+sub_0abfh:                                                      
+isrspl_tasks:                                                   
+    ld a,(isr_splash_task)           ; 0abf     3a c1 20         ;  Get the ISR task number
+print_to_mid_screen:                                                      
+    ld hl,02b14h                     ; 0acf     21 14 2b         ;  Near center of screen
+l0ad7h:                                                         
+wait_on_delay:                                                  
+    ld (isr_delay),a                 ; 0ad7     32 c0 20         ;  Delay counter
+l0adah:                                                         
+    ld a,(isr_delay)                 ; 0ada     3a c0 20         ;  Get current delay
+sub_0ae2h:                                                      
+ini_splash_ani:                                                 
+    ld hl,splash_an_form             ; 0ae2     21 c2 20         ;  The splash-animation descriptor
+l0aeah:                                                         
+    xor a                            ; 0aea     af               ;  Make a 0
+l0b0bh:                                                         
+    call print_to_mid_screen         ; 0b0b     cd cf 0a         ;  Print to middle-ish of screen
+l0b4ah:                                                         
+    call clear_play_field            ; 0b4a     cd d6 09         ;  Clear playfield
+l0b5dh:                                                         
+    call copy_rammirror              ; 0b5d     cd e4 01         ;  Block copy ROM mirror to initialize RAM
+l0b71h:                                                         
+    call plr_fire_or_demo            ; 0b71     cd 18 16         ;  In demo ... process demo movement and always fire
+l0b83h:                                                         
+    call flag_player_hit             ; 0b83     cd 59 0a         ;  Wait for demo player ...
+l0b89h:                                                         
+    xor a                            ; 0b89     af               ;  Turn off ...
+l0baeh:                                                         
+    ld bc,coord_msg_one_or_two_play  ; 0bae     01 9c 1f         ;  "<1 OR 2 PLAYERS>  "
+l0bc3h:                                                         
+    call two_sec_delay               ; 0bc3     cd b6 0a         ;  Print TWO descriptors worth
+l0bdah:                                                         
+    ld hl,splash_animate             ; 0bda     21 ec 20         ;  Toggle ...
+l0be8h:                                                         
+    ld de,msg_play_normal            ; 0be8     11 ab 1d         ;  "PLAY" with normal 'Y'
+check_player_shot_bump_hid:                                                      
+    call plyr_shot_and_bump          ; 0bf1     cd 0a 19         ;  Check if player is shot and aliens bumping the edge of screen
+a_end:                                                          
+                                                                
+msg_taito_cop:                                                        
+    defb 013h                        ; 0bf7     13              
+j_end:                                                          
+                                                                
+b_first:                                                        
+    defb 000h                        ; 0c00     00              
+b_end:                                                          
+                                                                
+c_first:                                                        
+    defb 000h                        ; 1000     00               ;  Three bytes for ...
+c_end:                                                          
+                                                                
+d_first:                                                        
+draw_shifted_sprite:                                            
+    nop                              ; 1400     00               ;  Time/size pad to match CPL in EraseShiftedSprite
+l1405h:                                                         
+    push bc                          ; 1405     c5               ;  Hold count
+sub_1424h:                                                      
+erase_simple_sprite:                                            
+    call cnvt_pix_number             ; 1424     cd 74 14         ;  Convert pixel number in HL
+l1427h:                                                         
+    push bc                          ; 1427     c5               ;  Hold
+sub_1439h:                                                      
+@pres c
+draw_simp_sprite:                                               
+    push bc                          ; 1439     c5               ;  Preserve counter
+sub_1452h:                                                      
+erase_shifted:                                                  
+    call cnvt_pix_number             ; 1452     cd 74 14         ;  Convert pixel number in HL to coorinates with shift
+l1455h:                                                         
+    push bc                          ; 1455     c5               ;  Hold BC
+sub_1474h:                                                      
+cnvt_pix_number:                                                
+    ld a,l                           ; 1474     7d               ;  Get X coordinate
+sub_147ch:                                                      
+remember_shields:                                               
+    push bc                          ; 147c     c5               ;  Hold counter
+l147eh:                                                         
+    ld a,(hl)                        ; 147e     7e               ;  From sprite ... (should be DE)
+sub_1491h:                                                      
+draw_spr_collision:                                             
+    call cnvt_pix_number             ; 1491     cd 74 14         ;  Convert pixel number to coord and shift
+l1498h:                                                         
+    push bc                          ; 1498     c5               ;  Hold count
+l14a9h:                                                         
+    pop af                           ; 14a9     f1               ;  Restore the pixel pattern
+l14bdh:                                                         
+    pop af                           ; 14bd     f1               ;  Restore the pixel pattern
+sub_14cbh:                                                      
+clear_small_sprite:                                             
+    xor a                            ; 14cb     af               ;  0
+l14cch:                                                         
+    push bc                          ; 14cc     c5               ;  Preserve BC
+sub_14d8h:                                                      
+player_shot_hit:                                                
+    ld a,(plyr_shot_status)          ; 14d8     3a 25 20         ;  Player shot flag
+l1504h:                                                         
+code_bug1:                                                      
+    ld l,b                           ; 1504     68               ;  L now holds the shot coordinate (adjusted)
+l1530h:                                                         
+    ld a,003h                        ; 1530     3e 03            ;  Mark ...
+l1538h:                                                         
+aexplode_time:                                                  
+    ld hl,exp_alien_timer            ; 1538     21 03 20         ;  Decrement alien explosion ...
+l1545h:                                                         
+    ld a,004h                        ; 1545     3e 04            ;  4 means that ...
+l154ah:                                                         
+    xor a                            ; 154a     af               ;  Turn off ...
+sub_1554h:                                                      
+cnt16s:                                                         
+    ld c,000h                        ; 1554     0e 00            ;  Count of 16s
+l155ah:                                                         
+    cp h                             ; 155a     bc               ;  Compare reference coordinate to target
+sub_1562h:                                                      
+find_row:                                                       
+    ld a,(ref_alien_yr)              ; 1562     3a 09 20         ;  Reference alien Yr coordinate
+sub_156fh:                                                      
+find_column:                                                    
+    ld a,(ref_alien_xr)              ; 156f     3a 0a 20         ;  Reference alien Yn coordinate
+l1579h:                                                         
+    ld a,001h                        ; 1579     3e 01            ;  Mark flying ...
+sub_1581h:                                                      
+get_alien_stat_ptr:                                             
+    ld a,b                           ; 1581     78               ;  Hold original
+sub_1590h:                                                      
+wrap_ref:                                                       
+    inc c                            ; 1590     0c               ;  Increase 16s count
+l1597h:                                                         
+rack_bump:                                                      
+    ld a,(rack_direction)            ; 1597     3a 0d 20         ;  Get rack direction
+l15a9h:                                                         
+    ld (rack_direction),a            ; 15a9     32 0d 20         ;  Set new rack direction
+l15b7h:                                                         
+    ld hl,02524h                     ; 15b7     21 24 25         ;  Line down the left edge of playfield
+check_column:                                                      
+    ld b,017h                        ; 15c5     06 17            ;  Checking 23 bytes in a line up the screen from near the bottom
+l15c7h:                                                         
+    ld a,(hl)                        ; 15c7     7e               ;  Get screen memory
+sub_15d3h:                                                      
+draw_sprite:                                                    
+    call cnvt_pix_number             ; 15d3     cd 74 14         ;  Convert pixel number to screen/shift
+l15d7h:                                                         
+    push bc                          ; 15d7     c5               ;  Hold for a second
+sub_15f3h:                                                      
+count_aliens:                                                   
+    call get_player_data_ptr         ; 15f3     cd 11 16         ;  Get active player descriptor
+l15f9h:                                                         
+    ld a,(hl)                        ; 15f9     7e               ;  Get byte
+l15ffh:                                                         
+    inc hl                           ; 15ff     23               ;  Next alien
+sub_1611h:                                                      
+get_player_data_ptr:                                            
+    ld l,000h                        ; 1611     2e 00            ;  Byte boundary
+sub_1618h:                                                      
+plr_fire_or_demo:                                               
+    ld a,(player_alive)              ; 1618     3a 15 20         ;  Is there an active player?
+l1648h:                                                         
+    call read_inputs                 ; 1648     cd c0 17         ;  Read active player controls
+l1652h:                                                         
+    ld hl,plyr_shot_status           ; 1652     21 25 20         ;  Demo fires ...
+l1663h:                                                         
+    ld (demo_cmd_ptr_lsb),hl         ; 1663     22 ed 20         ;  Next demo command
+l166bh:                                                         
+    scf                              ; 166b     37               ;  Set carry flag
+l166dh:                                                         
+    xor a                            ; 166d     af               ;  0
+l1671h:                                                         
+    call cur_ply_alive               ; 1671     cd 10 19         ;  Get active-flag ptr for current player
+l168bh:                                                         
+    cp (hl)                          ; 168b     be               ;  Is lower digit higher? (upper was the same)
+l168fh:                                                         
+    ld a,(hl)                        ; 168f     7e               ;  Copy the new ...
+l1698h:                                                         
+    ld a,(two_players)               ; 1698     3a ce 20         ;  Number of players
+l16b7h:                                                         
+    ld a,b                           ; 16b7     78               ;  To A
+l16c9h:                                                         
+    ld hl,02d18h                     ; 16c9     21 18 2d         ;  Screen coordinates
+l16e6h:                                                         
+    ld sp,02400h                     ; 16e6     31 00 24         ;  Reset stack
+l16eeh:                                                         
+    call player_shot_hit             ; 16ee     cd d8 14         ;  Player's shot collision detection
+sub_170eh:                                                      
+ashot_reload_rate:                                              
+    call get_player_score_descriptor ; 170e     cd ca 09         ;  Get score descriptor for active player
+l171ch:                                                         
+    ld a,(de)                        ; 171c     1a               ;  Get lookup from table
+l1727h:                                                         
+    ld a,(hl)                        ; 1727     7e               ;  Load the shot reload value
+sub_172ch:                                                      
+shot_sound:                                                     
+    ld a,(plyr_shot_status)          ; 172c     3a 25 20         ;  Player shot flag
+l1739h:                                                         
+    ld b,002h                        ; 1739     06 02            ;  Sound bit
+sub_1740h:                                                      
+time_fleet_sound:                                               
+    ld hl,fleet_snd_hold             ; 1740     21 9b 20         ;  Pointer to hold time for fleet
+sub_176dh:                                                      
+    ld a,(sound_port5)               ; 176d     3a 98 20         ;  Current sound port 3 value
+fleet_sound_off:                                                      
+    and 030h                         ; 1770     e6 30            ;  Mask off fleet movement sounds
+sub_1775h:                                                      
+fleet_delay_ex_ship:                                            
+    ld a,(change_fleet_snd)          ; 1775     3a 95 20         ;  Time for new ...
+l1785h:                                                         
+    cp (hl)                          ; 1785     be               ;  Compare it to the first list value
+l178eh:                                                         
+    ld a,(de)                        ; 178e     1a               ;  Get the delay from the second list
+l17a4h:                                                         
+    or b                             ; 17a4     b0               ;  Add fleet sounds to current sound value
+l17aah:                                                         
+    ld hl,extra_hold                 ; 17aa     21 99 20         ;  Sound timer for award extra ship
+sub_17c0h:                                                      
+read_inputs:                                                    
+    ld a,(player_data_msb)           ; 17c0     3a 67 20         ;  Get active player
+l17cah:                                                         
+    in a,(002h)                      ; 17ca     db 02            ;  Get controls for player 2
+sub_17cdh:                                                      
+check_handle_tilt:                                              
+    in a,(002h)                      ; 17cd     db 02            ;  Read input port
+l17dch:                                                         
+    call clear_play_field            ; 17dc     cd d6 09         ;  Clear center window
+sub_1804h:                                                      
+ctrl_saucer_sound:                                              
+    ld hl,saucer_active              ; 1804     21 84 20         ;  Saucer on screen flag
+sub_1815h:                                                      
+draw_adv_table:                                                 
+    ld hl,02810h                     ; 1815     21 10 28         ;  0x410 is 1040 rotCol=32, rotRow=16
+l1828h:                                                         
+    call read_pri_struct             ; 1828     cd 56 18         ;  Get HL=coordinate, DE=image
+l1837h:                                                         
+    ld bc,table_coord_msg_score      ; 1837     01 cf 1d         ;  Coordinate/message for drawing table
+slow_print_descrs:                                                      
+    call read_pri_struct             ; 183a     cd 56 18         ;  Get HL=coordinate, DE=message
+draw_wide_sprite:                                                      
+    push bc                          ; 1844     c5               ;  Hold BC
+print_msg_slow:                                                      
+    push bc                          ; 184c     c5               ;  Hold BC
+sub_1856h:                                                      
+read_pri_struct:                                                
+    ld a,(bc)                        ; 1856     0a               ;  Get the screen LSB
+l1868h:                                                         
+splash_sprite:                                                  
+    ld hl,splash_an_form             ; 1868     21 c2 20         ;  Descriptor
+l1888h:                                                         
+    ld (splash_image_lsb),hl         ; 1888     22 c7 20         ;  Image to descriptor structure
+l1898h:                                                         
+    ld a,001h                        ; 1898     3e 01            ;  Flag that sprite ...
+sub_189eh:                                                      
+    ld hl,game_object_4              ; 189e     21 50 20         ;  Task descriptor for game object 4 (squiggly shot)
+l18b8h:                                                         
+    ld a,(squ_shot_status)           ; 18b8     3a 55 20         ;  Has shot ...
+l18c0h:                                                         
+    ld a,(squ_shot_status)           ; 18c0     3a 55 20         ;  Wait ...
+l18d4h:                                                         
+init:                                                           
+    ld sp,02400h                     ; 18d4     31 00 24         ;  Set stack pointer just below screen
+l18dfh:                                                         
+    ld a,008h                        ; 18df     3e 08            ;  Set alien ...
+get_player_alive_ptr:                                                      
+    ld a,(player_data_msb)           ; 18e7     3a 67 20         ;  Player data MSB
+get_delta_x:                                                      
+    ld b,002h                        ; 18f1     06 02            ;  Rack moving right delta X
+sub_18fah:                                                      
+sound_bits3on:                                                  
+    ld a,(sound_port3)               ; 18fa     3a 94 20         ;  Current value of sound port
+sub_1904h:                                                      
+init_aliens_p2:                                                 
+    ld hl,02200h                     ; 1904     21 00 22         ;  Player 2 data area
+sub_190ah:                                                      
+plyr_shot_and_bump:                                             
+    call player_shot_hit             ; 190a     cd d8 14         ;  Player's shot collision detection
+sub_1910h:                                                      
+cur_ply_alive:                                                  
+    ld hl,player1alive               ; 1910     21 e7 20         ;  Alive flags
+sub_191ah:                                                      
+draw_score_head:                                                
+    ld c,01ch                        ; 191a     0e 1c            ;  28 bytes in message
+print_player_one_score:                                                      
+    ld hl,p1scor_l                   ; 1925     21 f8 20         ;  Player 1 score descriptor
+print_player_two_score:                                                      
+    ld hl,p2scor_l                   ; 192b     21 fc 20         ;  Player 2 score descriptor
+sub_1931h:                                                      
+draw_score:                                                     
+    ld e,(hl)                        ; 1931     5e               ;  Get score LSB
+print_credit_label:                                                      
+    ld c,007h                        ; 193c     0e 07            ;  7 bytes in message
+sub_1947h:                                                      
+draw_num_credits:                                               
+    ld a,(num_coins)                 ; 1947     3a eb 20         ;  Number of credits
+sub_1950h:                                                      
+print_hi_score:                                                 
+    ld hl,020f4h                     ; 1950     21 f4 20         ;  Hi Score descriptor
+sub_1956h:                                                      
+draw_status:                                                    
+    call clear_screen                ; 1956     cd 5c 1a         ;  Clear the screen
+l196bh:                                                         
+    call sound_bits3off              ; 196b     cd dc 19         ;  From 170B with B=FB. Turn off player shot sound
+l1971h:                                                         
+    ld a,001h                        ; 1971     3e 01            ;  Set flag that ...
+suspend_game_tasks:                                                      
+    call dsable_game_tasks           ; 1979     cd d7 19         ;  Disable ISR game tasks
+control_isr_splash_from_acc:                                                      
+    ld (isr_splash_task),a           ; 1982     32 c1 20         ;  Set ISR splash task
+clear_playfield_taito_msg:                                                      
+    jp clear_play_field              ; 1988     c3 d6 09         ;  Clear playfield and out
+l199ah:                                                         
+check_hidden_mes:                                               
+    ld a,(hid_mess_seq)              ; 199a     3a 1e 20         ;  Has the 1st "hidden-message" sequence ...
+l19ach:                                                         
+    in a,(001h)                      ; 19ac     db 01            ;  Check inputs for 2nd sequence
+d_end:                                                          
+                                                                
+e_first:                                                        
+msg_taito_corporation:
+    defb 028h                        ; 19be     28              
+e_end:                                                          
+                                                                
+f_first:                                                        
+enable_game_tasks:                                              
+    ld a,001h                        ; 19d1     3e 01            ;  Set ISR ...
+l19d3h:                                                         
+    ld (suspend_play),a              ; 19d3     32 e9 20         ;  ... game tasks enabled
+sub_19d7h:                                                      
+dsable_game_tasks:                                              
+    xor a                            ; 19d7     af               ;  Clear ISR game tasks flag
+sub_19dch:                                                      
+sound_bits3off:                                                 
+    ld a,(sound_port3)               ; 19dc     3a 94 20         ;  Current sound effects value
+sub_19e6h:                                                      
+draw_num_ships:                                                 
+    ld hl,02701h                     ; 19e6     21 01 27         ;  Screen coordinates
+l19ech:                                                         
+    ld de,sprite_player              ; 19ec     11 60 1c         ;  Player sprite
+erase_ship_stash:                                                      
+    ld b,010h                        ; 19fa     06 10            ;  16 rows
+sub_1a06h:                                                      
+comp_yto_beam:                                                  
+    ld hl,vblank_status              ; 1a06     21 72 20         ;  Get the ...
+f_end:                                                          
+                                                                
+h_first:                                                        
+table_number_of_aliens:                                          ; congruent with table_associated_delay
+    defb 032h                        ; 1a11     32              
+table_associated_delay:                                          ; congruent with table_number_of_aliens
+    defb 034h                        ; 1a21     34              
+h_end:                                                          
+                                                                
+i_first:                                                        
+block_copy:                                                     
+    ld a,(de)                        ; 1a32     1a               ;  Copy from [DE] to ...
+sub_1a3bh:                                                      
+read_desc:                                                      
+    ld e,(hl)                        ; 1a3b     5e               ;  Descriptor ...
+sub_1a47h:                                                      
+conv_to_scr:                                                    
+    push bc                          ; 1a47     c5               ;  Hold B (will mangle)
+l1a4ah:                                                         
+    ld a,h                           ; 1a4a     7c               ;  H to A
+sub_1a5ch:                                                      
+clear_screen:                                                   
+    ld hl,02400h                     ; 1a5c     21 00 24         ;  Screen coordinate
+l1a5fh:                                                         
+    ld (hl),000h                     ; 1a5f     36 00            ;  Clear it
+sub_1a69h:                                                      
+restore_shields:                                                
+    push bc                          ; 1a69     c5               ;  Preserve BC
+l1a6bh:                                                         
+    ld a,(de)                        ; 1a6b     1a               ;  From sprite
+sub_1a7fh:                                                      
+remove_ship:                                                    
+    call get_num_ships_active_player ; 1a7f     cd 2e 09         ;  Get last byte from player data
+print_num_ships_in_acc:                                                      
+    ld hl,02501h                     ; 1a8b     21 01 25         ;  Screen coordinates
+i_end:                                                          
+                                                                
+g_first:                                                        
+    defb 000h                        ; 1a93     00              
+splash_animation_struct_1:                                                         
+    defb 000h                        ; 1a95     00              
+shot_reload_rate:                                                         
+    defb 030h                        ; 1aa1     30              
+msg_game_over_player_x:                                                         
+    defb 006h                        ; 1aa6     06              
+msg_one_or_two_players_btn:                                                         
+    defb 01bh                        ; 1aba     1b              
+only_one_player_btn:                                                         
+    defb 00eh                        ; 1acf     0e              
+msg_score_header:                                                         
+    defb 026h                        ; 1ae4     26              
+rammirror:                                                         
+    defb 001h                        ; 1b00     01              
+game_object_0_init:                                                         
+    defb 000h                        ; 1b10     00              ; timer
+game_object_1_init:
+    defb 000h                        ; 1b20     00              ; timer
+shot_struct:                                                         
+    defb 000h                        ; 1b25     00              
+game_object_2_init:                                                         
+    defb 000h                        ; 1b30     00              ; timer
+game_object_2_init_timer:            
+    defb 002h                        ; 1b32     02              ; timer
+game_object_3_init:                                                         
+    defb 000h                        ; 1b40     00              ; timer 
+l1b48h:                                                         
+    defb 000h                        ; 1b48     00              
+game_object_4_init:                  ; squiggly shot rom info
+    defb 000h                        ; 1b50     00              ; timer
+l1b58h:                                                         
+    defb 006h                        ; 1b58     06              
+msg_play_player_one:                                                         
+    defb 00fh                        ; 1b70     0f              
+data_for_saucer:                                                         
+    defb 000h                        ; 1b83     00              
+l1bb0h:                                                         
+    defb 000h                        ; 1bb0     00              
+l1bc0h:                                                         
+    defb 000h                        ; 1bc0     00              
+sprite_aliens_start_a:                                                         
+sprite_alien_a_0;
+sprite_alien_c_0:
+    defb 000h                        ; 1c20     00              
+sprite_aliens_start_b:
+    defb 000h                        ; 1c30     00              
+sprite_alien_b_1:
+    defb 000h                        ; 1c40     00              
+sprite_player:                                                         
+    defb 000h                        ; 1c60     00              
+sprite_base_blowup:                                                         
+    defb 000h                        ; 1c70     00              
+msg_score_advance_table:                                                         
+    defb 028h                        ; 1ca3     28              
+score_msb_table:                                                         
+    defb 002h                        ; 1cb8     02              
+msg_tilt:                                                         
+    defb 013h                        ; 1cbc     13              
+sprite_ashot_explode:                                                         
+    defb 04ah                        ; 1cdc     4a              
+msg_play_upside_down:                                                         
+    defb 00fh                        ; 1cfa     0f              
+image_shield:                                                         
+    defb 0ffh                        ; 1d20     ff              
+l1d4ch:                                                         
+    defb 005h                        ; 1d4c     05              
+l1d50h:                                                         
+    defb 094h                        ; 1d50     94              
+sprite_flying_saucer:
+    defb 004h                        ; 1d68     04              
+sprite_saucer_blowup:                                                         
+    defb 000h                        ; 1d7c     00              
+table_alien_score_val:                                                         
+    defb 010h                        ; 1da0     10               ; Bottom two rows
+coord_start_alien_table:                                         ; Lol, fuck me - preinc in loop                
+    defb 030h                        ; 1da2     30               ; Weird overlap, this is the last of - Highest row.
+msg_play_normal:                                                         
+    defb 00fh                        ; 1dab     0f              
+msg_space_invaders:                                                         
+    defb 012h                        ; 1daf     12              
+table_coord_sprite_score:                                                         
+    defb 00eh                        ; 1dbe     0e              
+table_coord_msg_score:               ;                           ; references strings below
+    defb 00eh                        ; 1dcf     0e              
+msg_mystery:
+    defb 027h                        ; 1de0     27              
+msg_thirty_points:
+    defb 027h                        ; 1dea     27              
+msg_twenty_points:
+    defb 027h                        ; 1df4     27              
+padding_align_font:
+    defb 000h                        ; 1dfe     00              
+character_set:                                                         
+    defb 000h                        ; 1e00     00              
+sprite_alien_y_0:
+    defb 060h                        ; 1f80     60              
+msg_insert_coin:                                                         
+    defb 008h                        ; 1f90     08              
+coord_msg_one_or_two_play:                                                         
+    defb 00dh                        ; 1f9c     0d              
+coord_msg_one_play_one_coi:                                                         
+    defb 00ah                        ; 1fa0     0a              
+coord_msg_two_play_two_coi:                                                         
+    defb 007h                        ; 1fa4     07              
+terminate_table:
+    defb 0ffh                        ; 1fa8     ff              
+msg_credit:                                                         
+    defb 002h                        ; 1fa9     02              
+sprite_alien_y_1:
+    defb 000h                        ; 1fb0     00              
+sprite_char_query:
+    defb 000h                        ; 1fc0     00              
+splash_animation_struct_3:                                                         
+    defb 000h                        ; 1fc9     00              
+splash_animation_struct_4:                                                         
+    defb 000h                        ; 1fd5     00              
+msg_two_players_two_coins:
+    defb 028h                        ; 1fe1     28               
+msg_push:                                                         
+    defb 00fh                        ; 1ff3     0f              
+g_end:                                                          
+    nop                              ; 1fff     00              
+wait_on_draw:                  equ 02000h                        ; 02000h 02000    ; from here is copied from rom at rammirror                  defb 001h ; 1b00 01  rammirror:                                                  
+                                                                 ; 02001h 02001                                                                 defb 000h ; 1b01 00  
+alien_is_exploding:            equ 02002h                        ; 02002h 02002    ; read sequentially in draw_alien                            defb 000h ; 1b02 00  
+exp_alien_timer:               equ 02003h                        ; 02003h 02003                                                                 defb 010h ; 1b03 10  
+alien_row:                     equ 02004h                        ; 02004h 02004                                                                 defb 000h ; 1b04 00  
+alien_ani_frame_number:        equ 02005h                        ; 02005h 02005    ; alien animation frame number                               defb 000h ; 1b05 00  
+alien_cur_index:               equ 02006h                        ; 02006h 02006                                                                 defb 000h ; 1b06 00  
+ref_alien_dyr:                 equ 02007h                        ; 02007h 02007                                                                 defb 000h ; 1b07 00  
+ref_alien_dxr:                 equ 02008h                        ; 02008h 02008                                                                 defb 002h ; 1b08 02  
+ref_alien_yr:                  equ 02009h                        ; 02009h 02009                                                                 defb 078h ; 1b09 78  
+ref_alien_xr:                  equ 0200ah                        ; 0200ah 0200a                                                                 defb 038h ; 1b0a 38  
+alien_pos_lsb:                 equ 0200bh                        ; 0200bh 0200b                                                                 defb 078h ; 1b0b 78  
+                                                                 ; 0200ch 0200c                                                                 defb 038h ; 1b0c 38  
+rack_direction:                equ 0200dh                        ; 0200dh 0200d                                                                 defb 000h ; 1b0d 00  
+rack_down_delta:               equ 0200eh                        ; 0200eh 0200e                                                                 defb 0f8h ; 1b0e f8  
+                                                                 ; 0200fh 0200f                                                                 defb 000h ; 1b0f 00  
+game_object_0:                 equ 02010h                        ; 02010h 02010    ; @ first game object active player                          defb 000h ; 1b10 00  game_object_0_init:                                      
+obj0timer_lsb:                 equ 02011h                        ; 02011h 02011                                                                 defb 080h ; 1b11 80  
+obj0timer_extra:               equ 02012h                        ; 02012h 02012                                                                 defb 000h ; 1b12 00  
+                                                                 ; 02013h 02013    ; vec lo                                                     defb 08eh ; 1b13 8e  
+player_alive:                  equ 02015h                        ; 02015h 02015                                                                 defb 0ffh ; 1b15 ff  
+                                                                 ; 02016h 02016                                                                 defb 005h ; 1b16 05  
+plyr_spr_pic_l:                equ 02018h                        ; 02018h 02018    e ; descriptor                                               defb 060h ; 1b18 60  
+                                                                 ; 02019h 02019    d                                                            defb 01ch ; 1b19 1c  
+player_yr:                     equ 0201ah                        ; 0201ah 0201a    l                                                            defb 020h ; 1b1a 20  
+player_xr:                     equ 0201bh                        ; 0201bh 0201b    h                                                            defb 030h ; 1b1b 30  
+                                                                 ; 0201ch 0201c    b                                                            defb 010h ; 1b1c 10  
+next_demo_cmd:                 equ 0201dh                        ; 0201dh 0201d                                                                 defb 001h ; 1b1d 01  
+hid_mess_seq:                  equ 0201eh                        ; 0201eh 0201e                                                                 defb 000h ; 1b1e 00  
+                                                                 ; 0201fh 0201f                                                                 defb 000h ; 1b1f 00  
+plyr_shot_status:              equ 02025h                        ; 02025h 02025                                                                 defb 000h ; 1b25 00  shot_struct:                                                
+                                                                 ; 02026h 02026                                                                 defb 010h ; 1b26 10  
+obj1coor_yr:                   equ 02029h                        ; 02029h 02029    l                                                            defb 028h ; 1b29 28  
+obj1coor_xr:                   equ 0202ah                        ; 0202ah 0202a    h                                                            defb 030h ; 1b2a 30  
+                                                                 ; 0202bh 0202b    b                                                            defb 001h ; 1b2b 01  
+shot_delta_x:                  equ 0202ch                        ; 0202ch 0202c                                                                 defb 004h ; 1b2c 04  
+fire_bounce:                   equ 0202dh                        ; 0202dh 0202d                                                                 defb 000h ; 1b2d 00  
+                                                                 ; 0202eh 0202e                                                                 defb 0ffh ; 1b2e ff  
+game_object_2:                 equ 02030h                        ; 02030h 02030    ; @ reload object structure from rom                         defb 000h ; 1b30 00  l1b30h:                                                     
+                                                                 ; 02031h 02031                                                                 defb 000h ; 1b31 00  
+obj2timer_extra:               equ 02032h                        ; 02032h 02032                                                                 defb 002h ; 1b32 02  l1b32h:                                                     
+                                                                 ; 02033h 02033    ; vec lo                                                     defb 076h ; 1b33 76  
+rol_shot_struct:               equ 02035h                        ; 02035h 02035    ; @ rolling shot data structure                              defb 000h ; 1b35 00  
+rol_shot_step_cnt:             equ 02036h                        ; 02036h 02036                                                                 defb 000h ; 1b36 00  
+                                                                 ; 02037h 02037                                                                 defb 000h ; 1b37 00  
+rol_shot_cfir_lsb:             equ 02038h                        ; 02038h 02038                                                                 defb 000h ; 1b38 00  
+                                                                 ; 02039h 02039                                                                 defb 000h ; 1b39 00  
+game_object_3:                 equ 02040h                        ; 02040h 02040    ; @ reload object structure from rom                         defb 000h ; 1b40 00  l1b40h:                                                     
+                                                                 ; 02041h 02041                                                                 defb 000h ; 1b41 00  
+plu_shot_struct:               equ 02045h                        ; 02045h 02045    ; @ plunger shot data structure                              defb 000h ; 1b45 00  
+plu_shot_step_cnt:             equ 02046h                        ; 02046h 02046                                                                 defb 000h ; 1b46 00  
+                                                                 ; 02047h 02047                                                                 defb 001h ; 1b47 01  
+plu_shot_cfir_lsb:             equ 02048h                        ; 02048h 02048                                                                 defb 000h ; 1b48 00  l1b48h:                                                     
+                                                                 ; 02049h 02049                                                                 defb 01dh ; 1b49 1d  
+game_object_4:                 equ 02050h                        ; 02050h 02050    ; squiggly shot ram info                                     defb 000h ; 1b50 00  l1b50h:                                                     
+                                                                 ; 02051h 02051                                                                 defb 000h ; 1b51 00  
+squ_shot_status:               equ 02055h                        ; 02055h 02055                                                                 defb 000h ; 1b55 00  
+squ_shot_step_cnt:             equ 02056h                        ; 02056h 02056                                                                 defb 000h ; 1b56 00  
+                                                                 ; 02057h 02057                                                                 defb 001h ; 1b57 01  
+squ_shot_cfir_lsb:             equ 02058h                        ; 02058h 02058                                                                 defb 006h ; 1b58 06  l1b58h:                                                     
+                                                                 ; 02059h 02059                                                                 defb 01dh ; 1b59 1d  
+collision:                     equ 02061h                        ; 02061h 02061                                                                 defb 000h ; 1b61 00  
+                                                                 ; 02062h 02062    ; e ; descriptor ; exploding alien                           defb 0c0h ; 1b62 c0  
+exp_alien_yr:                  equ 02064h                        ; 02064h 02064    ; l                                                          defb 000h ; 1b64 00  
+                                                                 ; 02065h 02065    ; h                                                          defb 000h ; 1b65 00  
+player_data_msb:               equ 02067h                        ; 02067h 02067                                                                 defb 021h ; 1b67 21  
+player_ok:                     equ 02068h                        ; 02068h 02068                                                                 defb 001h ; 1b68 01  
+enable_alien_fire:             equ 02069h                        ; 02069h 02069                                                                 defb 000h ; 1b69 00  
+alien_fire_delay:              equ 0206ah                        ; 0206ah 0206a                                                                 defb 030h ; 1b6a 30  
+                                                                 ; 0206bh 0206b    ; flag if only one alien left                                defb 000h ; 1b6b 00  
+temp206c:                      equ 0206ch                        ; 0206ch 0206c                                                                 defb 012h ; 1b6c 12  
+invaded:                       equ 0206dh                        ; 0206dh 0206d                                                                 defb 000h ; 1b6d 00  
+skip_plunger:                  equ 0206eh                        ; 0206eh 0206e                                                                 defb 000h ; 1b6e 00  
+                                                                 ; 0206fh 0206f                                                                 defb 000h ; 1b6f 00  
+other_shot1:                   equ 02070h                        ; 02070h 02070                                                                 defb 00fh ; 1b70 0f  msg_play_player_one:                                        
+other_shot2:                   equ 02071h                        ; 02071h 02071                                                                 defb 00bh ; 1b71 0b  
+vblank_status:                 equ 02072h                        ; 02072h 02072                                                                 defb 000h ; 1b72 00  
+a_shot_status:                 equ 02073h                        ; 02073h 02073                                                                 defb 018h ; 1b73 18  
+                                                                 ; 02074h 02074                                                                 defb 026h ; 1b74 26  
+a_shot_cfir_lsb:               equ 02076h                        ; 02076h 02076                                                                 defb 00bh ; 1b76 0b  
+                                                                 ; 02077h 02077                                                                 defb 000h ; 1b77 00  
+a_shot_blow_cnt:               equ 02078h                        ; 02078h 02078                                                                 defb 018h ; 1b78 18  
+a_shot_image_lsb:              equ 02079h                        ; 02079h 02079    ; e ; descriptor                                             defb 004h ; 1b79 04  
+                                                                 ; 0207ah 0207a    ; d                                                          defb 011h ; 1b7a 11  
+alien_shot_yr:                 equ 0207bh                        ; 0207bh 0207b    ; l                                                          defb 024h ; 1b7b 24  
+                                                                 ; 0207ch 0207c    ; h  ; @ alien shot y? coordinate                            defb 01bh ; 1b7c 1b  
+alien_shot_size:               equ 0207dh                        ; 0207dh 0207d    ; b                                                          defb 025h ; 1b7d 25  
+alien_shot_delta:              equ 0207eh                        ; 0207eh 0207e                                                                 defb 0fch ; 1b7e fc  
+shot_pic_end:                  equ 0207fh                        ; 0207fh 0207f                                                                 defb 000h ; 1b7f 00  
+shot_sync:                     equ 02080h                        ; 02080h 02080                                                                 defb 001h ; 1b80 01  
+tmp2081:                       equ 02081h                        ; 02081h 02081                                                                 defb 0ffh ; 1b81 ff  
+num_aliens:                    equ 02082h                        ; 02082h 02082                                                                 defb 0ffh ; 1b82 ff  
+saucer_start:                  equ 02083h                        ; 02083h 02083                                                                 defb 000h ; 1b83 00  data_for_saucer: +                                          
+saucer_active:                 equ 02084h                        ; 02084h 02084                                                                 defb 000h ; 1b84 00                   |                 
+saucer_hit:                    equ 02085h                        ; 02085h 02085                                                                 defb 000h ; 1b85 00                   |                 
+                                                                 ; 02086h 02086                                                                 defb 020h ; 1b86 20                   |                 
+saucer_pri_loc_lsb:            equ 02087h                        ; 02087h 02087    ; e ; descriptor                                             defb 064h ; 1b87 64                   |                 
+                                                                 ; 02088h 02088    ; d                                                          defb 01dh ; 1b88 1d                   |                 
+saucer_pri_pic_msb:            equ 0208ah                        ; 0208ah 0208a    ; h                                                          defb 029h ; 1b8a 29                   |                 
+                                                                 ; 0208bh 0208b    ; b                                                          defb 018h ; 1b8b 18                   |                 
+sau_score_lsb:                 equ 0208dh                        ; 0208dh 0208d                                                                 defb 054h ; 1b8d 54                                     
+                                                                 ; 0208eh 0208e                                                                 defb 01dh ; 1b8e 1d                                     
+shot_count_lsb:                equ 0208fh                        ; 0208fh 0208f                                                                 defb 000h ; 1b8f 00                                     
+                                                                 ; 02090h 02090                                                                 defb 008h ; 1b90 08                                     
+till_saucer_lsb:               equ 02091h                        ; 02091h 02091                                                                 defb 000h ; 1b91 00                                     
+                                                                 ; 02092h 02092                                                                 defb 006h ; 1b92 06                                     
+wait_start_loop:               equ 02093h                        ; 02093h 02093                                                                 defb 000h ; 1b93 00                                     
+sound_port3:                   equ 02094h                        ; 02094h 02094                                                                 defb 000h ; 1b94 00                                     
+change_fleet_snd:              equ 02095h                        ; 02095h 02095                                                                 defb 001h ; 1b95 01                                     
+                                                                 ; 02096h 02096    ; @ current time on fleet sound                              defb 040h ; 1b96 40                                     
+fleet_snd_reload:              equ 02097h                        ; 02097h 02097                                                                 defb 000h ; 1b97 00                                     
+sound_port5:                   equ 02098h                        ; 02098h 02098                                                                 defb 001h ; 1b98 01                                     
+extra_hold:                    equ 02099h                        ; 02099h 02099                                                                 defb 000h ; 1b99 00                                     
+tilt:                          equ 0209ah                        ; 0209ah 0209a                                                                 defb 000h ; 1b9a 00                                     
+fleet_snd_hold:                equ 0209bh                        ; 0209bh 0209b                                                                 defb 010h ; 1b9b 10                                     
+                                                                 ; 0209ch 0209c                                                                 defb 09eh ; 1b9c 9e  
+isr_delay:                     equ 020c0h                        ; 020c0h 020c0    
+isr_splash_task:               equ 020c1h                        ; 020c1h 020c1    
+splash_an_form:                equ 020c2h                        ; 020c2h 020c2    +
+                                                                 ; 020c3h 020c3    |                              
+splash_image_lsb:              equ 020c7h                        ; 020c7h 020c7    |                                  
+                                                                 ; 020c8h 020c8    |                              
+splash_target_y:               equ 020cah                        ; 020cah 020ca    |                                  
+splash_reached:                equ 020cbh                        ; 020cbh 020cb    |                                  
+splash_im_rest_lsb:            equ 020cch                        ; 020cch 020cc    |                                  
+                                                                 ; 020cdh 020cd    +                              
+two_players:                   equ 020ceh                        ; 020ceh 020ce                                       
+a_shot_reload_rate:            equ 020cfh                        ; 020cfh 020cf                                       
+                                                                 ; 020d0h 020d0                                   
+player1ex:                     equ 020e5h                        ; 020e5h 020e5    
+                                                                 ; 020e6h 020e6
+player1alive:                  equ 020e7h                        ; 020e7h 020e7    
+                                                                 ; 020e8h 020e8
+suspend_play:                  equ 020e9h                        ; 020e9h 020e9    
+coin_switch:                   equ 020eah                        ; 020eah 020ea    
+num_coins:                     equ 020ebh                        ; 020ebh 020eb    
+splash_animate:                equ 020ech                        ; 020ech 020ec    
+demo_cmd_ptr_lsb:              equ 020edh                        ; 020edh 020ed    
+                                                                 ; 020eeh 020ee
+game_mode:                     equ 020efh                        ; 020efh 020ef    
+                                                                 ; 020f0h 020f0
+adjust_score_data:             equ 020f1h                        ; 020f1h 020f1    
+score_delta_lsb:               equ 020f2h                        ; 020f2h 020f2    
+                                                                 ; 020f3h 020f3    ; @ pointer to score delta msb
+p1scor_l:                      equ 020f8h                        ; 020f8h 020f8    
+                                                                 ; 020f9h 020f9
+p2scor_l:                      equ 020fch                        ; 020fch 020fc    
+                                                                 ; 020fdh 020fd
+p1ref_alien_dx:                equ 021fbh                        ; 021fbh 021fb    
+p1ref_alien_y:                 equ 021fch                        ; 021fch 021fc    
+                                                                 ; 021fdh 021fd
+p1rack_cnt:                    equ 021feh                        ; 021feh 021fe    
+p1ships_rem:                   equ 021ffh                        ; 021ffh 021ff    
+                                                                 ; 02200h 02200     ; @ player two data area
+p2ref_alien_dx:                equ 022fbh                        ; 022fbh 022fb    
+p2ref_alien_yr:                equ 022fch                        ; 022fch 022fc    
+                                                                 ; 022fdh 022fd
+p2rack_cnt:                    equ 022feh                        ; 022feh 022fe    
+p2ships_rem:                   equ 022ffh                        ; 022ffh 022ff    
