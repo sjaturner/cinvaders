@@ -921,7 +921,8 @@ uint32_t _block_copy_impl(uint8_t *mem, uint16_t *dst, uint16_t *src, uint8_t *l
         ++*dst;
         ++*src;
         --*len;
-    } while(*len);
+    }
+    while (*len);
     return 0;
 }
 
@@ -943,10 +944,26 @@ uint32_t _draw_char(struct cpu *cpu)
     return _draw_char_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_a(cpu, 0));
 }
 
+uint32_t _print_message_impl(uint8_t *mem, uint8_t length, uint16_t *message, uint16_t *screen_coord)
+{
+    printf("%s\n", __func__);
+    for (uint8_t index = 0; index < length; ++index)
+    {
+        _draw_char_impl(mem, screen_coord, mem[*message + index]);
+    }
+    return 0;
+}
+
+uint32_t _print_message(struct cpu *cpu)
+{
+    return _print_message_impl(cpu->mem, get_c(cpu, 0), cpu->cpu_state.regs + REG_DE, cpu->cpu_state.regs + REG_HL);
+}
+
 uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     [0x1439] = _draw_simp_sprite,
     [0x1a32] = _block_copy,
     [0x08ff] = _draw_char,
+    [0x08f3] = _print_message,
 };
 
 uint32_t cimpl_wrapper(struct cpu *cpu, uint32_t duration)
