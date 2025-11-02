@@ -959,11 +959,27 @@ uint32_t _print_message(struct cpu *cpu)
     return _print_message_impl(cpu->mem, get_c(cpu, 0), cpu->cpu_state.regs + REG_DE, cpu->cpu_state.regs + REG_HL);
 }
 
+enum
+{
+    CHAR_TABLE_OFFSET_OF_ZERO = 0x1a, /* Hop over letters A-Z. */
+};
+uint32_t _draw_digit_in_acc_impl(uint8_t *mem, uint16_t *screen_coord, uint8_t digit)
+{
+    printf("%s\n", __func__);
+    return _draw_char_impl(mem, screen_coord, digit + CHAR_TABLE_OFFSET_OF_ZERO);
+}
+
+uint32_t _draw_digit_in_acc(struct cpu *cpu)
+{
+    return _draw_digit_in_acc_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_a(cpu, 0));
+}
+
 uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     [0x1439] = _draw_simp_sprite,
     [0x1a32] = _block_copy,
     [0x08ff] = _draw_char,
     [0x08f3] = _print_message,
+    [0x09c5] = _draw_digit_in_acc,
 };
 
 uint32_t cimpl_wrapper(struct cpu *cpu, uint32_t duration)
