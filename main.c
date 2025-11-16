@@ -974,12 +974,47 @@ uint32_t _draw_digit_in_acc(struct cpu *cpu)
     return _draw_digit_in_acc_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_a(cpu, 0));
 }
 
+uint32_t _draw_hex_byte_impl(uint8_t *mem, uint16_t *screen_coord, uint8_t byte)
+{
+    printf("%s\n", __func__);
+    uint32_t ret = 0;
+
+    ret += _draw_digit_in_acc_impl(mem, screen_coord, byte >> 4 * 1 & 0x0f);
+    ret += _draw_digit_in_acc_impl(mem, screen_coord, byte >> 4 * 0 & 0x0f);
+
+    return 0;
+}
+
+uint32_t _draw_hex_byte(struct cpu *cpu)
+{
+    return _draw_hex_byte_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_a(cpu, 0));
+}
+
+uint32_t _draw_hex_word_impl(uint8_t *mem, uint16_t *screen_coord, uint16_t word)
+{
+    printf("%s\n", __func__);
+    uint32_t ret = 0;
+
+    ret += _draw_hex_byte_impl(mem, screen_coord, word >> 8 * 1 & 0xff);
+    ret += _draw_hex_byte_impl(mem, screen_coord, word >> 8 * 0 & 0xff);
+
+    return 0;
+}
+
+uint32_t _draw_hex_word(struct cpu *cpu)
+{
+    return _draw_hex_word_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_de(cpu, 0));
+}
+
+#define MAP_CIMPL(F) [F] = _ ## F
 uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
-    [0x1439] = _draw_simp_sprite,
-    [0x1a32] = _block_copy,
-    [0x08ff] = _draw_char,
-    [0x08f3] = _print_message,
-    [0x09c5] = _draw_digit_in_acc,
+    MAP_CIMPL(draw_simp_sprite),
+    MAP_CIMPL(block_copy),
+    MAP_CIMPL(draw_char),
+    MAP_CIMPL(print_message),
+    MAP_CIMPL(draw_digit_in_acc),
+    MAP_CIMPL(draw_hex_byte),
+    MAP_CIMPL(draw_hex_word),
 };
 
 uint32_t cimpl_wrapper(struct cpu *cpu, uint32_t duration)
