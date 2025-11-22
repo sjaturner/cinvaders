@@ -1108,14 +1108,14 @@ uint32_t _clear_screen(struct cpu *cpu)
     return _clear_screen_impl(cpu->mem);
 }
 
-uint32_t _handle_alien_shot_impl(uint8_t *mem)
+uint32_t _template_impl(uint8_t *mem)
 {
     return 0;
 }
 
-uint32_t _handle_alien_shot(struct cpu *cpu)
+uint32_t _template(struct cpu *cpu)
 {
-    return _handle_alien_shot_impl(cpu->mem);
+    return _template_impl(cpu->mem);
 }
 
 #define MAP_CIMPL(F) [F] = _ ## F
