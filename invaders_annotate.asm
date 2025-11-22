@@ -5601,6 +5601,7 @@ sprite_base_blowup:
     defb 084h                        ; 1c8d     84              
     defb 011h                        ; 1c8e     11              
     defb 048h                        ; 1c8f     48              
+player_shot_sprite:
     defb 00fh                        ; 1c90     0f              
     defb 099h                        ; 1c91     99              
     defb 03ch                        ; 1c92     3c              
@@ -5652,6 +5653,7 @@ msg_tilt:
     defb 008h                        ; 1cbd     08              
     defb 00bh                        ; 1cbe     0b              
     defb 013h                        ; 1cbf     13              
+alien_explode:
     defb 000h                        ; 1cc0     00              
     defb 008h                        ; 1cc1     08              
     defb 049h                        ; 1cc2     49              
@@ -6590,7 +6592,7 @@ obj0timer_extra:               equ 02012h                        ; 02012h 02012 
 player_alive:                  equ 02015h                        ; 02015h 02015                                                                 defb 0ffh ; 1b15 ff  
                                                                  ; 02016h 02016                                                                 defb 005h ; 1b16 05  
                                                                  ; 02017h 02017                                                                 defb 00ch ; 1b17 0c  
-plyr_spr_pic_l:                equ 02018h                        ; 02018h 02018    e ; descriptor                                               defb 060h ; 1b18 60  
+plyr_spr_pic_l:                equ 02018h                        ; 02018h 02018    e ; descriptor                                               defb 060h ; 1b18 60  sprite_player
                                                                  ; 02019h 02019    d                                                            defb 01ch ; 1b19 1c  
 player_yr:                     equ 0201ah                        ; 0201ah 0201a    l                                                            defb 020h ; 1b1a 20  
 player_xr:                     equ 0201bh                        ; 0201bh 0201b    h                                                            defb 030h ; 1b1b 30  
@@ -6606,7 +6608,7 @@ hid_mess_seq:                  equ 0201eh                        ; 0201eh 0201e 
                                                                  ; 02024h 02024    ; vec hi                                                     defb 003h ; 1b24 03  
 plyr_shot_status:              equ 02025h                        ; 02025h 02025                                                                 defb 000h ; 1b25 00  shot_struct:                                                
                                                                  ; 02026h 02026                                                                 defb 010h ; 1b26 10  
-                                                                 ; 02027h 02027    e ; descriptor                                               defb 090h ; 1b27 90  
+                                                                 ; 02027h 02027    e ; descriptor                                               defb 090h ; 1b27 90  player_shot_sprite
                                                                  ; 02028h 02028    d                                                            defb 01ch ; 1b28 1c  
 obj1coor_yr:                   equ 02029h                        ; 02029h 02029    l                                                            defb 028h ; 1b29 28  
 obj1coor_xr:                   equ 0202ah                        ; 0202ah 0202a    h                                                            defb 030h ; 1b2a 30  
@@ -6670,7 +6672,7 @@ squ_shot_cfir_lsb:             equ 02058h                        ; 02058h 02058 
                                                                  ; 02060h 02060                                                                 defb 0ffh ; 1b60 ff  
 
 collision:                     equ 02061h                        ; 02061h 02061                                                                 defb 000h ; 1b61 00  
-                                                                 ; 02062h 02062    ; e ; descriptor ; exploding alien                           defb 0c0h ; 1b62 c0  
+                                                                 ; 02062h 02062    ; e ; descriptor ; exploding alien                           defb 0c0h ; 1b62 c0  alien_explode
                                                                  ; 02063h 02063    ; d                                                          defb 01ch ; 1b63 1c  
 exp_alien_yr:                  equ 02064h                        ; 02064h 02064    ; l                                                          defb 000h ; 1b64 00  
                                                                  ; 02065h 02065    ; h                                                          defb 000h ; 1b65 00  

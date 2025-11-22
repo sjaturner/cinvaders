@@ -889,18 +889,65 @@ void set_flags(struct cpu *cpu, const struct opcode *opcode, uint32_t res_val, i
     set_f(cpu, 0, (get_f(cpu, 0) & ~flag_mask) | (flags & flag_mask));
 }
 
+static uint8_t dip0 = 0x0f;
+static uint8_t dip1 = 0x08;
+static uint8_t dip2 = 0x01;
+
+static uint16_t shift_reg;
+static int shift_off;
+
+uint8_t port_ip(struct cpu *cpu, uint16_t addr)
+{
+    switch (addr)
+    {
+        case 0:
+            return dip0;
+        case 1:
+            return dip1;
+        case 2:
+            return dip2;
+        case 3:
+            return shift_reg >> (8 - shift_off);
+        default:
+            printf("Port read %d\n", addr);
+    }
+
+    return 0x00;
+}
+
+void port_op(struct cpu *cpu, uint16_t addr, uint8_t val)
+{
+    switch (addr)
+    {
+        case 2:
+            shift_off = val & 7;
+            break;
+        case 3:
+            break;
+        case 4:
+            shift_reg = (shift_reg >> 8) | ((uint16_t)val << 8);
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        default:
+            printf("Port write %d %d\n", addr, val);
+    }
+}
+
 enum
 {
     SCREEN_ROW_SIZE = 0x20,
 };
 
-uint32_t _draw_simp_sprite_impl(uint8_t *mem, uint16_t counter, uint16_t *char_set, uint16_t *screen_address)
+uint32_t _draw_simp_sprite_impl(uint8_t *mem, uint16_t counter, uint16_t *char_set, uint16_t *screen_addr)
 {
-    printf("%s %u *char_set:%04x *screen_address:%04x\n", __func__, counter, *char_set, *screen_address);
+    printf("%s %u *char_set:%04x *screen_addr:%04x\n", __func__, counter, *char_set, *screen_addr);
     do
     {
-        mem[*screen_address] = mem[*char_set];
-        *screen_address += SCREEN_ROW_SIZE;
+        mem[*screen_addr] = mem[*char_set];
+        *screen_addr += SCREEN_ROW_SIZE;
         ++*char_set;
         --counter;
     } while(counter);
@@ -931,11 +978,11 @@ uint32_t _block_copy(struct cpu *cpu)
     return _block_copy_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs + REG_DE, (uint8_t *)(cpu->cpu_state.regs + REG_BC) + 1);
 }
 
-uint32_t _draw_char_impl(uint8_t *mem, uint16_t *screen_coord, uint8_t character)
+uint32_t _draw_char_impl(uint8_t *mem, uint16_t *screen_addr, uint8_t character)
 {
     uint16_t character_addr = character_set + 8 * character;
 
-    _draw_simp_sprite_impl(mem, 8, &character_addr, screen_coord);
+    _draw_simp_sprite_impl(mem, 8, &character_addr, screen_addr);
     return 0;
 }
 
@@ -944,12 +991,12 @@ uint32_t _draw_char(struct cpu *cpu)
     return _draw_char_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_a(cpu, 0));
 }
 
-uint32_t _print_message_impl(uint8_t *mem, uint8_t length, uint16_t *message, uint16_t *screen_coord)
+uint32_t _print_message_impl(uint8_t *mem, uint8_t length, uint16_t *message, uint16_t *screen_addr)
 {
     printf("%s\n", __func__);
     for (uint8_t index = 0; index < length; ++index)
     {
-        _draw_char_impl(mem, screen_coord, mem[*message + index]);
+        _draw_char_impl(mem, screen_addr, mem[*message + index]);
     }
     return 0;
 }
@@ -963,10 +1010,10 @@ enum
 {
     CHAR_TABLE_OFFSET_OF_ZERO = 0x1a, /* Hop over letters A-Z. */
 };
-uint32_t _draw_digit_in_acc_impl(uint8_t *mem, uint16_t *screen_coord, uint8_t digit)
+uint32_t _draw_digit_in_acc_impl(uint8_t *mem, uint16_t *screen_addr, uint8_t digit)
 {
     printf("%s\n", __func__);
-    return _draw_char_impl(mem, screen_coord, digit + CHAR_TABLE_OFFSET_OF_ZERO);
+    return _draw_char_impl(mem, screen_addr, digit + CHAR_TABLE_OFFSET_OF_ZERO);
 }
 
 uint32_t _draw_digit_in_acc(struct cpu *cpu)
@@ -974,13 +1021,13 @@ uint32_t _draw_digit_in_acc(struct cpu *cpu)
     return _draw_digit_in_acc_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_a(cpu, 0));
 }
 
-uint32_t _draw_hex_byte_impl(uint8_t *mem, uint16_t *screen_coord, uint8_t byte)
+uint32_t _draw_hex_byte_impl(uint8_t *mem, uint16_t *screen_addr, uint8_t byte)
 {
     printf("%s\n", __func__);
     uint32_t ret = 0;
 
-    ret += _draw_digit_in_acc_impl(mem, screen_coord, byte >> 4 * 1 & 0x0f);
-    ret += _draw_digit_in_acc_impl(mem, screen_coord, byte >> 4 * 0 & 0x0f);
+    ret += _draw_digit_in_acc_impl(mem, screen_addr, byte >> 4 * 1 & 0x0f);
+    ret += _draw_digit_in_acc_impl(mem, screen_addr, byte >> 4 * 0 & 0x0f);
 
     return 0;
 }
@@ -990,13 +1037,13 @@ uint32_t _draw_hex_byte(struct cpu *cpu)
     return _draw_hex_byte_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_a(cpu, 0));
 }
 
-uint32_t _draw_hex_word_impl(uint8_t *mem, uint16_t *screen_coord, uint16_t word)
+uint32_t _draw_hex_word_impl(uint8_t *mem, uint16_t *screen_addr, uint16_t word)
 {
     printf("%s\n", __func__);
     uint32_t ret = 0;
 
-    ret += _draw_hex_byte_impl(mem, screen_coord, word >> 8 * 1 & 0xff);
-    ret += _draw_hex_byte_impl(mem, screen_coord, word >> 8 * 0 & 0xff);
+    ret += _draw_hex_byte_impl(mem, screen_addr, word >> 8 * 1 & 0xff);
+    ret += _draw_hex_byte_impl(mem, screen_addr, word >> 8 * 0 & 0xff);
 
     return 0;
 }
@@ -1011,7 +1058,7 @@ uint32_t _conv_to_scr_impl(uint16_t *val)
     uint16_t a = (*val >> 8 * 0 & 0xff);
     uint16_t b = (*val >> 8 * 1 & 0xff);
 
-    *val = 0x2000 + ((b * 0x20 + a / 8) & 0x3fff);
+    *val = 0x2000 + ((b * SCREEN_ROW_SIZE + a / 8) & 0x3fff);
     
     return 0;
 }
@@ -1019,6 +1066,30 @@ uint32_t _conv_to_scr_impl(uint16_t *val)
 uint32_t _conv_to_scr(struct cpu *cpu)
 {
     return _conv_to_scr_impl(cpu->cpu_state.regs + REG_HL);
+}
+
+struct desc
+{
+    uint16_t sprite_addr;
+    uint16_t screen_loc;
+    uint8_t sprite_bytes;
+}__attribute__((packed));
+
+struct desc impl_read_desc(uint8_t *mem, uint16_t desc_addr)
+{
+    struct desc desc = { };
+    memcpy(&desc, mem + desc_addr, sizeof(desc));
+
+    return desc;
+}
+
+uint32_t _read_desc(struct cpu *cpu)
+{
+    struct desc desc = impl_read_desc(cpu->mem, cpu->cpu_state.regs[REG_HL]);
+    cpu->cpu_state.regs[REG_DE] = desc.sprite_addr;
+    cpu->cpu_state.regs[REG_HL] = desc.screen_loc;
+    set_b(cpu, 0, desc.sprite_bytes);
+    return 0;
 }
 
 #define MAP_CIMPL(F) [F] = _ ## F
@@ -1031,6 +1102,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_hex_byte),
     MAP_CIMPL(draw_hex_word),
     MAP_CIMPL(conv_to_scr),
+    MAP_CIMPL(read_desc),
 };
 
 uint32_t cimpl_wrapper(struct cpu *cpu, uint32_t duration)
@@ -1614,53 +1686,6 @@ uint8_t get_mem(struct cpu *cpu, uint16_t addr)
 void set_mem(struct cpu *cpu, uint16_t addr, uint8_t val)
 {
     cpu->mem[addr] = val;
-}
-
-static uint8_t dip0 = 0x0f;
-static uint8_t dip1 = 0x08;
-static uint8_t dip2 = 0x01;
-
-static uint16_t shift_reg;
-static int shift_off;
-
-uint8_t port_ip(struct cpu *cpu, uint16_t addr)
-{
-    switch (addr)
-    {
-        case 0:
-            return dip0;
-        case 1:
-            return dip1;
-        case 2:
-            return dip2;
-        case 3:
-            return shift_reg >> (8 - shift_off);
-        default:
-            printf("Port read %d\n", addr);
-    }
-
-    return 0x00;
-}
-
-void port_op(struct cpu *cpu, uint16_t addr, uint8_t val)
-{
-    switch (addr)
-    {
-        case 2:
-            shift_off = val & 7;
-            break;
-        case 3:
-            break;
-        case 4:
-            shift_reg = (shift_reg >> 8) | ((uint16_t)val << 8);
-            break;
-        case 5:
-            break;
-        case 6:
-            break;
-        default:
-            printf("Port write %d %d\n", addr, val);
-    }
 }
 
 void init(struct cpu *cpu, uint8_t *mem)
