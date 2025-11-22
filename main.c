@@ -1108,7 +1108,18 @@ uint32_t _clear_screen(struct cpu *cpu)
     return _clear_screen_impl(cpu->mem);
 }
 
+uint32_t _handle_alien_shot_impl(uint8_t *mem)
+{
+    return 0;
+}
+
+uint32_t _handle_alien_shot(struct cpu *cpu)
+{
+    return _handle_alien_shot_impl(cpu->mem);
+}
+
 #define MAP_CIMPL(F) [F] = _ ## F
+#define _________(F) [F] = 0
 uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_simp_sprite),
     MAP_CIMPL(block_copy),
@@ -1120,6 +1131,43 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(conv_to_scr),
     MAP_CIMPL(read_desc),
     MAP_CIMPL(clear_screen),
+
+    /* leaves */
+
+    _________(init_racks_direction),
+    _________(sub_013bh),
+    _________(get_alien_coords),
+    _________(add_delta),
+    _________(copy_rammirror),
+    _________(read_ply_shot),
+    _________(to_shot_struct),
+    _________(find_in_column),
+    _________(reinit_saucer),
+    _________(get_al_ref_ptr),
+    _________(get_ships_per_cred),
+    _________(time_to_saucer),
+    _________(alien_score_value),
+    _________(cnvt_pix_number),
+    _________(get_alien_stat_ptr),
+    _________(wrap_ref),
+    _________(sub_176dh),
+    _________(fleet_sound_off),
+    _________(check_handle_tilt),
+    _________(read_pri_struct),
+    _________(get_player_alive_ptr),
+    _________(get_delta_x),
+    _________(sound_bits3on),
+    _________(init_aliens_p2),
+    _________(draw_score_head),
+    _________(print_player_one_score),
+    _________(print_player_two_score),
+    _________(print_credit_label),
+    _________(draw_num_credits),
+    _________(print_hi_score),
+    _________(enable_game_tasks),
+    _________(dsable_game_tasks),
+    _________(sound_bits3off),
+    _________(comp_yto_beam),
 };
 
 uint32_t cimpl_wrapper(struct cpu *cpu, uint32_t duration)

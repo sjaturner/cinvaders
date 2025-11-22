@@ -249,6 +249,7 @@ l0154h:
     ld a,001h                        ; 0174     3e 01            ;  Set the wait-flag for the ...
     ld (wait_on_draw),a              ; 0176     32 00 20         ;  ... draw-alien routine to clear
     ret                              ; 0179     c9               ;  Done
+
 get_alien_coords:                                               
     ld d,000h                        ; 017a     16 00            ;  Row 0
     ld a,l                           ; 017c     7d               ;  Hold onto alien index
@@ -357,6 +358,7 @@ l01fdh:
     dec c                            ; 0204     0d               ;  Drawn all shields?
     jp nz,l01fdh                     ; 0205     c2 fd 01         ;  No ... go draw them all
     ret                              ; 0208     c9               ;  Done
+
 remember_shields1:                                              
     ld a,001h                        ; 0209     3e 01            ;  Not zero means remember
     jp l021bh                        ; 020b     c3 1b 02         ;  Shuffle-shields player 1
@@ -1322,6 +1324,7 @@ get_alien_ptr_etc:
     nop                              ; 0883     00               ;  ** Why?
     nop                              ; 0884     00              
     nop                              ; 0885     00              
+
 get_al_ref_ptr:                                                 
     ld a,(player_data_msb)           ; 0886     3a 67 20         ;  Player data MSB (21 or 22)
     ld h,a                           ; 0889     67               ;  To H
