@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <inttypes.h>
+#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -938,7 +939,10 @@ void port_op(struct cpu *cpu, uint16_t addr, uint8_t val)
 
 enum
 {
-    SCREEN_ROW_SIZE = 0x20,
+    SCREEN_BASE = 0x2400,
+    SCREEN_BITS_PER_PIXEL_COLUMN = 0x100,
+    SCREEN_BYTES_PER_PIXEL_COLUMN = SCREEN_BITS_PER_PIXEL_COLUMN / CHAR_BIT,
+    SCREEN_BITS_PER_ROW = 224,
 };
 
 uint32_t _draw_simp_sprite_impl(uint8_t *mem, uint16_t counter, uint16_t *char_set, uint16_t *screen_addr)
@@ -947,7 +951,7 @@ uint32_t _draw_simp_sprite_impl(uint8_t *mem, uint16_t counter, uint16_t *char_s
     do
     {
         mem[*screen_addr] = mem[*char_set];
-        *screen_addr += SCREEN_ROW_SIZE;
+        *screen_addr += SCREEN_BYTES_PER_PIXEL_COLUMN;
         ++*char_set;
         --counter;
     } while(counter);
@@ -1058,7 +1062,8 @@ uint32_t _conv_to_scr_impl(uint16_t *val)
     uint16_t a = (*val >> 8 * 0 & 0xff);
     uint16_t b = (*val >> 8 * 1 & 0xff);
 
-    *val = 0x2000 + ((b * SCREEN_ROW_SIZE + a / 8) & 0x3fff);
+    *val = (0x2000 | (b * SCREEN_BYTES_PER_PIXEL_COLUMN + a / 8)) & 0x3fff;
+    printf("%s %u %u %u %04x\n", __func__, b, a / 8, a, *val);
     
     return 0;
 }
@@ -1092,6 +1097,17 @@ uint32_t _read_desc(struct cpu *cpu)
     return 0;
 }
 
+int _clear_screen_impl(uint8_t *mem)
+{
+    memset(mem + SCREEN_BASE, 0, SCREEN_BYTES_PER_PIXEL_COLUMN * SCREEN_BITS_PER_ROW);
+    return 0;
+}
+
+uint32_t _clear_screen(struct cpu *cpu)
+{
+    return _clear_screen_impl(cpu->mem);
+}
+
 #define MAP_CIMPL(F) [F] = _ ## F
 uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_simp_sprite),
@@ -1103,6 +1119,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_hex_word),
     MAP_CIMPL(conv_to_scr),
     MAP_CIMPL(read_desc),
+    MAP_CIMPL(clear_screen),
 };
 
 uint32_t cimpl_wrapper(struct cpu *cpu, uint32_t duration)
@@ -1716,7 +1733,7 @@ struct machine *machine;
 
 void render(uint8_t *mem)
 {
-    uint16_t vram_base = 0x2400;
+    uint16_t vram_base = SCREEN_BASE;
     uint32_t screen_buf[256 * 224];
     uint32_t *screen_ptr = screen_buf;
 
