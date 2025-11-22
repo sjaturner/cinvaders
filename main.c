@@ -1006,6 +1006,21 @@ uint32_t _draw_hex_word(struct cpu *cpu)
     return _draw_hex_word_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_de(cpu, 0));
 }
 
+uint32_t _conv_to_scr_impl(uint16_t *val)
+{
+    uint16_t a = (*val >> 8 * 0 & 0xff);
+    uint16_t b = (*val >> 8 * 1 & 0xff);
+
+    *val = 0x2000 + ((b * 0x20 + a / 8) & 0x3fff);
+    
+    return 0;
+}
+
+uint32_t _conv_to_scr(struct cpu *cpu)
+{
+    return _conv_to_scr_impl(cpu->cpu_state.regs + REG_HL);
+}
+
 #define MAP_CIMPL(F) [F] = _ ## F
 uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_simp_sprite),
@@ -1015,6 +1030,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_digit_in_acc),
     MAP_CIMPL(draw_hex_byte),
     MAP_CIMPL(draw_hex_word),
+    MAP_CIMPL(conv_to_scr),
 };
 
 uint32_t cimpl_wrapper(struct cpu *cpu, uint32_t duration)
@@ -1563,7 +1579,7 @@ void run(struct cpu *cpu, int cycles)
         {
             printf("%-32s %s ", interrupt_occurred ? "INTERRUPT" : opcode->dasm, interrupt_returns ? "IRET" : "    ");
 
-            printf("inat:%04x next:%04x jump:%04x sp:%04x sub_depth:%d ie:%d ", cpu->inat, cpu->next, cpu->jump, sp, cpu->sub_depth, ie);
+            printf("inat:%04x next:%04x jump:%04x sp:%04x sub_depth:%d ie:%d intr:%d ", cpu->inat, cpu->next, cpu->jump, sp, cpu->intr ? cpu->sub_depth - cpu->sub_depth_intr : cpu->sub_depth, ie, cpu->intr);
 
             for (int i = -2; i <= 2; ++i)
             {
@@ -1878,16 +1894,19 @@ int main(int argc, char *argv[])
         struct regval regval = {
             .de = sprite_player,
             .bc = 0x1000,
-            .hl = 0x2501,
+            .hl = 0x0208,
             .sp = 0x2400,
             .pc = 0,
         };
 
         init_regs(&cpu, &regval);
 
+        printf("get_h(&cpu, 0):%02x\n", get_h(&cpu, 0));
+        printf("get_l(&cpu, 0):%02x\n", get_l(&cpu, 0));
+
         cpu.mem[0] = 0xCD;
-        cpu.mem[1] = draw_simp_sprite >> 0 * 8 & 0xff;
-        cpu.mem[2] = draw_simp_sprite >> 1 * 8 & 0xff;
+        cpu.mem[1] = conv_to_scr >> 0 * 8 & 0xff;
+        cpu.mem[2] = conv_to_scr >> 1 * 8 & 0xff;
 
         memset(cpu.mem + 0x2400, 0, 0x4000 - 0x2400);
 
@@ -1897,6 +1916,7 @@ int main(int argc, char *argv[])
             cycles += step(&cpu);
 
             printf("pc:%04x sp:%04x\n", get_pc(&cpu, 0), get_sp(&cpu, 0));
+            dump();
 
             if (get_sp(&cpu, 0) == 0x2400)
             {
@@ -1904,11 +1924,16 @@ int main(int argc, char *argv[])
             }
         }
 
-        render(cpu.mem);
+        exit(0);
 
-        for (;;)
+        if (0)
         {
-            get_input();
+            render(cpu.mem);
+
+            for (;;)
+            {
+                get_input();
+            }
         }
     }
     else

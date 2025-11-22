@@ -317,7 +317,7 @@ draw_bottom_line:
     ld a,001h                        ; 01cf     3e 01            ;  Bit 1 set ... going to draw a 1-pixel stripe down left side
     ld b,0e0h                        ; 01d1     06 e0            ;  All the way down the screen
     ld hl,02402h                     ; 01d3     21 02 24         ;  Screen coordinates (3rd byte from upper left)
-    jp l14cch                        ; 01d6     c3 cc 14         ;  Draw line down left side
+    jp fill_screen_row               ; 01d6     c3 cc 14         ;  Draw line down left side
 
 add_delta:                                                      
     inc hl                           ; 01d9     23               ;  We loaded delta-x already ... skip over it
@@ -331,8 +331,10 @@ add_delta:
     add a,(hl)                       ; 01e1     86               ;  ... to y
     ld (hl),a                        ; 01e2     77               ;  Store new y
     ret                              ; 01e3     c9               ;  Done
+
 copy_rammirror:                                                 
     ld b,0c0h                        ; 01e4     06 c0            ;  Number of bytes
+
 copy_rom_to_ram:                                                      
     ld de,rammirror                  ; 01e6     11 00 1b         ;  RAM mirror in ROM
     ld hl,wait_on_draw               ; 01e9     21 00 20         ;  Start of RAM
@@ -643,7 +645,7 @@ l03b0h:
                                                                  ;  
                                                                  ;  This task executes at either mid-screen ISR (if it is on the top half of the non-rotated screen) or
                                                                  ;  at the end-screen ISR (if it is on the bottom half of the screen).
-game_object_1_handler:                                                                 ;
+game_object_1_handler:                                           ;
     ld de,obj1coor_xr                ; 03bb     11 2a 20         ;  Object's Yn coordiante vec rom at 1b23 ram at 02023h
     call comp_yto_beam               ; 03be     cd 06 1a         ;  Compare to screen-update location
     pop hl                           ; 03c1     e1               ;  Pointer to task data
@@ -4064,14 +4066,14 @@ l14bdh:
 
 clear_small_sprite:                                             
     xor a                            ; 14cb     af               ;  0
-l14cch:                                                         
+fill_screen_row:                     
     push bc                          ; 14cc     c5               ;  Preserve BC
     ld (hl),a                        ; 14cd     77               ;  Clear screen byte
     ld bc,l0020h                     ; 14ce     01 20 00         ;  Bump HL ...
     add hl,bc                        ; 14d1     09               ;  ... one screen row
     pop bc                           ; 14d2     c1               ;  Restore
     dec b                            ; 14d3     05               ;  All done?
-    jp nz,l14cch                     ; 14d4     c2 cc 14         ;  No ... clear all
+    jp nz,fill_screen_row            ; 14d4     c2 cc 14         ;  No ... clear all
     ret                              ; 14d7     c9              
 
 player_shot_hit:                                                
