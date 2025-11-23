@@ -207,7 +207,7 @@ draw_alien:
     ex de,hl                         ; 0128     eb               ;  Sprite offset to DE
     ld a,b                           ; 0129     78               ;  Animation frame number
     and a                            ; 012a     a7               ;  Is it position 0?
-    call nz,sub_013bh                ; 012b     c4 3b 01         ;  No ... add 30 and use position 1 alien sprites
+    call nz,alt_alien_sprites        ; 012b     c4 3b 01         ;  No ... add 30 and use position 1 alien sprites
     ld hl,(alien_pos_lsb)            ; 012e     2a 0b 20         ;  Pixel position
     ld b,010h                        ; 0131     06 10            ;  16 rows in alien sprites
     call draw_sprite                 ; 0133     cd d3 15         ;  Draw shifted sprite
@@ -216,7 +216,7 @@ l0136h:
     ld (wait_on_draw),a              ; 0137     32 00 20         ;  ... advance the cursor to the next alien
     ret                              ; 013a     c9               ;  Out
 
-sub_013bh:                                                      
+alt_alien_sprites:                                                      
     ld hl,l0030h                     ; 013b     21 30 00         ;  Offset sprite pointer ...
     add hl,de                        ; 013e     19               ;  ... to animation frame 1 sprites
     ex de,hl                         ; 013f     eb               ;  Back to DE

@@ -28,7 +28,7 @@ enum
     init_racks_direction         =  0x00d7,
     draw_alien                   =  0x0100,
     l0136h                       =  0x0136,
-    sub_013bh                    =  0x013b,
+    alt_alien_sprites            =  0x013b,
     cursor_next_alien            =  0x0141,
     l0154h                       =  0x0154,
     get_alien_coords             =  0x017a,

@@ -1108,6 +1108,40 @@ uint32_t _clear_screen(struct cpu *cpu)
     return _clear_screen_impl(cpu->mem);
 }
 
+enum
+{
+    PLAYER_TWO_SCORE_COORD = 0x391c,
+};
+
+uint32_t _init_racks_direction_impl(uint8_t *mem)
+{
+    mem[p1ref_alien_dx] = mem[p2ref_alien_dx] = 2; /* Delta is right two pixels */
+
+    if (mem[two_players])
+    {
+        assert(0);
+    }
+
+    return 0;
+}
+
+uint32_t _init_racks_direction(struct cpu *cpu)
+{
+    return _init_racks_direction_impl(cpu->mem);
+}
+
+uint32_t _alt_alien_sprites_impl(uint16_t *de) /* Fucksake why is this a subroutine? */
+{
+    *de += 0x30; /* Animates the aliens. Add nothing and they freeze.*/
+    return 0;
+}
+
+uint32_t _alt_alien_sprites(struct cpu *cpu)
+{
+    return _alt_alien_sprites_impl(cpu->cpu_state.regs + REG_DE);
+}
+
+#if 0
 uint32_t _template_impl(uint8_t *mem)
 {
     return 0;
@@ -1117,6 +1151,7 @@ uint32_t _template(struct cpu *cpu)
 {
     return _template_impl(cpu->mem);
 }
+#endif
 
 #define MAP_CIMPL(F) [F] = _ ## F
 #define _________(F) [F] = 0
@@ -1134,8 +1169,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
 
     /* leaves */
 
-    _________(init_racks_direction),
-    _________(sub_013bh),
+    MAP_CIMPL(init_racks_direction),
+    MAP_CIMPL(alt_alien_sprites),
     _________(get_alien_coords),
     _________(add_delta),
     _________(copy_rammirror),
