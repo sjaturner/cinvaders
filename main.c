@@ -1141,6 +1141,81 @@ uint32_t _alt_alien_sprites(struct cpu *cpu)
     return _alt_alien_sprites_impl(cpu->cpu_state.regs + REG_DE);
 }
 
+enum
+{
+    ALIENS_PER_ROW = 0x0b,
+};
+
+// Convert alien index in L to screen bit position in C,L.
+// Return alien row index (converts to type) in D.
+uint32_t _get_alien_coords_impl(uint8_t *mem, uint8_t *c, uint8_t *l, uint8_t *d)
+{
+//  ld d,000h                        ; 017a     16 00            ;  Row 0
+    *d = 0;
+//  ld a,l                           ; 017c     7d               ;  Hold onto alien index
+    uint8_t a = *l;
+
+//      ld hl,ref_alien_yr               ; 017d     21 09 20         ;  Get alien X ...
+//      ld b,(hl)                        ; 0180     46               ;  ... to B
+//      inc hl                           ; 0181     23               ;  Get alien y ...
+//      ld c,(hl)                        ; 0182     4e               ;  ... to C
+    uint8_t b = mem[ref_alien_yr];
+    *c = mem[ref_alien_xr];
+
+    printf("%s entry *l:%u mem[ref_alien_yr]:%u mem[ref_alien_xr]:%u ", __func__, *l, mem[ref_alien_yr], mem[ref_alien_xr]);
+
+l0183h:
+    if (a < ALIENS_PER_ROW) goto l0194h;
+//      cp 00bh                          ; 0183     fe 0b            ;  Can we take a full row off of index?
+//      jp m,l0194h                      ; 0185     fa 94 01         ;  No ... we have the row
+//      sbc a,00bh                       ; 0188     de 0b            ;  Subtract off 11 (one whole row)
+    a -= ALIENS_PER_ROW;
+//      ld e,a                           ; 018a     5f               ;  Hold the new index
+//      ld a,b                           ; 018b     78               ;  Add ...
+//      add a,010h                       ; 018c     c6 10            ;  ... 16 to bit ...
+//      ld b,a                           ; 018e     47               ;  ... position Y (1 row in rack)
+    b += 0x10;
+//      ld a,e                           ; 018f     7b               ;  Restore tallied index
+//      inc d                            ; 0190     14               ;  Next row
+    ++*d;
+//      jp l0183h                        ; 0191     c3 83 01         ;  Keep skipping whole rows
+    goto l0183h;
+
+l0194h:
+//      ld l,b                           ; 0194     68               ;  We have the LSB (the row)
+    *l = b;
+
+l0195h:
+//      and a                            ; 0195     a7               ;  Are we in the right column?
+//      ret z                            ; 0196     c8               ;  Yes ... X and Y are right
+    if (!a) {
+        printf("exit *c:%u *l:%u *d:%u\n", *c, *l, *d);
+        return 0;
+    }
+//      ld e,a                           ; 0197     5f               ;  Hold index
+//      ld a,c                           ; 0198     79               ;  Add ...
+//      add a,010h                       ; 0199     c6 10            ;  ... 16 to bit ...
+//      ld c,a                           ; 019b     4f               ;  ... position X (1 column in rack)
+//      ld a,e                           ; 019c     7b               ;  Restore index
+    *c += 0x10;
+//      dec a                            ; 019d     3d               ;  We adjusted for 1 column
+    --a;
+//      jp l0195h                        ; 019e     c3 95 01         ;  Keep moving over column
+    goto l0195h;
+
+    return 0;
+}
+
+enum
+{
+    LO,
+    HI
+};
+uint32_t _get_alien_coords(struct cpu *cpu)
+{
+    return _get_alien_coords_impl(cpu->mem, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + LO, (uint8_t *)&cpu->cpu_state.regs[REG_HL] + LO, (uint8_t *)&cpu->cpu_state.regs[REG_DE] + HI);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1171,7 +1246,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
 
     MAP_CIMPL(init_racks_direction),
     MAP_CIMPL(alt_alien_sprites),
-    _________(get_alien_coords),
+    MAP_CIMPL(get_alien_coords),
     _________(add_delta),
     _________(copy_rammirror),
     _________(read_ply_shot),
