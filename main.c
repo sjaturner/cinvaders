@@ -946,12 +946,21 @@ enum
     SCREEN_BYTES = SCREEN_BYTES_PER_PIXEL_COLUMN * SCREEN_COLUMNS,
 };
 
+void set_mem_impl(uint8_t *mem, uint16_t addr, uint8_t val)
+{
+    if (addr >= SCREEN_BASE && addr < SCREEN_BASE + SCREEN_BYTES)
+    {
+        printf("R %04x %02x\n", addr, val);
+    }
+    mem[addr] = val;
+}
+
 uint32_t _draw_simp_sprite_impl(uint8_t *mem, uint16_t counter, uint16_t *char_set, uint16_t *screen_addr)
 {
     printf("%s %u *char_set:%04x *screen_addr:%04x\n", __func__, counter, *char_set, *screen_addr);
     do
     {
-        mem[*screen_addr] = mem[*char_set];
+        set_mem_impl(mem, *screen_addr, mem[*char_set]);
         *screen_addr += SCREEN_BYTES_PER_PIXEL_COLUMN;
         ++*char_set;
         --counter;
@@ -969,7 +978,7 @@ uint32_t _block_copy_impl(uint8_t *mem, uint16_t *dst, uint16_t *src, uint8_t *l
     printf("%s *dst:%04x *src:%04x *len:%04x\n", __func__, *dst, *src, *len);
     do
     {
-        mem[*dst] = mem[*src];
+        set_mem_impl(mem, *dst, mem[*src]);
         ++*dst;
         ++*src;
         --*len;
@@ -1098,9 +1107,20 @@ uint32_t _read_desc(struct cpu *cpu)
     return 0;
 }
 
+int screen_regression_mode;
 int _clear_screen_impl(uint8_t *mem)
 {
-    memset(mem + SCREEN_BASE, 0, SCREEN_BYTES);
+    if (screen_regression_mode)
+    {
+        for (uint16_t index = 0; index < SCREEN_BYTES; ++index)
+        {
+            set_mem_impl(mem, SCREEN_BASE + index, 0);
+        }
+    }
+    else
+    {
+        memset(mem + SCREEN_BASE, 0, SCREEN_BYTES);
+    }
     return 0;
 }
 
@@ -1826,7 +1846,6 @@ enum
 
 struct cpu cpu;
 
-int screen_regression_mode;
 void run(struct cpu *cpu, int cycles)
 {
     while (cycles > 0)
