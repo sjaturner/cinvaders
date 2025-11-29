@@ -306,6 +306,7 @@ move_ref_alien:
     ret                              ; 01be     c9               ;  Done
 
     nop                              ; 01bf     00               ;  ** Why?
+
 init_aliens:                                                    
     ld hl,02100h                     ; 01c0     21 00 21         ;  Start of alien structures (this is the last alien)
 l01c3h:                                                         

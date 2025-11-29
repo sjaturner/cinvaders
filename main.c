@@ -942,7 +942,8 @@ enum
     SCREEN_BASE = 0x2400,
     SCREEN_BITS_PER_PIXEL_COLUMN = 0x100,
     SCREEN_BYTES_PER_PIXEL_COLUMN = SCREEN_BITS_PER_PIXEL_COLUMN / CHAR_BIT,
-    SCREEN_BITS_PER_ROW = 224,
+    SCREEN_COLUMNS = 224,
+    SCREEN_BYTES = SCREEN_BYTES_PER_PIXEL_COLUMN * SCREEN_COLUMNS,
 };
 
 uint32_t _draw_simp_sprite_impl(uint8_t *mem, uint16_t counter, uint16_t *char_set, uint16_t *screen_addr)
@@ -1099,7 +1100,7 @@ uint32_t _read_desc(struct cpu *cpu)
 
 int _clear_screen_impl(uint8_t *mem)
 {
-    memset(mem + SCREEN_BASE, 0, SCREEN_BYTES_PER_PIXEL_COLUMN * SCREEN_BITS_PER_ROW);
+    memset(mem + SCREEN_BASE, 0, SCREEN_BYTES);
     return 0;
 }
 
@@ -1309,10 +1310,11 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     _________(comp_yto_beam),
 };
 
+int interpreter_only;
 uint32_t cimpl_wrapper(struct cpu *cpu, uint32_t duration)
 {
     uint32_t clks = duration;
-    if (cimpl[get_pc(cpu, 0)])
+    if (!interpreter_only && cimpl[get_pc(cpu, 0)])
     {
         printf("here\n");
         clks = (cimpl[get_pc(cpu, 0)])(cpu);
@@ -1824,6 +1826,7 @@ enum
 
 struct cpu cpu;
 
+int screen_regression_mode;
 void run(struct cpu *cpu, int cycles)
 {
     while (cycles > 0)
@@ -1846,6 +1849,11 @@ void run(struct cpu *cpu, int cycles)
         if (cpu->inat == 0x0087)
         {
             cpu->intr = 0;
+        }
+
+        if (screen_regression_mode && cpu->inat == 0x0bc3)
+        {
+            exit(0);
         }
 
         int sub_depth_altered = last_sub_depth != cpu->sub_depth;
@@ -1889,6 +1897,10 @@ uint8_t get_mem(struct cpu *cpu, uint16_t addr)
 
 void set_mem(struct cpu *cpu, uint16_t addr, uint8_t val)
 {
+    if (addr >= SCREEN_BASE && addr < SCREEN_BASE + SCREEN_BYTES)
+    {
+        printf("R %04x %02x\n", addr, val);
+    }
     cpu->mem[addr] = val;
 }
 
@@ -2077,7 +2089,7 @@ int main(int argc, char *argv[])
 
     for (;;)
     {
-        int opt = getopt(argc, argv, "l:s:");
+        int opt = getopt(argc, argv, "l:s:ri");
 
         if (opt == -1)
         {
@@ -2091,6 +2103,12 @@ int main(int argc, char *argv[])
                 break;
             case 's':
                 save = optarg;
+                break;
+            case 'r':
+                screen_regression_mode = 1;
+                break;
+            case 'i':
+                interpreter_only = 1;
                 break;
             default: /* '?' */
                 printf("bad arg %c\n", opt);
