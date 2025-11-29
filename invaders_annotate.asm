@@ -350,11 +350,11 @@ copy_rom_to_ram:
     jp block_copy                    ; 01ec     c3 32 1a         ;  Copy [DE]->[HL] and return
 
 draw_shield_pl1:                                                
-    ld hl,02142h                     ; 01ef     21 42 21         ;  Player 1 shield buffer (remember between games in multi-player)
+    ld hl,player_one_shield_buf      ; 01ef     21 42 21         ;  Player 1 shield buffer (remember between games in multi-player)
     jp l01f8h                        ; 01f2     c3 f8 01         ;  Common draw point
 
 draw_shield_pl2:                                                
-    ld hl,02242h                     ; 01f5     21 42 22         ;  Player 2 shield buffer (remember between games in multi-player)
+    ld hl,player_two_shield_buf      ; 01f5     21 42 22         ;  Player 2 shield buffer (remember between games in multi-player)
 l01f8h:                                                         
     ld c,004h                        ; 01f8     0e 04            ;  Going to draw 4 shields
     ld de,image_shield               ; 01fa     11 20 1d         ;  Shield pixel pattern
@@ -378,13 +378,13 @@ remember_shields2:
 restore_shields2:                                               
     xor a                            ; 0213     af               ;  Zero means restore
 l0214h:                                                         
-    ld de,02242h                     ; 0214     11 42 22         ;  Player 2 shield buffer (remember between games in multi-player)
+    ld de,player_two_shield_buf      ; 0214     11 42 22         ;  Player 2 shield buffer (remember between games in multi-player)
     jp copy_shields                  ; 0217     c3 1e 02         ;  Shuffle-shields player 2
 
 restore_shields1:                                               
     xor a                            ; 021a     af               ;  Zero means restore
 l021bh:                                                         
-    ld de,02142h                     ; 021b     11 42 21         ;  Player 1 shield buffer (remember between games in multi-player)
+    ld de,player_one_shield_buf      ; 021b     11 42 21         ;  Player 1 shield buffer (remember between games in multi-player)
 l021eh:                                                         
 copy_shields:                                                   
     ld (tmp2081),a                   ; 021e     32 81 20         ;  Remember copy/restore flag
@@ -6695,22 +6695,22 @@ plu_shot_cfir_lsb:             equ 02048h                        ; 02048h 02048 
                                                                  ; 0204eh 0204e                                                                 defb 000h ; 1b4e 00  
                                                                  ; 0204fh 0204f                                                                 defb 003h ; 1b4f 03  
 ; game object 4
-game_object_4:                 equ 02050h                        ; 02050h 02050    ; squiggly shot ram info                                     defb 000h ; 1b50 00  l1b50h:                                                     
-                                                                 ; 02051h 02051                                                                 defb 000h ; 1b51 00  
-                                                                 ; 02052h 02052                                                                 defb 000h ; 1b52 00  
-                                                                 ; 02053h 02053    ; vec lo                                                     defb 082h ; 1b53 82  
-                                                                 ; 02054h 02054    ; vec hi                                                     defb 006h ; 1b54 06  
-squ_shot_status:               equ 02055h                        ; 02055h 02055                                                                 defb 000h ; 1b55 00  
-squ_shot_step_cnt:             equ 02056h                        ; 02056h 02056                                                                 defb 000h ; 1b56 00  
-                                                                 ; 02057h 02057                                                                 defb 001h ; 1b57 01  
-squ_shot_cfir_lsb:             equ 02058h                        ; 02058h 02058                                                                 defb 006h ; 1b58 06  l1b58h:                                                     
-                                                                 ; 02059h 02059                                                                 defb 01dh ; 1b59 1d  
-                                                                 ; 0205ah 0205a                                                                 defb 004h ; 1b5a 04  
-                                                                 ; 0205bh 0205b                                                                 defb 0d0h ; 1b5b d0  
-                                                                 ; 0205ch 0205c                                                                 defb 01ch ; 1b5c 1c  
-                                                                 ; 0205dh 0205d                                                                 defb 000h ; 1b5d 00  
-                                                                 ; 0205eh 0205e                                                                 defb 000h ; 1b5e 00  
-                                                                 ; 0205fh 0205f                                                                 defb 003h ; 1b5f 03  
+game_object_4:                 equ 02050h                        ; 02050h 02050 +  ; squiggly shot ram info                                     defb 000h ; 1b50 00  l1b50h:                                                     
+                                                                 ; 02051h 02051 |                                                               defb 000h ; 1b51 00  
+                                                                 ; 02052h 02052 |                                                               defb 000h ; 1b52 00  
+                                                                 ; 02053h 02053 |  ; vec lo                                                     defb 082h ; 1b53 82  
+                                                                 ; 02054h 02054 |  ; vec hi                                                     defb 006h ; 1b54 06  
+squ_shot_status:               equ 02055h                        ; 02055h 02055 |                                                               defb 000h ; 1b55 00  
+squ_shot_step_cnt:             equ 02056h                        ; 02056h 02056 |                                                               defb 000h ; 1b56 00  
+                                                                 ; 02057h 02057 |                                                               defb 001h ; 1b57 01  
+squ_shot_cfir_lsb:             equ 02058h                        ; 02058h 02058 |                                                               defb 006h ; 1b58 06  l1b58h:                                                     
+                                                                 ; 02059h 02059 |                                                               defb 01dh ; 1b59 1d  
+                                                                 ; 0205ah 0205a |                                                               defb 004h ; 1b5a 04  
+                                                                 ; 0205bh 0205b |                                                               defb 0d0h ; 1b5b d0  
+                                                                 ; 0205ch 0205c |                                                               defb 01ch ; 1b5c 1c  
+                                                                 ; 0205dh 0205d |                                                               defb 000h ; 1b5d 00  
+                                                                 ; 0205eh 0205e |                                                               defb 000h ; 1b5e 00  
+                                                                 ; 0205fh 0205f +                                                               defb 003h ; 1b5f 03  
 ; game object table end marker is 0ffh
                                                                  ; 02060h 02060                                                                 defb 0ffh ; 1b60 ff  
 
@@ -6732,17 +6732,19 @@ skip_plunger:                  equ 0206eh                        ; 0206eh 0206e 
 other_shot1:                   equ 02070h                        ; 02070h 02070                                                                 defb 00fh ; 1b70 0f  msg_play_player_one:                                        
 other_shot2:                   equ 02071h                        ; 02071h 02071                                                                 defb 00bh ; 1b71 0b  
 vblank_status:                 equ 02072h                        ; 02072h 02072                                                                 defb 000h ; 1b72 00  
-a_shot_status:                 equ 02073h                        ; 02073h 02073                                                                 defb 018h ; 1b73 18  
-                                                                 ; 02074h 02074                                                                 defb 026h ; 1b74 26  
-                                                                 ; 02075h 02075                                                                 defb 00fh ; 1b75 0f  
-a_shot_cfir_lsb:               equ 02076h                        ; 02076h 02076                                                                 defb 00bh ; 1b76 0b  
-                                                                 ; 02077h 02077                                                                 defb 000h ; 1b77 00  
-a_shot_blow_cnt:               equ 02078h                        ; 02078h 02078                                                                 defb 018h ; 1b78 18  
-a_shot_image_lsb:              equ 02079h                        ; 02079h 02079    ; e ; descriptor                                             defb 004h ; 1b79 04  
-                                                                 ; 0207ah 0207a    ; d                                                          defb 011h ; 1b7a 11  
-alien_shot_yr:                 equ 0207bh                        ; 0207bh 0207b    ; l                                                          defb 024h ; 1b7b 24  
-                                                                 ; 0207ch 0207c    ; h  ; @ alien shot y? coordinate                            defb 01bh ; 1b7c 1b  
-alien_shot_size:               equ 0207dh                        ; 0207dh 0207d    ; b                                                          defb 025h ; 1b7d 25  
+
+a_shot_status:                 equ 02073h                        ; 02073h 02073 +                                                               defb 018h ; 1b73 18  
+                                                                 ; 02074h 02074 |                                                               defb 026h ; 1b74 26  
+                                                                 ; 02075h 02075 |                                                               defb 00fh ; 1b75 0f  
+a_shot_cfir_lsb:               equ 02076h                        ; 02076h 02076 |                                                               defb 00bh ; 1b76 0b  
+                                                                 ; 02077h 02077 |                                                               defb 000h ; 1b77 00  
+a_shot_blow_cnt:               equ 02078h                        ; 02078h 02078 |                                                               defb 018h ; 1b78 18  
+a_shot_image_lsb:              equ 02079h                        ; 02079h 02079 |  ; e ; descriptor                                             defb 004h ; 1b79 04  
+                                                                 ; 0207ah 0207a |  ; d                                                          defb 011h ; 1b7a 11  
+alien_shot_yr:                 equ 0207bh                        ; 0207bh 0207b |  ; l                                                          defb 024h ; 1b7b 24  
+                                                                 ; 0207ch 0207c |  ; h  ; @ alien shot y? coordinate                            defb 01bh ; 1b7c 1b  
+alien_shot_size:               equ 0207dh                        ; 0207dh 0207d +  ; b                                                          defb 025h ; 1b7d 25  
+
 alien_shot_delta:              equ 0207eh                        ; 0207eh 0207e                                                                 defb 0fch ; 1b7e fc  
 shot_pic_end:                  equ 0207fh                        ; 0207fh 0207f                                                                 defb 000h ; 1b7f 00  
 shot_sync:                     equ 02080h                        ; 02080h 02080                                                                 defb 001h ; 1b80 01  
@@ -6812,18 +6814,18 @@ fleet_snd_hold:                equ 0209bh                        ; 0209bh 0209b 
 
 isr_delay:                     equ 020c0h                        ; 020c0h 020c0    
 isr_splash_task:               equ 020c1h                        ; 020c1h 020c1    
-splash_an_form:                equ 020c2h                        ; 020c2h 020c2    +
-                                                                 ; 020c3h 020c3    | 
-                                                                 ; 020c4h 020c4    |                              
-                                                                 ; 020c5h 020c5    | @ xy image descriptor
-                                                                 ; 020c6h 020c6    |                              
-splash_image_lsb:              equ 020c7h                        ; 020c7h 020c7    |                                  
-                                                                 ; 020c8h 020c8    |                              
-                                                                 ; 020c9h 020c9    |                              
-splash_target_y:               equ 020cah                        ; 020cah 020ca    |                                  
-splash_reached:                equ 020cbh                        ; 020cbh 020cb    |                                  
-splash_im_rest_lsb:            equ 020cch                        ; 020cch 020cc    |                                  
-                                                                 ; 020cdh 020cd    +                              
+splash_an_form:                equ 020c2h                        ; 020c2h 020c2 +   
+                                                                 ; 020c3h 020c3 |    
+                                                                 ; 020c4h 020c4 |                                 
+                                                                 ; 020c5h 020c5 |    @ xy image descriptor
+                                                                 ; 020c6h 020c6 |                                 
+splash_image_lsb:              equ 020c7h                        ; 020c7h 020c7 |                                     
+                                                                 ; 020c8h 020c8 |                                 
+                                                                 ; 020c9h 020c9 |                                 
+splash_target_y:               equ 020cah                        ; 020cah 020ca |                                     
+splash_reached:                equ 020cbh                        ; 020cbh 020cb |                                     
+splash_im_rest_lsb:            equ 020cch                        ; 020cch 020cc |                                     
+                                                                 ; 020cdh 020cd +                                 
 two_players:                   equ 020ceh                        ; 020ceh 020ce                                       
 a_shot_reload_rate:            equ 020cfh                        ; 020cfh 020cf                                       
                                                                  ; 020d0h 020d0                                   
@@ -6940,7 +6942,7 @@ p2scor_l:                      equ 020fch                        ; 020fch 020fc
                                                                  ; 0213fh 0213f
                                                                  ; 02140h 02140
                                                                  ; 02141h 02141
-                                                                 ; 02142h 02142     ; @ player one shield buffer
+player_one_shield_buf: equ 02142h                                ; 02142h 02142     ; @ player one shield buffer
                                                                  ; 02143h 02143
                                                                  ; 02144h 02144
                                                                  ; 02145h 02145
@@ -7196,7 +7198,7 @@ p1ships_rem:                   equ 021ffh                        ; 021ffh 021ff
                                                                  ; 0223fh 0223f
                                                                  ; 02240h 02240
                                                                  ; 02241h 02241
-                                                                 ; 02242h 02242     ; @ player two shield buffer
+player_two_shield_buf: equ 02242h                                ; 02242h 02242     ; @ player two shield buffer
                                                                  ; 02243h 02243
                                                                  ; 02244h 02244
                                                                  ; 02245h 02245
