@@ -1216,6 +1216,20 @@ uint32_t _get_alien_coords(struct cpu *cpu)
     return _get_alien_coords_impl(cpu->mem, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + LO, (uint8_t *)&cpu->cpu_state.regs[REG_HL] + LO, (uint8_t *)&cpu->cpu_state.regs[REG_DE] + HI);
 }
 
+uint32_t _add_delta_impl(uint8_t *mem, uint16_t addr, uint8_t dx)
+{
+    uint8_t dy = mem[addr + 1];  /* We loaded delta-x already ... skip over it */
+    mem[addr + 2] += dx;
+    mem[addr + 3] += dy; /* Fail to do this and the aliens do not move across the screen. Clues for x and y which appear muddled in the comments. */
+
+    return 0;
+}
+
+uint32_t _add_delta(struct cpu *cpu)
+{
+    return _add_delta_impl(cpu->mem, cpu->cpu_state.regs[REG_HL], cpu->cpu_state.regs[REG_BC] & 0xff);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1247,7 +1261,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(init_racks_direction),
     MAP_CIMPL(alt_alien_sprites),
     MAP_CIMPL(get_alien_coords),
-    _________(add_delta),
+    MAP_CIMPL(add_delta),
     _________(copy_rammirror),
     _________(read_ply_shot),
     _________(to_shot_struct),

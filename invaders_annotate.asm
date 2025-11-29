@@ -257,7 +257,7 @@ l0154h:
 get_alien_coords:                                               
     ld d,000h                        ; 017a     16 00            ;  Row 0
     ld a,l                           ; 017c     7d               ;  Hold onto alien index
-    ld hl,ref_alien_yr               ; 017d     21 09 20         ;  Get alien X ...
+    ld hl,ref_alien_yr               ; 017d     21 09 20         ;  Get alien x ...
     ld b,(hl)                        ; 0180     46               ;  ... to B
     inc hl                           ; 0181     23               ;  Get alien y ...
     ld c,(hl)                        ; 0182     4e               ;  ... to C
@@ -291,9 +291,9 @@ move_ref_alien:
     jp z,return_two                  ; 01a2     ca cd 01         ;  Return out of TWO call frames (only used if no aliens left)
     ld hl,alien_cur_index            ; 01a5     21 06 20         ;  Set current alien ...
     ld (hl),000h                     ; 01a8     36 00            ;  ... index to 0
-    inc hl                           ; 01aa     23               ;  Point to DeltaX
-    ld c,(hl)                        ; 01ab     4e               ;  Load DX into C
-    ld (hl),000h                     ; 01ac     36 00            ;  Set DX to 0
+    inc hl                           ; 01aa     23               ;  Point to delta-x
+    ld c,(hl)                        ; 01ab     4e               ;  Load delta-x into C
+    ld (hl),000h                     ; 01ac     36 00            ;  Set delta-x to 0, reset delta-x to zero
     call add_delta                   ; 01ae     cd d9 01         ;  Move alien
     ld hl,alien_ani_frame_number     ; 01b1     21 05 20         ;  Alien animation frame number
     ld a,(hl)                        ; 01b4     7e               ;  Toggle ...
@@ -327,12 +327,12 @@ draw_bottom_line:
     ld hl,02402h                     ; 01d3     21 02 24         ;  Screen coordinates (3rd byte from upper left)
     jp fill_screen_row               ; 01d6     c3 cc 14         ;  Draw line down left side
 
-add_delta:                                                      
+add_delta:                                                       ;  C contains delta-x
     inc hl                           ; 01d9     23               ;  We loaded delta-x already ... skip over it
-    ld b,(hl)                        ; 01da     46               ;  Get delta-y
+    ld b,(hl)                        ; 01da     46               ;  Get delta-y, B contains delta-y
     inc hl                           ; 01db     23               ;  Skip over it
     ld a,c                           ; 01dc     79               ;  Add delta-x ...
-    add a,(hl)                       ; 01dd     86               ;  ... to x
+    add a,(hl)                       ; 01dd     86               ;  ... to x, so add delta-x to x
     ld (hl),a                        ; 01de     77               ;  Store new x
     inc hl                           ; 01df     23               ;  Skip to y
     ld a,b                           ; 01e0     78               ;  Add delta-y ...
@@ -713,7 +713,7 @@ move_ply_shot:
     pop bc                           ; 0413     c1               ;  Restore size
     pop hl                           ; 0414     e1               ;  Restore coords
     pop de                           ; 0415     d1               ;  Restore pointer to sprite image
-    ld a,(shot_delta_x)              ; 0416     3a 2c 20         ;  DeltaX for shot
+    ld a,(shot_delta_x)              ; 0416     3a 2c 20         ;  delta-x for shot
     add a,l                          ; 0419     85               ;  Move the shot ...
     ld l,a                           ; 041a     6f               ;  ... up the screen
     ld (obj1coor_yr),a               ; 041b     32 29 20         ;  Store shot's new X coordinate
@@ -6809,7 +6809,7 @@ fleet_snd_hold:                equ 0209bh                        ; 0209bh 0209b 
 isr_delay:                     equ 020c0h                        ; 020c0h 020c0    
 isr_splash_task:               equ 020c1h                        ; 020c1h 020c1    
 splash_an_form:                equ 020c2h                        ; 020c2h 020c2    +
-                                                                 ; 020c3h 020c3    |                              
+                                                                 ; 020c3h 020c3    | 
                                                                  ; 020c4h 020c4    |                              
                                                                  ; 020c5h 020c5    | @ xy image descriptor
                                                                  ; 020c6h 020c6    |                              
