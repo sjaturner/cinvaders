@@ -82,10 +82,10 @@ sub_01d9h:
 add_delta:                                                      
     inc hl                           ; 01d9     23               ;  We loaded delta-x already ... skip over it
 sub_01e4h:                                                      
-copy_rammirror:                                                 
+copy_ram_mirror:                                                 
     ld b,0c0h                        ; 01e4     06 c0            ;  Number of bytes
 copy_rom_to_ram:                                                      
-    ld de,rammirror                  ; 01e6     11 00 1b         ;  RAM mirror in ROM
+    ld de,ram_mirror                 ; 01e6     11 00 1b         ;  RAM mirror in ROM
 sub_01efh:                                                      
 draw_shield_pl1:                                                
     ld hl,02142h                     ; 01ef     21 42 21         ;  Player 1 shield buffer (remember between games in multi-player)
@@ -425,7 +425,7 @@ l0b0bh:
 l0b4ah:                                                         
     call clear_play_field            ; 0b4a     cd d6 09         ;  Clear playfield
 l0b5dh:                                                         
-    call copy_rammirror              ; 0b5d     cd e4 01         ;  Block copy ROM mirror to initialize RAM
+    call copy_ram_mirror             ; 0b5d     cd e4 01         ;  Block copy ROM mirror to initialize RAM
 l0b71h:                                                         
     call plr_fire_or_demo            ; 0b71     cd 18 16         ;  In demo ... process demo movement and always fire
 l0b83h:                                                         
@@ -794,7 +794,7 @@ only_one_player_btn:
     defb 00eh                        ; 1acf     0e              
 msg_score_header:                                                         
     defb 026h                        ; 1ae4     26              
-rammirror:                                                         
+ram_mirror:                                                         
     defb 001h                        ; 1b00     01              
 game_object_0_init:                                                         
     defb 000h                        ; 1b10     00              ; timer
@@ -904,7 +904,7 @@ msg_push:
     defb 00fh                        ; 1ff3     0f              
 g_end:                                                          
     nop                              ; 1fff     00              
-wait_on_draw:                  equ 02000h                        ; 02000h 02000    ; from here is copied from rom at rammirror                  defb 001h ; 1b00 01  rammirror:                                                  
+wait_on_draw:                  equ 02000h                        ; 02000h 02000    ; from here is copied from rom at ram_mirror                 defb 001h ; 1b00 01  ram_mirror:                                                  
                                                                  ; 02001h 02001                                                                 defb 000h ; 1b01 00  
 alien_is_exploding:            equ 02002h                        ; 02002h 02002    ; read sequentially in draw_alien                            defb 000h ; 1b02 00  
 exp_alien_timer:               equ 02003h                        ; 02003h 02003                                                                 defb 010h ; 1b03 10  

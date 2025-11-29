@@ -340,12 +340,12 @@ add_delta:                                                       ;  C contains d
     ld (hl),a                        ; 01e2     77               ;  Store new y
     ret                              ; 01e3     c9               ;  Done
 
-copy_rammirror:                                                 
+copy_ram_mirror:                                                 
     ld b,0c0h                        ; 01e4     06 c0            ;  Number of bytes
 
 copy_rom_to_ram:                                                      
-    ld de,rammirror                  ; 01e6     11 00 1b         ;  RAM mirror in ROM
-    ld hl,wait_on_draw               ; 01e9     21 00 20         ;  Start of RAM
+    ld de,ram_mirror                 ; 01e6     11 00 1b         ;  RAM mirror in ROM
+    ld hl,ram_start                  ; 01e9     21 00 20         ;  Start of RAM
     jp block_copy                    ; 01ec     c3 32 1a         ;  Copy [DE]->[HL] and return
 
 draw_shield_pl1:                                                
@@ -539,7 +539,7 @@ l02f8h:
     dec hl                           ; 02ff     2b               ;  .. to delta storage
     ld (hl),b                        ; 0300     70               ;  Store ref-alien's delta (direction)
     nop                              ; 0301     00               ;  ** Why?
-    call copy_rammirror              ; 0302     cd e4 01         ;  Copy RAM mirror (getting ready to switch players)
+    call copy_ram_mirror             ; 0302     cd e4 01         ;  Copy RAM mirror (getting ready to switch players)
     pop af                           ; 0305     f1               ;  Restore active player MSB
     rrca                             ; 0306     0f               ;  Player 1?
     ld a,021h                        ; 0307     3e 21            ;  Player 1 data pointer
@@ -1259,7 +1259,7 @@ new_game:
     ld hl,03878h                     ; 07ea     21 78 38         ;  Screen coordinates for lower-left alien
     ld (p1ref_alien_y),hl            ; 07ed     22 fc 21         ;  Initialize reference alien for player 1
     ld (p2ref_alien_yr),hl           ; 07f0     22 fc 22         ;  Initialize reference alien for player 2
-    call copy_rammirror              ; 07f3     cd e4 01         ;  Copy ROM mirror to RAM (2000 - 20C0)
+    call copy_ram_mirror             ; 07f3     cd e4 01         ;  Copy ROM mirror to RAM (2000 - 20C0)
     call remove_ship                 ; 07f6     cd 7f 1a         ;  Initialize ship hold indicator
 l07f9h:                                                         
     call prompt_player               ; 07f9     cd 8d 08         ;  Prompt with "PLAY PLAYER "
@@ -1583,7 +1583,7 @@ l09efh:
     call clear_play_field            ; 09f6     cd d6 09         ;  Clear playfield
     ld a,(player_data_msb)           ; 09f9     3a 67 20         ;  Hold current player number ...
     push af                          ; 09fc     f5               ;  ... on stack
-    call copy_rammirror              ; 09fd     cd e4 01         ;  Block copy RAM mirror from ROM
+    call copy_ram_mirror             ; 09fd     cd e4 01         ;  Block copy RAM mirror from ROM
     pop af                           ; 0a00     f1               ;  Restore ...
     ld (player_data_msb),a           ; 0a01     32 67 20         ;  ... current player number
     ld a,(player_data_msb)           ; 0a04     3a 67 20         ;  ** Why load this again? Nobody ever jumps to 0A04?
@@ -1780,7 +1780,7 @@ l0b4ah:
     ld (p1ships_rem),a               ; 0b57     32 ff 21         ;  Reset number of ships for player-1
     call remove_ship                 ; 0b5a     cd 7f 1a         ;  Remove a ship from stash and update indicators
 l0b5dh:                                                         
-    call copy_rammirror              ; 0b5d     cd e4 01         ;  Block copy ROM mirror to initialize RAM
+    call copy_ram_mirror             ; 0b5d     cd e4 01         ;  Block copy ROM mirror to initialize RAM
     call init_aliens                 ; 0b60     cd c0 01         ;  Initialize all player 1 aliens
     call draw_shield_pl1             ; 0b63     cd ef 01         ;  Draw shields for player 1 (to buffer)
     call restore_shields1            ; 0b66     cd 1a 02         ;  Restore shields for player 1 (to screen)
@@ -5220,7 +5220,8 @@ msg_score_header:
     defb 01ch                        ; 1afd     1c              
     defb 025h                        ; 1afe     25              
     defb 026h                        ; 1aff     26              
-rammirror:                                                         
+
+ram_mirror:                                                         
     defb 001h                        ; 1b00     01              
     defb 000h                        ; 1b01     00              
     defb 000h                        ; 1b02     00              
@@ -5490,8 +5491,8 @@ l1bc0h:
     defb 000h                        ; 1bfd     00              
     defb 01ch                        ; 1bfe     1c              
     defb 039h                        ; 1bff     39              
+                                     ; end of ram_mirror
 sprite_aliens_start_a:                                                         
-sprite_alien_a_0:
     defb 000h                        ; 1c00     00              
     defb 000h                        ; 1c01     00              
     defb 039h                        ; 1c02     39              
@@ -6607,7 +6608,8 @@ msg_push:
 g_end:                                                          
     nop                              ; 1fff     00              
                                                                 
-wait_on_draw:                  equ 02000h                        ; 02000h 02000    ; from here is copied from rom at rammirror                  defb 001h ; 1b00 01  rammirror:                                                  
+ram_start:                     equ 02000h                        ; 02000h 02000    ; from here is copied from rom at ram_mirror                 defb 001h ; 1b00 01  ram_mirror:                                                  
+wait_on_draw:                  equ 02000h                        ; 02000h 02000    ; from here is copied from rom at ram_mirror                 defb 001h ; 1b00 01  ram_mirror:                                                  
                                                                  ; 02001h 02001                                                                 defb 000h ; 1b01 00  
 alien_is_exploding:            equ 02002h                        ; 02002h 02002    ; read sequentially in draw_alien                            defb 000h ; 1b02 00  
 exp_alien_timer:               equ 02003h                        ; 02003h 02003                                                                 defb 010h ; 1b03 10  
@@ -6805,7 +6807,8 @@ fleet_snd_hold:                equ 0209bh                        ; 0209bh 0209b 
                                                                  ; 020bch 020bc                                                                 defb 000h ; 1bbc 00  
                                                                  ; 020bdh 020bd                                                                 defb 000h ; 1bbd 00  
                                                                  ; 020beh 020be                                                                 defb 000h ; 1bbe 00  
-                                                                 ; 020bfh 020bf    ; up to here is copied from rom at rammirror                 defb 000h ; 1bbf 00  ; last byte of ram mirror                                   
+                                                                 ; 020bfh 020bf    ; up to here is copied from rom at ram_mirror                defb 000h ; 1bbf 00  ; last byte of ram mirror                                   
+
 isr_delay:                     equ 020c0h                        ; 020c0h 020c0    
 isr_splash_task:               equ 020c1h                        ; 020c1h 020c1    
 splash_an_form:                equ 020c2h                        ; 020c2h 020c2    +

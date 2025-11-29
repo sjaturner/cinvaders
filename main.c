@@ -1230,6 +1230,21 @@ uint32_t _add_delta(struct cpu *cpu)
     return _add_delta_impl(cpu->mem, cpu->cpu_state.regs[REG_HL], cpu->cpu_state.regs[REG_BC] & 0xff);
 }
 
+uint32_t _copy_ram_mirror_impl(uint8_t *mem)
+{
+    enum
+    {
+        RAM_MIRROR_SIZE = 0xc0,
+    };
+    memcpy(mem + ram_start, mem + ram_mirror, RAM_MIRROR_SIZE);
+    return 0;
+}
+
+uint32_t _copy_ram_mirror(struct cpu *cpu)
+{
+    return _copy_ram_mirror_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1262,7 +1277,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(alt_alien_sprites),
     MAP_CIMPL(get_alien_coords),
     MAP_CIMPL(add_delta),
-    _________(copy_rammirror),
+    MAP_CIMPL(copy_ram_mirror),
     _________(read_ply_shot),
     _________(to_shot_struct),
     _________(find_in_column),
