@@ -1459,6 +1459,38 @@ uint32_t _get_alien_state_ptr(struct cpu *cpu)
     return _get_alien_state_ptr_impl(cpu->mem, get_b(cpu, 0), get_c(cpu, 0), cpu->cpu_state.regs + REG_HL);
 }
 
+uint32_t _wrap_ref_impl(uint8_t *mem, int8_t *a, uint8_t *sixteens_count)
+{
+    do
+    {
+        assert(0);
+        ++*sixteens_count;
+        *a += 0x10;
+    }while (*a < 0);
+
+    return 0;
+}
+
+uint32_t _wrap_ref(struct cpu *cpu)
+{
+    return _wrap_ref_impl(cpu->mem, (int8_t *)&cpu->cpu_state.regs[REG_AF] + HI, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + LO);
+}
+
+uint32_t _sub_176dh(struct cpu *cpu) /* Full of sound and fury. Signifying nothing. */
+{
+    return 0;
+}
+
+uint32_t _fleet_sound_off(struct cpu *cpu) /* Full of sound and fury. Signifying nothing. */
+{
+    return 0;
+}
+
+uint32_t _check_handle_tilt(struct cpu *cpu) /* I do not think my laptop has accelerometers. */
+{
+    return 0;
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1502,11 +1534,11 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(alien_score_value),
     MAP_CIMPL(cnvt_pix_number),
     MAP_CIMPL(get_alien_state_ptr),
-    _________(wrap_ref),
-    _________(sub_176dh),
-    _________(fleet_sound_off),
-    _________(check_handle_tilt),
-    _________(read_pri_struct),
+    MAP_CIMPL(wrap_ref),
+    MAP_CIMPL(sub_176dh),
+    MAP_CIMPL(fleet_sound_off),
+    MAP_CIMPL(check_handle_tilt),
+    _________(read_print_struct),
     _________(get_player_alive_ptr),
     _________(get_delta_x),
     _________(sound_bits3on),

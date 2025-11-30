@@ -1816,7 +1816,7 @@ l0b89h:
     call draw_char                   ; 0bab     cd ff 08         ;  Put an extra "C" for "CCOIN" on the screen
 l0baeh:                                                         
     ld bc,coord_msg_one_or_two_play  ; 0bae     01 9c 1f         ;  "<1 OR 2 PLAYERS>  "
-    call read_pri_struct             ; 0bb1     cd 56 18         ;  Load the screen,pointer
+    call read_print_struct           ; 0bb1     cd 56 18         ;  Load the screen,pointer
     call print_msg_slow              ; 0bb4     cd 4c 18         ;  Print the message
     in a,(002h)                      ; 0bb7     db 02            ;  Display coin info (bit 7) ...
     rlca                             ; 0bb9     07               ;  ... on demo screen?
@@ -4627,7 +4627,7 @@ draw_adv_table:
     ld (temp206c),a                  ; 1822     32 6c 20         ;  Hold the count
     ld bc,table_coord_sprite_score   ; 1825     01 be 1d         ;  Coordinate/sprite for drawing table
 l1828h:                                                         
-    call read_pri_struct             ; 1828     cd 56 18         ;  Get HL=coordinate, DE=image
+    call read_print_struct           ; 1828     cd 56 18         ;  Get HL=coordinate, DE=image
     jp c,l1837h                      ; 182b     da 37 18         ;  Move on if done
     call draw_wide_sprite            ; 182e     cd 44 18         ;  Draw 16-byte sprite
     jp l1828h                        ; 1831     c3 28 18         ;  Do all in table
@@ -4636,7 +4636,7 @@ l1828h:
 l1837h:                                                         
     ld bc,table_coord_msg_score      ; 1837     01 cf 1d         ;  Coordinate/message for drawing table
 slow_print_descrs:                                                      
-    call read_pri_struct             ; 183a     cd 56 18         ;  Get HL=coordinate, DE=message
+    call read_print_struct           ; 183a     cd 56 18         ;  Get HL=coordinate, DE=message
     ret c                            ; 183d     d8               ;  Out if done
     call print_msg_slow              ; 183e     cd 4c 18         ;  Print message
     jp slow_print_descrs             ; 1841     c3 3a 18         ;  Do all in table
@@ -4656,7 +4656,7 @@ print_msg_slow:
     pop bc                           ; 1854     c1               ;  Restore BC
     ret                              ; 1855     c9               ;  Out
 
-read_pri_struct:                                                
+read_print_struct:                                                
     ld a,(bc)                        ; 1856     0a               ;  Get the screen LSB
     cp 0ffh                          ; 1857     fe ff            ;  Valid?
     scf                              ; 1859     37               ;  If not Carry will be Set

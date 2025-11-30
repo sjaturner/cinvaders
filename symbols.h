@@ -288,7 +288,7 @@ enum
     slow_print_descrs            =  0x183a,
     draw_wide_sprite             =  0x1844,
     print_msg_slow               =  0x184c,
-    read_pri_struct              =  0x1856,
+    read_print_struct            =  0x1856,
     splash_sprite                =  0x1868,
     l1888h                       =  0x1888,
     l1898h                       =  0x1898,
