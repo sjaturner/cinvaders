@@ -731,7 +731,7 @@ l042ah:
     jp end_of_blowup                 ; 042d     c3 36 04         ;  Anything else erases the shot and removes it from duty
 
 read_ply_shot:                                                  
-    ld hl,02027h                     ; 0430     21 27 20         ;  Read 5 byte sprite structure for ...
+    ld hl,player_shot_desc           ; 0430     21 27 20         ;  Read 5 byte sprite structure for ...
     jp read_desc                     ; 0433     c3 3b 1a         ;  ... player shot
 
 end_of_blowup:                                                  
@@ -6651,7 +6651,7 @@ hid_mess_seq:                  equ 0201eh                        ; 0201eh 0201e 
                                                                  ; 02024h 02024    ; vec hi                                                     defb 003h ; 1b24 03  
 plyr_shot_status:              equ 02025h                        ; 02025h 02025                                                                 defb 000h ; 1b25 00  shot_struct:                                                
                                                                  ; 02026h 02026                                                                 defb 010h ; 1b26 10  
-                                                                 ; 02027h 02027    e ; descriptor                                               defb 090h ; 1b27 90  player_shot_sprite
+player_shot_desc:              equ 02027h                        ; 02027h 02027    e ; descriptor                                               defb 090h ; 1b27 90  player_shot_sprite
                                                                  ; 02028h 02028    d                                                            defb 01ch ; 1b28 1c  
 obj1coor_yr:                   equ 02029h                        ; 02029h 02029    l                                                            defb 028h ; 1b29 28  
 obj1coor_xr:                   equ 0202ah                        ; 0202ah 0202a    h                                                            defb 030h ; 1b2a 30  

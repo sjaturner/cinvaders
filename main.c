@@ -1090,7 +1090,7 @@ struct desc
     uint8_t sprite_bytes;
 }__attribute__((packed));
 
-struct desc impl_read_desc(uint8_t *mem, uint16_t desc_addr)
+struct desc read_desc_impl(uint8_t *mem, uint16_t desc_addr)
 {
     struct desc desc = { };
     memcpy(&desc, mem + desc_addr, sizeof(desc));
@@ -1100,7 +1100,7 @@ struct desc impl_read_desc(uint8_t *mem, uint16_t desc_addr)
 
 uint32_t _read_desc(struct cpu *cpu)
 {
-    struct desc desc = impl_read_desc(cpu->mem, cpu->cpu_state.regs[REG_HL]);
+    struct desc desc = read_desc_impl(cpu->mem, cpu->cpu_state.regs[REG_HL]);
     cpu->cpu_state.regs[REG_DE] = desc.sprite_addr;
     cpu->cpu_state.regs[REG_HL] = desc.screen_loc;
     set_b(cpu, 0, desc.sprite_bytes);
@@ -1266,6 +1266,15 @@ uint32_t _copy_ram_mirror(struct cpu *cpu)
     return _copy_ram_mirror_impl(cpu->mem);
 }
 
+uint32_t _read_ply_shot(struct cpu *cpu)
+{
+    struct desc desc = read_desc_impl(cpu->mem, player_shot_desc);
+    cpu->cpu_state.regs[REG_DE] = desc.sprite_addr;
+    cpu->cpu_state.regs[REG_HL] = desc.screen_loc;
+    set_b(cpu, 0, desc.sprite_bytes);
+    return 0;
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1299,7 +1308,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(get_alien_coords),
     MAP_CIMPL(add_delta),
     MAP_CIMPL(copy_ram_mirror),
-    _________(read_ply_shot),
+    MAP_CIMPL(read_ply_shot),
     _________(to_shot_struct),
     _________(find_in_column),
     _________(reinit_saucer),

@@ -435,6 +435,7 @@ enum
     next_demo_cmd                =  0x201d,
     hid_mess_seq                 =  0x201e,
     plyr_shot_status             =  0x2025,
+    player_shot_desc             =  0x2027,
     obj1coor_yr                  =  0x2029,
     obj1coor_xr                  =  0x202a,
     shot_delta_x                 =  0x202c,
