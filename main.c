@@ -1275,6 +1275,23 @@ uint32_t _read_ply_shot(struct cpu *cpu)
     return 0;
 }
 
+enum
+{
+    SHOT_STRUCTURE_SIZE = 0x0b,
+};
+
+uint32_t _to_shot_struct_impl(uint8_t *mem, uint8_t shot_pic_end_value, uint16_t shot_struct_addr)
+{
+    mem[shot_pic_end] = shot_pic_end_value;
+    memcpy(mem + a_shot_status, mem + shot_struct_addr, SHOT_STRUCTURE_SIZE);
+    return 0;
+}
+
+uint32_t _to_shot_struct(struct cpu *cpu)
+{
+    return _to_shot_struct_impl(cpu->mem, get_a(cpu, 0), cpu->cpu_state.regs[REG_DE]);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1309,7 +1326,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(add_delta),
     MAP_CIMPL(copy_ram_mirror),
     MAP_CIMPL(read_ply_shot),
-    _________(to_shot_struct),
+    MAP_CIMPL(to_shot_struct),
     _________(find_in_column),
     _________(reinit_saucer),
     _________(get_al_ref_ptr),
