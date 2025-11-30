@@ -237,7 +237,7 @@ enum
     find_row                     =  0x1562,
     find_column                  =  0x156f,
     l1579h                       =  0x1579,
-    get_alien_stat_ptr           =  0x1581,
+    get_alien_state_ptr          =  0x1581,
     wrap_ref                     =  0x1590,
     rack_bump                    =  0x1597,
     l15a9h                       =  0x15a9,

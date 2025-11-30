@@ -1437,7 +1437,7 @@ uint32_t _alien_score_value(struct cpu *cpu) /* Why not put the result in a thou
 
 uint32_t _cnvt_pix_number_impl(uint8_t *mem, uint16_t *val)
 {
-    port_op(0, 2, *val & 7); /* Set up the gpu (lol, a barrel shifter). Seems to affect the missiles most ... */ 
+    port_op(0, 2, *val & 7); /* Set up the gpu (lol, a barrel shifter). Seems to affect the missiles most ... */
     _conv_to_scr_impl(val);
 
     return 0;
@@ -1446,6 +1446,17 @@ uint32_t _cnvt_pix_number_impl(uint8_t *mem, uint16_t *val)
 uint32_t _cnvt_pix_number(struct cpu *cpu)
 {
     return _cnvt_pix_number_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
+}
+
+uint32_t _get_alien_state_ptr_impl(uint8_t *mem, uint8_t row, uint8_t col, uint16_t *alien_state_addr)
+{
+    *alien_state_addr = ((uint16_t)mem[player_data_msb] << 8) + row * ALIENS_PER_ROW + col - 1;
+    return 0;
+}
+
+uint32_t _get_alien_state_ptr(struct cpu *cpu)
+{
+    return _get_alien_state_ptr_impl(cpu->mem, get_b(cpu, 0), get_c(cpu, 0), cpu->cpu_state.regs + REG_HL);
 }
 
 #if 0
@@ -1490,7 +1501,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(time_to_saucer),
     MAP_CIMPL(alien_score_value),
     MAP_CIMPL(cnvt_pix_number),
-    _________(get_alien_stat_ptr),
+    MAP_CIMPL(get_alien_state_ptr),
     _________(wrap_ref),
     _________(sub_176dh),
     _________(fleet_sound_off),

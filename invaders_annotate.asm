@@ -4135,7 +4135,7 @@ code_bug1:
     ld (exp_alien_yr),hl             ; 150f     22 64 20         ;  Put it in the exploding-alien descriptor
     ld a,005h                        ; 1512     3e 05            ;  Flag alien explosion ...
     ld (plyr_shot_status),a          ; 1514     32 25 20         ;  ... in progress
-    call get_alien_stat_ptr          ; 1517     cd 81 15         ;  Get descriptor for alien
+    call get_alien_state_ptr         ; 1517     cd 81 15         ;  Get pointer to alien state
     ld a,(hl)                        ; 151a     7e               ;  Is alien ...
     and a                            ; 151b     a7               ;  ... alive
     jp z,l1530h                      ; 151c     ca 30 15         ;  No ... must have been an alien shot
@@ -4203,7 +4203,7 @@ l1579h:
     ld (saucer_hit),a                ; 157b     32 85 20         ;  ... saucer has been hit
     jp l1545h                        ; 157e     c3 45 15         ;  Remove player shot
 
-get_alien_stat_ptr:                                             
+get_alien_state_ptr:                                             
     ld a,b                           ; 1581     78               ;  Hold original
     rlca                             ; 1582     07               ;  *2
     rlca                             ; 1583     07               ;  *4
