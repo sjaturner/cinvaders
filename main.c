@@ -1435,6 +1435,19 @@ uint32_t _alien_score_value(struct cpu *cpu) /* Why not put the result in a thou
     return _alien_score_value_impl(cpu->mem, get_a(cpu, 0), cpu->cpu_state.regs + REG_HL);
 }
 
+uint32_t _cnvt_pix_number_impl(uint8_t *mem, uint16_t *val)
+{
+    port_op(0, 2, *val & 7); /* Set up the gpu (lol, a barrel shifter). Seems to affect the missiles most ... */ 
+    _conv_to_scr_impl(val);
+
+    return 0;
+}
+
+uint32_t _cnvt_pix_number(struct cpu *cpu)
+{
+    return _cnvt_pix_number_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1476,7 +1489,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(get_ships_per_cred),
     MAP_CIMPL(time_to_saucer),
     MAP_CIMPL(alien_score_value),
-    _________(cnvt_pix_number),
+    MAP_CIMPL(cnvt_pix_number),
     _________(get_alien_stat_ptr),
     _________(wrap_ref),
     _________(sub_176dh),
