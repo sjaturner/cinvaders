@@ -1074,7 +1074,7 @@ uint32_t _conv_to_scr_impl(uint16_t *val)
 
     *val = (0x2000 | (b * SCREEN_BYTES_PER_PIXEL_COLUMN + a / 8)) & 0x3fff;
     printf("%s %u %u %u %04x\n", __func__, b, a / 8, a, *val);
-    
+
     return 0;
 }
 
@@ -1164,6 +1164,7 @@ uint32_t _alt_alien_sprites(struct cpu *cpu)
 
 enum
 {
+    ROWS_OF_ALIENS = 5,
     ALIENS_PER_ROW = 0x0b,
 };
 
@@ -1292,6 +1293,45 @@ uint32_t _to_shot_struct(struct cpu *cpu)
     return _to_shot_struct_impl(cpu->mem, get_a(cpu, 0), cpu->cpu_state.regs[REG_DE]);
 }
 
+uint32_t _find_in_column_impl(uint8_t *mem, uint8_t column, int *found, uint8_t *alien_index)
+{
+    uint8_t index = column - 1;
+    uint8_t *aliens_base_addr = mem + ((uint16_t)mem[player_data_msb] << 8);
+
+    *found = 0;
+    uint8_t rows_remaining = ROWS_OF_ALIENS;
+    do
+    {
+        if (aliens_base_addr[index])
+        {
+            *found = 1;
+            *alien_index = index;
+            return 0;
+        }
+
+        index += ALIENS_PER_ROW;
+
+        --rows_remaining;
+    } while(rows_remaining);
+
+    return 0;
+}
+
+uint32_t _find_in_column(struct cpu *cpu)
+{
+    int found = 0;
+    uint8_t alien_index = 0;
+    int ret = _find_in_column_impl(cpu->mem, get_c(cpu, 0), &found, &alien_index);
+
+    if (found)
+    {
+        set_f(cpu, 0, get_f(cpu, 0) | FLAG_BIT_C);
+        set_l(cpu, 0, alien_index);
+    }
+
+    return ret;
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1327,7 +1367,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(copy_ram_mirror),
     MAP_CIMPL(read_ply_shot),
     MAP_CIMPL(to_shot_struct),
-    _________(find_in_column),
+    MAP_CIMPL(find_in_column),
     _________(reinit_saucer),
     _________(get_al_ref_ptr),
     _________(get_ships_per_cred),
