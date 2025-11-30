@@ -141,7 +141,7 @@ enum
     new_two_player_game          =  0x086d,
     l0872h                       =  0x0872,
     get_alien_ptr_etc            =  0x0878,
-    get_al_ref_ptr               =  0x0886,
+    get_alien_reference_ptr      =  0x0886,
     prompt_player                =  0x088d,
     l08a9h                       =  0x08a9,
     l08bch                       =  0x08bc,

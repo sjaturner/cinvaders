@@ -117,7 +117,7 @@ l00a5h:
     jp isr_restore_regs_exit         ; 00ae     c3 82 00         ;  Restore and return
 
 init_rack:                                                      
-    call get_al_ref_ptr              ; 00b1     cd 86 08         ;  2xFC Get current player's ref-alien position pointer
+    call get_alien_reference_ptr     ; 00b1     cd 86 08         ;  2xFC Get current player's ref-alien position pointer
     push hl                          ; 00b4     e5               ;  Hold pointer
     ld a,(hl)                        ; 00b5     7e               ;  Get player's ...
     inc hl                           ; 00b6     23               ;  ... ref-alien ...
@@ -1331,13 +1331,13 @@ get_alien_ptr_etc:
     ld b,a                           ; 087b     47               ;  Hold it
     ld hl,(ref_alien_yr)             ; 087c     2a 09 20         ;  Alien coordinates
     ex de,hl                         ; 087f     eb               ;  Coordinates to DE
-    jp get_al_ref_ptr                ; 0880     c3 86 08         ;  HL is 21FC or 22FC and out
+    jp get_alien_reference_ptr       ; 0880     c3 86 08         ;  HL is 21FC or 22FC and out
 
     nop                              ; 0883     00               ;  ** Why?
     nop                              ; 0884     00              
     nop                              ; 0885     00              
 
-get_al_ref_ptr:                                                 
+get_alien_reference_ptr:                                                 
     ld a,(player_data_msb)           ; 0886     3a 67 20         ;  Player data MSB (21 or 22)
     ld h,a                           ; 0889     67               ;  To H
     ld l,0fch                        ; 088a     2e fc            ;  21FC or 22FC ... alien coordinates

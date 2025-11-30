@@ -1328,6 +1328,39 @@ uint32_t _find_in_column(struct cpu *cpu)
     return ret;
 }
 
+enum
+{
+    SAUCER_STRUCTURE_SIZE = 0x0a,
+};
+
+uint32_t _reinit_saucer_impl(uint8_t *mem)
+{
+    /* Doing a bit more than neccessary here ... The assembler looks silly. */
+    memcpy(mem + saucer_start, mem + data_for_saucer, SAUCER_STRUCTURE_SIZE);
+    return 0;
+}
+
+uint32_t _reinit_saucer(struct cpu *cpu)
+{
+    return _reinit_saucer_impl(cpu->mem);
+}
+
+enum
+{
+    ALIENS_COORD_OFFSET_IN_PLAYER_DATA = 0xfc,
+};
+
+uint32_t _get_alien_reference_ptr_impl(uint8_t *mem, uint16_t *ptr)
+{
+    *ptr = ((uint16_t)mem[player_data_msb] << 8) + ALIENS_COORD_OFFSET_IN_PLAYER_DATA;
+    return 0;
+}
+
+uint32_t _get_alien_reference_ptr(struct cpu *cpu)
+{
+    return _get_alien_reference_ptr_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1364,8 +1397,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(read_ply_shot),
     MAP_CIMPL(to_shot_struct),
     MAP_CIMPL(find_in_column),
-    _________(reinit_saucer),
-    _________(get_al_ref_ptr),
+    MAP_CIMPL(reinit_saucer),
+    MAP_CIMPL(get_alien_reference_ptr),
     _________(get_ships_per_cred),
     _________(time_to_saucer),
     _________(alien_score_value),
