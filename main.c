@@ -1322,8 +1322,13 @@ uint32_t _find_in_column(struct cpu *cpu)
     if (found)
     {
         set_f(cpu, 0, get_f(cpu, 0) | FLAG_BIT_C);
-        set_l(cpu, 0, alien_index);
     }
+    else
+    {
+        set_f(cpu, 0, get_f(cpu, 0) & ~FLAG_BIT_C);
+    }
+
+    set_l(cpu, 0, alien_index);
 
     return ret;
 }
@@ -1377,6 +1382,36 @@ uint32_t _get_ships_per_cred(struct cpu *cpu)
     return ret;
 }
 
+uint32_t _time_to_saucer_impl(uint8_t *mem)
+{
+    enum
+    {
+        FIRST_RACK_YR = 0x78,
+        TILL_SAUCER_GAME_LOOPS = 0x600,
+    };
+
+    if (mem[ref_alien_yr] >= FIRST_RACK_YR) /* Aliens need to have moved down a row to make space for sauceri, before we even start the timer */
+    {
+        return 0;
+    }
+
+    uint16_t *till_saucer = (uint16_t *)(mem + till_saucer_lsb);
+
+    if (*till_saucer == 0)
+    {
+        *till_saucer = TILL_SAUCER_GAME_LOOPS;
+        mem[saucer_start] = 1;
+    }
+
+    --*till_saucer;
+    return 0;
+}
+
+uint32_t _time_to_saucer(struct cpu *cpu)
+{
+    return _time_to_saucer_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1416,7 +1451,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(reinit_saucer),
     MAP_CIMPL(get_alien_reference_ptr),
     MAP_CIMPL(get_ships_per_cred),
-    _________(time_to_saucer),
+    MAP_CIMPL(time_to_saucer),
     _________(alien_score_value),
     _________(cnvt_pix_number),
     _________(get_alien_stat_ptr),
