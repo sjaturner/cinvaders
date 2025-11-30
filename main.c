@@ -1299,8 +1299,8 @@ uint32_t _find_in_column_impl(uint8_t *mem, uint8_t column, int *found, uint8_t 
     uint8_t *aliens_base_addr = mem + ((uint16_t)mem[player_data_msb] << 8);
 
     *found = 0;
-    uint8_t rows_remaining = ROWS_OF_ALIENS;
-    do
+
+    for (uint8_t row = 0; row < ROWS_OF_ALIENS; ++row, index += ALIENS_PER_ROW)
     {
         if (aliens_base_addr[index])
         {
@@ -1308,11 +1308,7 @@ uint32_t _find_in_column_impl(uint8_t *mem, uint8_t column, int *found, uint8_t 
             *alien_index = index;
             return 0;
         }
-
-        index += ALIENS_PER_ROW;
-
-        --rows_remaining;
-    } while(rows_remaining);
+    }
 
     return 0;
 }
