@@ -1361,6 +1361,22 @@ uint32_t _get_alien_reference_ptr(struct cpu *cpu)
     return _get_alien_reference_ptr_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
 }
 
+uint32_t _get_ships_per_cred_impl(uint8_t *mem, uint8_t *val)
+{
+    *val = (dip2 & 3) + 3;
+    return 0;
+}
+
+uint32_t _get_ships_per_cred(struct cpu *cpu)
+{
+    uint8_t val = 0;
+    uint32_t ret = _get_ships_per_cred_impl(cpu->mem, &val);
+
+    set_a(cpu, 0, val);
+
+    return ret;
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1399,7 +1415,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(find_in_column),
     MAP_CIMPL(reinit_saucer),
     MAP_CIMPL(get_alien_reference_ptr),
-    _________(get_ships_per_cred),
+    MAP_CIMPL(get_ships_per_cred),
     _________(time_to_saucer),
     _________(alien_score_value),
     _________(cnvt_pix_number),
