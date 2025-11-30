@@ -1412,6 +1412,29 @@ uint32_t _time_to_saucer(struct cpu *cpu)
     return _time_to_saucer_impl(cpu->mem);
 }
 
+uint32_t _alien_score_value_impl(uint8_t *mem, uint8_t row, uint16_t *value_addr)
+{
+    if (row < 2)
+    {
+        *value_addr = table_alien_score_val + 0;
+    }
+    else if (row < 4)
+    {
+        *value_addr = table_alien_score_val + 1;
+    }
+    else
+    {
+        *value_addr = table_alien_score_val + 2;
+    }
+
+    return 0;
+}
+
+uint32_t _alien_score_value(struct cpu *cpu) /* Why not put the result in a though? */
+{
+    return _alien_score_value_impl(cpu->mem, get_a(cpu, 0), cpu->cpu_state.regs + REG_HL);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1452,7 +1475,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(get_alien_reference_ptr),
     MAP_CIMPL(get_ships_per_cred),
     MAP_CIMPL(time_to_saucer),
-    _________(alien_score_value),
+    MAP_CIMPL(alien_score_value),
     _________(cnvt_pix_number),
     _________(get_alien_stat_ptr),
     _________(wrap_ref),
