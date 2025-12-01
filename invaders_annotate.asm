@@ -307,7 +307,7 @@ move_ref_alien:
 
     nop                              ; 01bf     00               ;  ** Why?
 
-init_aliens:                                                    
+init_aliens_player_one:                                                    
     ld hl,02100h                     ; 01c0     21 00 21         ;  Start of alien structures (this is the last alien)
 l01c3h:                                                         
     ld b,037h                        ; 01c3     06 37            ;  Count to 55 (that's five rows of 11 aliens)
@@ -1255,8 +1255,8 @@ new_game:
     xor a                            ; 07dd     af               ;  Make a 0
     ld (p1rack_cnt),a                ; 07de     32 fe 21         ;  Player 1 is on first rack of aliens
     ld (p2rack_cnt),a                ; 07e1     32 fe 22         ;  Player 2 is on first rack of aliens
-    call init_aliens                 ; 07e4     cd c0 01         ;  Initialize 55 aliens for player 1
-    call init_aliens_p2              ; 07e7     cd 04 19         ;  Initialize 55 aliens for player 2
+    call init_aliens_player_one      ; 07e4     cd c0 01         ;  Initialize 55 aliens for player 1
+    call init_aliens_player_two      ; 07e7     cd 04 19         ;  Initialize 55 aliens for player 2
     ld hl,03878h                     ; 07ea     21 78 38         ;  Screen coordinates for lower-left alien
     ld (p1ref_alien_y),hl            ; 07ed     22 fc 21         ;  Initialize reference alien for player 1
     ld (p2ref_alien_yr),hl           ; 07f0     22 fc 22         ;  Initialize reference alien for player 2
@@ -1612,12 +1612,12 @@ l0a13h:
     ld a,021h                        ; 0a25     3e 21            ;  Start fleet with ...
     ld (sound_port5),a               ; 0a27     32 98 20         ;  ... first sound
     call draw_shield_pl2             ; 0a2a     cd f5 01         ;  Draw shields for player 2
-    call init_aliens_p2              ; 0a2d     cd 04 19         ;  Initalize aliens for player 2
+    call init_aliens_player_two      ; 0a2d     cd 04 19         ;  Initalize aliens for player 2
     jp top_of_game_loop              ; 0a30     c3 04 08         ;  Continue at top of game loop
 
 l0a33h:                                                         
     call draw_shield_pl1             ; 0a33     cd ef 01         ;  Draw shields for player 1
-    call init_aliens                 ; 0a36     cd c0 01         ;  Initialize aliens for player 1
+    call init_aliens_player_one      ; 0a36     cd c0 01         ;  Initialize aliens for player 1
     jp top_of_game_loop              ; 0a39     c3 04 08         ;  Continue at top of game loop
 
 check_player_collision:                                                      
@@ -1782,7 +1782,7 @@ l0b4ah:
     call remove_ship                 ; 0b5a     cd 7f 1a         ;  Remove a ship from stash and update indicators
 l0b5dh:                                                         
     call copy_ram_mirror             ; 0b5d     cd e4 01         ;  Block copy ROM mirror to initialize RAM
-    call init_aliens                 ; 0b60     cd c0 01         ;  Initialize all player 1 aliens
+    call init_aliens_player_one      ; 0b60     cd c0 01         ;  Initialize all player 1 aliens
     call draw_shield_pl1             ; 0b63     cd ef 01         ;  Draw shields for player 1 (to buffer)
     call restore_shields1            ; 0b66     cd 1a 02         ;  Restore shields for player 1 (to screen)
     ld a,001h                        ; 0b69     3e 01            ;  ISR splash-task ...
@@ -4764,7 +4764,7 @@ sound_bits3on:
     out (003h),a                     ; 1901     d3 03            ;  Write new value to sound hardware
     ret                              ; 1903     c9              
 
-init_aliens_p2:                                                 
+init_aliens_player_two:                                                 
     ld hl,02200h                     ; 1904     21 00 22         ;  Player 2 data area
     jp l01c3h                        ; 1907     c3 c3 01         ;  Initialize player 2 aliens
 

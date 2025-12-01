@@ -1166,6 +1166,7 @@ enum
 {
     ROWS_OF_ALIENS = 5,
     ALIENS_PER_ROW = 0x0b,
+    ALIENS = ROWS_OF_ALIENS * ALIENS_PER_ROW,
 };
 
 // Convert alien index in L to screen bit position in C,L.
@@ -1533,14 +1534,22 @@ uint32_t _read_print_struct(struct cpu *cpu)
     return ret;
 }
 
+enum
+{
+    PLAYER_1_ADDR = 0x2100,
+    PLAYER_1_ADDR_MSB = (PLAYER_1_ADDR >> 8) & 0xff,
+    PLAYER_2_ADDR = 0x2200,
+    PLAYER_2_ADDR_MSB = (PLAYER_2_ADDR >> 8) & 0xff,
+};
+
 uint32_t _get_player_alive_ptr_impl(uint8_t *mem, uint16_t *player_alive_ptr)
 {
     switch (mem[player_data_msb]) /* Original checks the lowest bit, that seems royally fucked up. */
     {
-        case 0x21:
+        case PLAYER_1_ADDR_MSB:
             *player_alive_ptr = player2alive;
             break;
-        case 0x22:
+        case PLAYER_2_ADDR_MSB:
             *player_alive_ptr = player1alive;
             break;
         default:
@@ -1558,10 +1567,10 @@ uint32_t _cur_ply_alive_impl(uint8_t *mem, uint16_t *player_alive_ptr) /* Upside
 {
     switch (mem[player_data_msb]) /* Original checks the lowest bit, that seems royally fucked up. */
     {
-        case 0x21:
+        case PLAYER_1_ADDR_MSB:
             *player_alive_ptr = player1alive;
             break;
-        case 0x22:
+        case PLAYER_2_ADDR_MSB:
             *player_alive_ptr = player2alive;
             break;
         default:
@@ -1591,6 +1600,28 @@ uint32_t _get_delta_x_impl(uint8_t *mem, uint8_t *delta_x)
 uint32_t _get_delta_x(struct cpu *cpu)
 {
     return _get_delta_x_impl(cpu->mem, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + HI);
+}
+
+uint32_t _sound_bits3on(struct cpu *cpu) /* Full of sound and fury. Signifying nothing. */
+{
+    return 0;
+}
+
+void init_aliens(uint8_t *mem, uint16_t aliens_addr)
+{
+    memset(mem + aliens_addr, 1, ALIENS);
+}
+
+uint32_t _init_aliens_player_one(struct cpu *cpu)
+{
+    init_aliens(cpu->mem, PLAYER_1_ADDR);
+    return 0;
+}
+
+uint32_t _init_aliens_player_two(struct cpu *cpu)
+{
+    init_aliens(cpu->mem, PLAYER_2_ADDR);
+    return 0;
 }
 
 #if 0
@@ -1643,8 +1674,9 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(read_print_struct),
     MAP_CIMPL(get_player_alive_ptr),
     MAP_CIMPL(get_delta_x),
-    _________(sound_bits3on),
-    _________(init_aliens_p2),
+    MAP_CIMPL(sound_bits3on),
+    MAP_CIMPL(init_aliens_player_one),
+    MAP_CIMPL(init_aliens_player_two),
     _________(draw_score_head),
     _________(print_player_one_score),
     _________(print_player_two_score),
