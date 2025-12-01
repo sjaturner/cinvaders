@@ -1575,6 +1575,24 @@ uint32_t _cur_ply_alive(struct cpu *cpu)
     return _cur_ply_alive_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
 }
 
+uint32_t _get_delta_x_impl(uint8_t *mem, uint8_t *delta_x)
+{
+    if (mem[num_aliens] <= 1)
+    {
+        *delta_x = 3; /* Speed up when there is only one alien, but thos only applies for moving right... */
+    }
+    else
+    {
+        *delta_x = 2;
+    }
+    return 0;
+}
+
+uint32_t _get_delta_x(struct cpu *cpu)
+{
+    return _get_delta_x_impl(cpu->mem, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + HI);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1624,7 +1642,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(check_handle_tilt),
     MAP_CIMPL(read_print_struct),
     MAP_CIMPL(get_player_alive_ptr),
-    _________(get_delta_x),
+    MAP_CIMPL(get_delta_x),
     _________(sound_bits3on),
     _________(init_aliens_p2),
     _________(draw_score_head),
