@@ -1491,6 +1491,49 @@ uint32_t _check_handle_tilt(struct cpu *cpu) /* I do not think my laptop has acc
     return 0;
 }
 
+struct print_struct
+{
+    uint16_t screen_coord;
+    uint16_t message_addr;
+}__attribute((packed));
+
+uint32_t _read_print_struct_impl(uint8_t *mem, int *invalid, uint16_t *struct_addr, uint16_t *screen_coord, uint16_t *message_addr)
+{
+    *invalid = 0;
+
+    if (mem[*struct_addr] == 0xff)
+    {
+        *invalid = 1;
+        return 0;
+    }
+
+    struct print_struct *print_struct = (struct print_struct *)(mem + *struct_addr);
+    *screen_coord = print_struct->screen_coord;
+    *message_addr = print_struct->message_addr;
+
+    printf("%s *struct_addr:%04x *screen_coord:%04x *message_addr:%04x\n", __func__, *struct_addr, *screen_coord, *message_addr);fflush(stdout);
+    *struct_addr += sizeof(struct print_struct);
+
+    return 0;
+}
+
+uint32_t _read_print_struct(struct cpu *cpu)
+{
+    int invalid = 0;
+    int ret = _read_print_struct_impl(cpu->mem, &invalid, cpu->cpu_state.regs + REG_BC, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs + REG_DE);
+
+    if (invalid)
+    {
+        set_f(cpu, 0, get_f(cpu, 0) | FLAG_BIT_C);
+    }
+    else
+    {
+        set_f(cpu, 0, get_f(cpu, 0) & ~FLAG_BIT_C);
+    }
+
+    return ret;
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1538,7 +1581,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(sub_176dh),
     MAP_CIMPL(fleet_sound_off),
     MAP_CIMPL(check_handle_tilt),
-    _________(read_print_struct),
+    MAP_CIMPL(read_print_struct),
     _________(get_player_alive_ptr),
     _________(get_delta_x),
     _________(sound_bits3on),
