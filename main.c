@@ -1607,6 +1607,11 @@ uint32_t _sound_bits3on(struct cpu *cpu) /* Full of sound and fury. Signifying n
     return 0;
 }
 
+uint32_t _sound_bits3off(struct cpu *cpu) /* Full of sound and fury. Signifying nothing. */
+{
+    return 0;
+}
+
 void init_aliens(uint8_t *mem, uint16_t aliens_addr)
 {
     memset(mem + aliens_addr, 1, ALIENS);
@@ -1685,7 +1690,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     _________(print_hi_score),
     _________(enable_game_tasks),
     _________(dsable_game_tasks),
-    _________(sound_bits3off),
+    MAP_CIMPL(sound_bits3off),
     _________(comp_yto_beam),
 };
 
