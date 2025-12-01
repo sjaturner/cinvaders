@@ -1463,7 +1463,6 @@ uint32_t _wrap_ref_impl(uint8_t *mem, int8_t *a, uint8_t *sixteens_count)
 {
     do
     {
-        assert(0);
         ++*sixteens_count;
         *a += 0x10;
     }while (*a < 0);
@@ -1534,6 +1533,48 @@ uint32_t _read_print_struct(struct cpu *cpu)
     return ret;
 }
 
+uint32_t _get_player_alive_ptr_impl(uint8_t *mem, uint16_t *player_alive_ptr)
+{
+    switch (mem[player_data_msb]) /* Original checks the lowest bit, that seems royally fucked up. */
+    {
+        case 0x21:
+            *player_alive_ptr = player2alive;
+            break;
+        case 0x22:
+            *player_alive_ptr = player1alive;
+            break;
+        default:
+            break;
+    };
+    return 0;
+}
+
+uint32_t _get_player_alive_ptr(struct cpu *cpu) /* Unused, and you are an idiot for implementing it ... */
+{
+    return _get_player_alive_ptr_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
+}
+
+uint32_t _cur_ply_alive_impl(uint8_t *mem, uint16_t *player_alive_ptr) /* Upside down version of get_player_alive_ptr? */
+{
+    switch (mem[player_data_msb]) /* Original checks the lowest bit, that seems royally fucked up. */
+    {
+        case 0x21:
+            *player_alive_ptr = player1alive;
+            break;
+        case 0x22:
+            *player_alive_ptr = player2alive;
+            break;
+        default:
+            break;
+    };
+    return 0;
+}
+
+uint32_t _cur_ply_alive(struct cpu *cpu)
+{
+    return _cur_ply_alive_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1582,7 +1623,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(fleet_sound_off),
     MAP_CIMPL(check_handle_tilt),
     MAP_CIMPL(read_print_struct),
-    _________(get_player_alive_ptr),
+    MAP_CIMPL(get_player_alive_ptr),
     _________(get_delta_x),
     _________(sound_bits3on),
     _________(init_aliens_p2),
