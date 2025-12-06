@@ -1239,18 +1239,18 @@ uint32_t _get_alien_coords(struct cpu *cpu)
     return _get_alien_coords_impl(cpu->mem, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + LO, (uint8_t *)&cpu->cpu_state.regs[REG_HL] + LO, (uint8_t *)&cpu->cpu_state.regs[REG_DE] + HI);
 }
 
-uint32_t _add_delta_impl(uint8_t *mem, uint16_t addr, uint8_t dx)
+uint32_t _add_delta_impl(uint8_t *mem, uint16_t addr, uint8_t dx, uint8_t *y)
 {
     uint8_t dy = mem[addr + 1];  /* We loaded delta-x already ... skip over it */
     mem[addr + 2] += dx;
-    mem[addr + 3] += dy; /* Fail to do this and the aliens do not move across the screen. Clues for x and y which appear muddled in the comments. */
+    *y = mem[addr + 3] += dy; /* Fail to do this and the aliens do not move across the screen. Clues for x and y which appear muddled in the comments. */
 
     return 0;
 }
 
 uint32_t _add_delta(struct cpu *cpu)
 {
-    return _add_delta_impl(cpu->mem, cpu->cpu_state.regs[REG_HL], cpu->cpu_state.regs[REG_BC] & 0xff);
+    return _add_delta_impl(cpu->mem, cpu->cpu_state.regs[REG_HL], cpu->cpu_state.regs[REG_BC] & 0xff, (uint8_t *)&cpu->cpu_state.regs[REG_AF] + HI);
 }
 
 uint32_t _copy_ram_mirror_impl(uint8_t *mem)
