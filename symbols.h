@@ -325,7 +325,7 @@ enum
     enable_game_tasks            =  0x19d1,
     f_first                      =  0x19d1,
     l19d3h                       =  0x19d3,
-    dsable_game_tasks            =  0x19d7,
+    disable_game_tasks           =  0x19d7,
     sound_bits3off               =  0x19dc,
     draw_num_ships               =  0x19e6,
     l19ech                       =  0x19ec,

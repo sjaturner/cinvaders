@@ -1727,6 +1727,28 @@ uint32_t _draw_num_credits(struct cpu *cpu)
     return _draw_num_credits_impl(cpu->mem);
 }
 
+uint32_t _enable_game_tasks_impl(uint8_t *mem)
+{
+    mem[suspend_play] = 1; /* Wut? */
+    return 0;
+}
+
+uint32_t _enable_game_tasks(struct cpu *cpu)
+{
+    return _enable_game_tasks_impl(cpu->mem);
+}
+
+uint32_t _disable_game_tasks_impl(uint8_t *mem)
+{
+    mem[suspend_play] = 0; /* Wut? */
+    return 0;
+}
+
+uint32_t _disable_game_tasks(struct cpu *cpu)
+{
+    return _disable_game_tasks_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1788,8 +1810,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(print_credit_label),
     MAP_CIMPL(draw_num_credits),
 
-    _________(enable_game_tasks),
-    _________(dsable_game_tasks),
+    MAP_CIMPL(enable_game_tasks),
+    MAP_CIMPL(disable_game_tasks),
     MAP_CIMPL(sound_bits3off),
     _________(comp_yto_beam),
 };

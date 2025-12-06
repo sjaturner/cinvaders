@@ -513,7 +513,7 @@ game_object_0_handler:
     ret z                            ; 02cf     c8               ;  No ... return to splash screens
     ld sp,02400h                     ; 02d0     31 00 24         ;  We aren't going to return
     ei                               ; 02d3     fb               ;  Enable interrupts (we just dropped the ISR context)
-    call dsable_game_tasks           ; 02d4     cd d7 19         ;  Disable game tasks
+    call disable_game_tasks          ; 02d4     cd d7 19         ;  Disable game tasks
     call get_num_ships_active_player ; 02d7     cd 2e 09         ;  Get number of ships for active player
     and a                            ; 02da     a7               ;  Any left?
     jp z,l166dh                      ; 02db     ca 6d 16         ;  No ... handle game over for player
@@ -1238,7 +1238,7 @@ new_game:
     ld (player_two_score_desc),hl    ; 07af     22 fc 20         ;  Clear player-2 score
     call print_player_one_score      ; 07b2     cd 25 19         ;  Print player-1 score
     call print_player_two_score      ; 07b5     cd 2b 19         ;  Print player-2 score
-    call dsable_game_tasks           ; 07b8     cd d7 19         ;  Disable game tasks
+    call disable_game_tasks          ; 07b8     cd d7 19         ;  Disable game tasks
     ld hl,00101h                     ; 07bb     21 01 01         ;  Two bytes 1, 1
     ld a,h                           ; 07be     7c               ;  1 to A
     ld (game_mode),a                 ; 07bf     32 ef 20         ;  20EF=1 ... game mode
@@ -4442,7 +4442,7 @@ l16eeh:
     call sound_bits3on               ; 16f3     cd fa 18         ;  ... sound
     call flag_player_hit             ; 16f6     cd 59 0a         ;  Has flag been set?
     jp nz,l16eeh                     ; 16f9     c2 ee 16         ;  No ... wait for the flag
-    call dsable_game_tasks           ; 16fc     cd d7 19         ;  Disable ISR game tasks
+    call disable_game_tasks          ; 16fc     cd d7 19         ;  Disable ISR game tasks
     ld hl,02701h                     ; 16ff     21 01 27         ;  Player's stash of ships
     call erase_ship_stash            ; 1702     cd fa 19         ;  Erase the stash of shps
     xor a                            ; 1705     af               ;  Print ...
@@ -4593,7 +4593,7 @@ l17dch:
     jp nz,l17dch                     ; 17e0     c2 dc 17         ;  No ... do again
     ld a,001h                        ; 17e3     3e 01            ;  Flag ...
     ld (tilt),a                      ; 17e5     32 9a 20         ;  ... handling TILT
-    call dsable_game_tasks           ; 17e8     cd d7 19         ;  Disable game tasks
+    call disable_game_tasks          ; 17e8     cd d7 19         ;  Disable game tasks
     ei                               ; 17eb     fb               ;  Re-enable interrupts
     ld de,msg_tilt                   ; 17ec     11 bc 1c         ;  Message "TILT"
     ld hl,03016h                     ; 17ef     21 16 30         ;  Center of screen
@@ -4838,7 +4838,7 @@ l1971h:
     jp l16e6h                        ; 1976     c3 e6 16         ;  End of round
 
 suspend_game_tasks:                                                      
-    call dsable_game_tasks           ; 1979     cd d7 19         ;  Disable ISR game tasks
+    call disable_game_tasks          ; 1979     cd d7 19         ;  Disable ISR game tasks
     call draw_num_credits            ; 197c     cd 47 19         ;  Display number of credits on screen
     jp print_credit_label            ; 197f     c3 3c 19         ;  Print message "CREDIT"
 
@@ -4915,7 +4915,7 @@ l19d3h:
     ld (suspend_play),a              ; 19d3     32 e9 20         ;  ... game tasks enabled
     ret                              ; 19d6     c9               ;  Done
 
-dsable_game_tasks:                                              
+disable_game_tasks:                                              
     xor a                            ; 19d7     af               ;  Clear ISR game tasks flag
     jp l19d3h                        ; 19d8     c3 d3 19         ;  Save a byte (the RET)
 
