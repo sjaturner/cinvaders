@@ -1695,6 +1695,38 @@ uint32_t _print_high_score(struct cpu *cpu)
     return _print_high_score_impl(cpu->mem);
 }
 
+uint32_t _print_credit_label_impl(uint8_t *mem)
+{
+    enum
+    {
+        MSG_CREDIT_LENGTH = 7,
+        MSG_CREDIT_COORDS = 0x3501,
+    };
+    uint16_t screen_addr = MSG_CREDIT_COORDS;
+    uint16_t msg = msg_credit;
+    return _print_message_impl(mem, MSG_CREDIT_LENGTH, &msg, &screen_addr);
+}
+
+uint32_t _print_credit_label(struct cpu *cpu)
+{
+    return _print_credit_label_impl(cpu->mem);
+}
+
+uint32_t _draw_num_credits_impl(uint8_t *mem)
+{
+    enum
+    {
+        NUM_CREDITS_COORD = 0x3c01,
+    };
+    uint16_t screen_addr = NUM_CREDITS_COORD;
+    return _draw_hex_byte_impl(mem, &screen_addr, mem[num_coins]);
+}
+
+uint32_t _draw_num_credits(struct cpu *cpu)
+{
+    return _draw_num_credits_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1753,8 +1785,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(print_player_one_score),
     MAP_CIMPL(print_player_two_score),
     MAP_CIMPL(print_high_score),
-    _________(print_credit_label),
-    _________(draw_num_credits),
+    MAP_CIMPL(print_credit_label),
+    MAP_CIMPL(draw_num_credits),
 
     _________(enable_game_tasks),
     _________(dsable_game_tasks),
