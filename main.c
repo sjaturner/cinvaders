@@ -1749,6 +1749,17 @@ uint32_t _disable_game_tasks(struct cpu *cpu)
     return _disable_game_tasks_impl(cpu->mem);
 }
 
+uint32_t _copy_rom_to_ram_impl(uint8_t *mem)
+{
+    memcpy(mem + ram_start, mem + ram_mirror, 0x100);
+    return 0;
+}
+
+uint32_t _copy_rom_to_ram(struct cpu *cpu)
+{
+    return _copy_rom_to_ram_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1759,6 +1770,7 @@ uint32_t _template(struct cpu *cpu)
 {
     return _template_impl(cpu->mem);
 }
+
 #endif
 
 #define MAP_CIMPL(F) [F] = _ ## F
@@ -1816,10 +1828,11 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
 
     /* Next leaves, ordered by difficulty. */
 
-    _________(wait_on_delay),
-    _________(one_sec_delay),
-    _________(two_sec_delay),
-    _________(copy_rom_to_ram),
+    _________(wait_on_delay), /* Tricky, we want the ISR to run but we are in CIMPL ... think harder. */
+    _________(one_sec_delay), /* Tricky, we want the ISR to run but we are in CIMPL ... think harder. */
+    _________(two_sec_delay), /* Tricky, we want the ISR to run but we are in CIMPL ... think harder. */
+
+    MAP_CIMPL(copy_rom_to_ram),
     _________(flag_player_hit),
     _________(get_saucer_descriptor),
     _________(ini_splash_ani),

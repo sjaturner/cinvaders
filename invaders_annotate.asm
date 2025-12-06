@@ -1626,7 +1626,7 @@ check_player_collision:
     ld (isr_delay),a                 ; 0a44     32 c0 20         ;  Set ISR timer
 l0a47h:                                                         
     ld a,(isr_delay)                 ; 0a47     3a c0 20         ;  Has timer expired?
-    and a                            ; 0a4a     a7               ;  Check exipre
+    and a                            ; 0a4a     a7               ;  Check expiry
     ret z                            ; 0a4b     c8               ;  Out if done
     call flag_player_hit             ; 0a4c     cd 59 0a         ;  Check player collision
     jp z,l0a47h                      ; 0a4f     ca 47 0a         ;  No collision ... wait on timer
