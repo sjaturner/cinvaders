@@ -1629,6 +1629,71 @@ uint32_t _init_aliens_player_two(struct cpu *cpu)
     return 0;
 }
 
+uint32_t _draw_score_head_impl(uint8_t *mem, uint16_t *screen_addr)
+{
+    enum
+    {
+        MSG_SCORE_HEADER_LENGTH = 0x1c,
+    };
+    *screen_addr = 0x241e;
+    uint16_t msg = msg_score_header;
+    _print_message_impl(mem, MSG_SCORE_HEADER_LENGTH, &msg, screen_addr);
+    return 0;
+}
+
+struct score_descriptor
+{
+    uint16_t value;
+    uint16_t screen_coord;
+}__attribute((packed));
+
+uint32_t _draw_score_impl(uint8_t *mem, uint16_t score_descriptor_addr)
+{
+    struct score_descriptor *score_descriptor = (struct score_descriptor *)(mem + score_descriptor_addr);
+    uint16_t screen_coord = score_descriptor->screen_coord;
+
+    return _draw_hex_word_impl(mem, &screen_coord, score_descriptor->value);
+}
+
+uint32_t _draw_score(struct cpu *cpu)
+{
+    return _draw_score_impl(cpu->mem, cpu->cpu_state.regs[REG_HL]);
+}
+
+uint32_t _draw_score_head(struct cpu *cpu)
+{
+    return _draw_score_head_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
+}
+
+uint32_t _print_player_one_score_impl(uint8_t *mem)
+{
+    return _draw_score_impl(mem, player_one_score_desc);
+}
+
+uint32_t _print_player_one_score(struct cpu *cpu)
+{
+    return _print_player_one_score_impl(cpu->mem);
+}
+
+uint32_t _print_player_two_score_impl(uint8_t *mem)
+{
+    return _draw_score_impl(mem, player_two_score_desc);
+}
+
+uint32_t _print_player_two_score(struct cpu *cpu)
+{
+    return _print_player_two_score_impl(cpu->mem);
+}
+
+uint32_t _print_high_score_impl(uint8_t *mem)
+{
+    return _draw_score_impl(mem, high_score_desc);
+}
+
+uint32_t _print_high_score(struct cpu *cpu)
+{
+    return _print_high_score_impl(cpu->mem);
+}
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1682,12 +1747,14 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(sound_bits3on),
     MAP_CIMPL(init_aliens_player_one),
     MAP_CIMPL(init_aliens_player_two),
-    _________(draw_score_head),
-    _________(print_player_one_score),
-    _________(print_player_two_score),
+
+    MAP_CIMPL(draw_score_head),
+    MAP_CIMPL(print_player_one_score),
+    MAP_CIMPL(print_player_two_score),
+    _________(print_high_score),
     _________(print_credit_label),
     _________(draw_num_credits),
-    _________(print_hi_score),
+
     _________(enable_game_tasks),
     _________(dsable_game_tasks),
     MAP_CIMPL(sound_bits3off),

@@ -11,7 +11,6 @@ a_first:
     nop                              ; 0002     00               ;  ... development
     jp init                          ; 0003     c3 d4 18         ;  Continue startup at 18D4
 
-l0006h:                                                         
     nop                              ; 0006     00               ;  Padding before fixed ISR address
     nop                              ; 0007     00              
 isr_008h:
@@ -445,7 +444,7 @@ keep_processing_game_objs:
 
 l026fh:                                                         
     pop hl                           ; 026f     e1               ;  Restore pointer to xx04
-    ld de,l000ch                     ; 0270     11 0c 00         ;  Offset to next ...
+    ld de,0000ch                     ; 0270     11 0c 00         ;  Offset to next ...
     add hl,de                        ; 0273     19               ;  ... game task (C+4=10)
     jp keep_processing_game_objs     ; 0274     c3 4b 02         ;  Do next game task
 
@@ -1235,8 +1234,8 @@ new_game:
     ld (num_coins),a                 ; 07a3     32 eb 20         ;  New credit count
     call draw_num_credits            ; 07a6     cd 47 19         ;  Display number of credits
     ld hl,00000h                     ; 07a9     21 00 00         ;  Score of 0000
-    ld (p1scor_l),hl                 ; 07ac     22 f8 20         ;  Clear player-1 score
-    ld (p2scor_l),hl                 ; 07af     22 fc 20         ;  Clear player-2 score
+    ld (player_one_score_desc),hl    ; 07ac     22 f8 20         ;  Clear player-1 score
+    ld (player_two_score_desc),hl    ; 07af     22 fc 20         ;  Clear player-2 score
     call print_player_one_score      ; 07b2     cd 25 19         ;  Print player-1 score
     call print_player_two_score      ; 07b5     cd 2b 19         ;  Print player-2 score
     call dsable_game_tasks           ; 07b8     cd d7 19         ;  Disable game tasks
@@ -1555,9 +1554,9 @@ draw_digit_in_acc:
 get_player_score_descriptor:                                                      
     ld a,(player_data_msb)           ; 09ca     3a 67 20         ;  Get active player
     rrca                             ; 09cd     0f               ;  Test for player
-    ld hl,p1scor_l                   ; 09ce     21 f8 20         ;  Player 1 score descriptor
+    ld hl,player_one_score_desc      ; 09ce     21 f8 20         ;  Player 1 score descriptor
     ret c                            ; 09d1     d8               ;  Keep it if player 1 is active
-    ld hl,p2scor_l                   ; 09d2     21 fc 20         ;  Else get player 2 descriptor
+    ld hl,player_two_score_desc      ; 09d2     21 fc 20         ;  Else get player 2 descriptor
     ret                              ; 09d5     c9               ;  Out
 
 clear_play_field:                                               
@@ -1569,7 +1568,7 @@ l09d9h:
     and 01fh                         ; 09dd     e6 1f            ;  ... coordinate
     cp 01ch                          ; 09df     fe 1c            ;  Edge minus a buffer?
     jp c,l09e8h                      ; 09e1     da e8 09         ;  No ... keep going
-    ld de,l0006h                     ; 09e4     11 06 00         ;  Else ... bump to
+    ld de,00006h                     ; 09e4     11 06 00         ;  Else ... bump to
     add hl,de                        ; 09e7     19               ;  ... next edge + buffer
 l09e8h:                                                         
     ld a,h                           ; 09e8     7c               ;  Get Y coordinate
@@ -4393,7 +4392,7 @@ l168fh:
     inc hl                           ; 1692     23               ;  Point to MSB
     ld a,(hl)                        ; 1693     7e               ;  Copy the new ...
     ld (de),a                        ; 1694     12               ;  ... high score upper two digits
-    call print_hi_score              ; 1695     cd 50 19         ;  Draw the new high score
+    call print_high_score            ; 1695     cd 50 19         ;  Draw the new high score
 l1698h:                                                         
     ld a,(two_players)               ; 1698     3a ce 20         ;  Number of players
     and a                            ; 169b     a7               ;  Is this a single player game?
@@ -4787,11 +4786,11 @@ draw_score_head:
     jp print_message                 ; 1922     c3 f3 08         ;  Print score header
 
 print_player_one_score:                                                      
-    ld hl,p1scor_l                   ; 1925     21 f8 20         ;  Player 1 score descriptor
+    ld hl,player_one_score_desc      ; 1925     21 f8 20         ;  Player 1 score descriptor
     jp draw_score                    ; 1928     c3 31 19         ;  Print score
 
 print_player_two_score:                                                      
-    ld hl,p2scor_l                   ; 192b     21 fc 20         ;  Player 2 score descriptor
+    ld hl,player_two_score_desc      ; 192b     21 fc 20         ;  Player 2 score descriptor
     jp draw_score                    ; 192e     c3 31 19         ;  Print score
 
 draw_score:                                                     
@@ -4816,8 +4815,8 @@ draw_num_credits:
     ld hl,03c01h                     ; 194a     21 01 3c         ;  Screen coordinates
     jp draw_hex_byte                 ; 194d     c3 b2 09         ;  Character to screen
 
-print_hi_score:                                                 
-    ld hl,020f4h                     ; 1950     21 f4 20         ;  Hi Score descriptor
+print_high_score:                                                 
+    ld hl,high_score_desc            ; 1950     21 f4 20         ;  Hi Score descriptor
     jp draw_score                    ; 1953     c3 31 19         ;  Print Hi-Score
 
 draw_status:                                                    
@@ -4825,7 +4824,7 @@ draw_status:
     call draw_score_head             ; 1959     cd 1a 19         ;  Print score header
     call print_player_one_score      ; 195c     cd 25 19         ;  Print player 1 score
     call print_player_two_score      ; 195f     cd 2b 19         ;  Print player 2 score
-    call print_hi_score              ; 1962     cd 50 19         ;  Print hi score
+    call print_high_score            ; 1962     cd 50 19         ;  Print hi score
     call print_credit_label          ; 1965     cd 3c 19         ;  Print credit lable
     jp draw_num_credits              ; 1968     c3 47 19         ;  Number of credits
 
@@ -5365,51 +5364,51 @@ msg_play_player_one:
     defb 0ffh                        ; 1b81     ff              
     defb 0ffh                        ; 1b82     ff              
 data_for_saucer:                                                         
-    defb 000h                        ; 1b83     00              
-    defb 000h                        ; 1b84     00              
-    defb 000h                        ; 1b85     00              
-    defb 020h                        ; 1b86     20              
-    defb 064h                        ; 1b87     64              
-    defb 01dh                        ; 1b88     1d              
-    defb 0d0h                        ; 1b89     d0              
-    defb 029h                        ; 1b8a     29              
-    defb 018h                        ; 1b8b     18              
-    defb 002h                        ; 1b8c     02              
-    defb 054h                        ; 1b8d     54              
-    defb 01dh                        ; 1b8e     1d              
-    defb 000h                        ; 1b8f     00              
-    defb 008h                        ; 1b90     08              
-    defb 000h                        ; 1b91     00              
-    defb 006h                        ; 1b92     06              
-    defb 000h                        ; 1b93     00              
-    defb 000h                        ; 1b94     00              
-    defb 001h                        ; 1b95     01              
-    defb 040h                        ; 1b96     40              
-    defb 000h                        ; 1b97     00              
-    defb 001h                        ; 1b98     01              
-    defb 000h                        ; 1b99     00              
-    defb 000h                        ; 1b9a     00              
-    defb 010h                        ; 1b9b     10              
-    defb 09eh                        ; 1b9c     9e              
-    defb 000h                        ; 1b9d     00              
-    defb 020h                        ; 1b9e     20              
-    defb 01ch                        ; 1b9f     1c              
-    defb 000h                        ; 1ba0     00              
-    defb 003h                        ; 1ba1     03              
-    defb 004h                        ; 1ba2     04              
-    defb 078h                        ; 1ba3     78              
-    defb 014h                        ; 1ba4     14              
-    defb 013h                        ; 1ba5     13              
-    defb 008h                        ; 1ba6     08              
-    defb 01ah                        ; 1ba7     1a              
-    defb 03dh                        ; 1ba8     3d              
-    defb 068h                        ; 1ba9     68              
-    defb 0fch                        ; 1baa     fc              
-    defb 0fch                        ; 1bab     fc              
-    defb 068h                        ; 1bac     68              
-    defb 03dh                        ; 1bad     3d              
-    defb 01ah                        ; 1bae     1a              
-    defb 000h                        ; 1baf     00              
+    defb 000h                        ; 1b83     00              ; saucer_start:                  equ 02083h                        
+    defb 000h                        ; 1b84     00              ; saucer_active:                 equ 02084h                        
+    defb 000h                        ; 1b85     00              ; saucer_hit:                    equ 02085h                        
+    defb 020h                        ; 1b86     20              ;                                                                  
+    defb 064h                        ; 1b87     64              ; saucer_pri_loc_lsb:            equ 02087h                        
+    defb 01dh                        ; 1b88     1d              ;                                                                  
+    defb 0d0h                        ; 1b89     d0              ;                                                                  
+    defb 029h                        ; 1b8a     29              ; saucer_pri_pic_msb:            equ 0208ah                        
+    defb 018h                        ; 1b8b     18              ;                                                                  
+    defb 002h                        ; 1b8c     02              ;                                                                  
+    defb 054h                        ; 1b8d     54              ; sau_score_lsb:                 equ 0208dh                        
+    defb 01dh                        ; 1b8e     1d              ;                                                                  
+    defb 000h                        ; 1b8f     00              ; shot_count_lsb:                equ 0208fh                        
+    defb 008h                        ; 1b90     08              ;                                                                  
+    defb 000h                        ; 1b91     00              ; till_saucer_lsb:               equ 02091h                        
+    defb 006h                        ; 1b92     06              ;                                                                  
+    defb 000h                        ; 1b93     00              ; wait_start_loop:               equ 02093h                        
+    defb 000h                        ; 1b94     00              ; sound_port3:                   equ 02094h                        
+    defb 001h                        ; 1b95     01              ; change_fleet_snd:              equ 02095h                        
+    defb 040h                        ; 1b96     40              ;                                                                  
+    defb 000h                        ; 1b97     00              ; fleet_snd_reload:              equ 02097h                        
+    defb 001h                        ; 1b98     01              ; sound_port5:                   equ 02098h                        
+    defb 000h                        ; 1b99     00              ; extra_hold:                    equ 02099h                        
+    defb 000h                        ; 1b9a     00              ; tilt:                          equ 0209ah                        
+    defb 010h                        ; 1b9b     10              ; fleet_snd_hold:                equ 0209bh                        
+    defb 09eh                        ; 1b9c     9e                                                                               
+    defb 000h                        ; 1b9d     00                                                                               
+    defb 020h                        ; 1b9e     20                                                                               
+    defb 01ch                        ; 1b9f     1c                                                                               
+    defb 000h                        ; 1ba0     00                                                                               
+    defb 003h                        ; 1ba1     03                                                                               
+    defb 004h                        ; 1ba2     04                                                                               
+    defb 078h                        ; 1ba3     78                                                                               
+    defb 014h                        ; 1ba4     14                                                                               
+    defb 013h                        ; 1ba5     13                                                                               
+    defb 008h                        ; 1ba6     08                                                                               
+    defb 01ah                        ; 1ba7     1a                                                                               
+    defb 03dh                        ; 1ba8     3d                                                                               
+    defb 068h                        ; 1ba9     68                                                                               
+    defb 0fch                        ; 1baa     fc                                                                               
+    defb 0fch                        ; 1bab     fc                                                                               
+    defb 068h                        ; 1bac     68                                                                               
+    defb 03dh                        ; 1bad     3d                                                                               
+    defb 01ah                        ; 1bae     1a                                                                               
+    defb 000h                        ; 1baf     00                                                                               
 l1bb0h:                                                         
     defb 000h                        ; 1bb0     00              
     defb 000h                        ; 1bb1     00              
@@ -5428,70 +5427,70 @@ l1bb0h:
     defb 000h                        ; 1bbe     00              
     defb 000h                        ; 1bbf     00               ; last byte of ram mirror
 l1bc0h:                                                         
-    defb 000h                        ; 1bc0     00              
-    defb 010h                        ; 1bc1     10              
-    defb 000h                        ; 1bc2     00              
-    defb 00eh                        ; 1bc3     0e              
-    defb 005h                        ; 1bc4     05              
-    defb 000h                        ; 1bc5     00              
-    defb 000h                        ; 1bc6     00              
-    defb 000h                        ; 1bc7     00              
-    defb 000h                        ; 1bc8     00              
-    defb 000h                        ; 1bc9     00              
-    defb 007h                        ; 1bca     07              
-    defb 0d0h                        ; 1bcb     d0              
-    defb 01ch                        ; 1bcc     1c              
-    defb 0c8h                        ; 1bcd     c8              
-    defb 09bh                        ; 1bce     9b              
-    defb 003h                        ; 1bcf     03              
-    defb 000h                        ; 1bd0     00              
-    defb 000h                        ; 1bd1     00              
-    defb 003h                        ; 1bd2     03              
-    defb 004h                        ; 1bd3     04              
-    defb 078h                        ; 1bd4     78              
-    defb 014h                        ; 1bd5     14              
-    defb 00bh                        ; 1bd6     0b              
-    defb 019h                        ; 1bd7     19              
-    defb 03ah                        ; 1bd8     3a              
-    defb 06dh                        ; 1bd9     6d              
-    defb 0fah                        ; 1bda     fa              
-    defb 0fah                        ; 1bdb     fa              
-    defb 06dh                        ; 1bdc     6d              
-    defb 03ah                        ; 1bdd     3a              
-    defb 019h                        ; 1bde     19              
-    defb 000h                        ; 1bdf     00              
-    defb 000h                        ; 1be0     00              
-    defb 000h                        ; 1be1     00              
-    defb 000h                        ; 1be2     00              
-    defb 000h                        ; 1be3     00              
-    defb 000h                        ; 1be4     00              
-    defb 000h                        ; 1be5     00              
-    defb 000h                        ; 1be6     00              
-    defb 000h                        ; 1be7     00              
-    defb 000h                        ; 1be8     00              
-    defb 001h                        ; 1be9     01              
-    defb 000h                        ; 1bea     00              
-    defb 000h                        ; 1beb     00              
-    defb 001h                        ; 1bec     01              
-    defb 074h                        ; 1bed     74              
-    defb 01fh                        ; 1bee     1f              
-    defb 000h                        ; 1bef     00              
-    defb 080h                        ; 1bf0     80              
-    defb 000h                        ; 1bf1     00              
-    defb 000h                        ; 1bf2     00              
-    defb 000h                        ; 1bf3     00              
-    defb 000h                        ; 1bf4     00              
-    defb 000h                        ; 1bf5     00              
-    defb 01ch                        ; 1bf6     1c              
-    defb 02fh                        ; 1bf7     2f              
-    defb 000h                        ; 1bf8     00              
-    defb 000h                        ; 1bf9     00              
-    defb 01ch                        ; 1bfa     1c              
-    defb 027h                        ; 1bfb     27              
-    defb 000h                        ; 1bfc     00              
-    defb 000h                        ; 1bfd     00              
-    defb 01ch                        ; 1bfe     1c              
-    defb 039h                        ; 1bff     39              
+    defb 000h                        ; 1bc0     00               ; isr_delay:                     equ 020c0h                        
+    defb 010h                        ; 1bc1     10               ; isr_splash_task:               equ 020c1h                        
+    defb 000h                        ; 1bc2     00               ; splash_an_form:                equ 020c2h                        
+    defb 00eh                        ; 1bc3     0e               ;                                                                  
+    defb 005h                        ; 1bc4     05               ;                                                                  
+    defb 000h                        ; 1bc5     00               ;                                                                  
+    defb 000h                        ; 1bc6     00               ;                                                                  
+    defb 000h                        ; 1bc7     00               ; splash_image_lsb:              equ 020c7h                        
+    defb 000h                        ; 1bc8     00               ;                                                                  
+    defb 000h                        ; 1bc9     00               ;                                                                  
+    defb 007h                        ; 1bca     07               ; splash_target_y:               equ 020cah                        
+    defb 0d0h                        ; 1bcb     d0               ; splash_reached:                equ 020cbh                        
+    defb 01ch                        ; 1bcc     1c               ; splash_im_rest_lsb:            equ 020cch                        
+    defb 0c8h                        ; 1bcd     c8               ;                                                                  
+    defb 09bh                        ; 1bce     9b               ; two_players:                   equ 020ceh                        
+    defb 003h                        ; 1bcf     03               ; a_shot_reload_rate:            equ 020cfh                        
+    defb 000h                        ; 1bd0     00               ;                                                                  
+    defb 000h                        ; 1bd1     00               ;                                                                  
+    defb 003h                        ; 1bd2     03               ;                                                                  
+    defb 004h                        ; 1bd3     04               ;                                                                  
+    defb 078h                        ; 1bd4     78               ;                                                                  
+    defb 014h                        ; 1bd5     14               ;                                                                  
+    defb 00bh                        ; 1bd6     0b               ;                                                                  
+    defb 019h                        ; 1bd7     19               ;                                                                  
+    defb 03ah                        ; 1bd8     3a               ;                                                                  
+    defb 06dh                        ; 1bd9     6d               ;                                                                  
+    defb 0fah                        ; 1bda     fa               ;                                                                  
+    defb 0fah                        ; 1bdb     fa               ;                                                                  
+    defb 06dh                        ; 1bdc     6d               ;                                                                  
+    defb 03ah                        ; 1bdd     3a               ;                                                                  
+    defb 019h                        ; 1bde     19               ;                                                                  
+    defb 000h                        ; 1bdf     00               ;                                                                  
+    defb 000h                        ; 1be0     00               ;                                                                  
+    defb 000h                        ; 1be1     00               ;                                                                  
+    defb 000h                        ; 1be2     00               ;                                                                  
+    defb 000h                        ; 1be3     00               ;                                                                  
+    defb 000h                        ; 1be4     00               ;                                                                  
+    defb 000h                        ; 1be5     00               ; player1ex:                     equ 020e5h                        
+    defb 000h                        ; 1be6     00               ; player2ex:                     equ 020e6h                        
+    defb 000h                        ; 1be7     00               ; player1alive:                  equ 020e7h                        
+    defb 000h                        ; 1be8     00               ; player2alive:                  equ 020e8h                        
+    defb 001h                        ; 1be9     01               ; suspend_play:                  equ 020e9h                        
+    defb 000h                        ; 1bea     00               ; coin_switch:                   equ 020eah                        
+    defb 000h                        ; 1beb     00               ; num_coins:                     equ 020ebh                        
+    defb 001h                        ; 1bec     01               ; splash_animate:                equ 020ech                        
+    defb 074h                        ; 1bed     74               ; demo_cmd_ptr_lsb:              equ 020edh                        
+    defb 01fh                        ; 1bee     1f               ;                                                                  
+    defb 000h                        ; 1bef     00               ; game_mode:                     equ 020efh                        
+    defb 080h                        ; 1bf0     80               ;                                                                  
+    defb 000h                        ; 1bf1     00               ; adjust_score_data:             equ 020f1h                        
+    defb 000h                        ; 1bf2     00               ; score_delta_lsb:               equ 020f2h                        
+    defb 000h                        ; 1bf3     00               ;                                                                  
+    defb 000h                        ; 1bf4     00               ;                                                                  
+    defb 000h                        ; 1bf5     00               ;                                                                  
+    defb 01ch                        ; 1bf6     1c               ;                                                                  
+    defb 02fh                        ; 1bf7     2f               ;                                                                  
+    defb 000h                        ; 1bf8     00               ; player_one_score_desc:                      equ 020f8h                        
+    defb 000h                        ; 1bf9     00               ;                                                                  
+    defb 01ch                        ; 1bfa     1c               ;                                                                  
+    defb 027h                        ; 1bfb     27               ;                                                                  
+    defb 000h                        ; 1bfc     00               ; player_two_score_desc:                      equ 020fch                        
+    defb 000h                        ; 1bfd     00               ;                                                                  
+    defb 01ch                        ; 1bfe     1c               ;                                                                  
+    defb 039h                        ; 1bff     39               ;                                                                  
                                      ; end of ram_mirror
 sprite_aliens_start_a:                                                         
     defb 000h                        ; 1c00     00              
@@ -6864,15 +6863,15 @@ game_mode:                     equ 020efh                        ; 020efh 020ef
 adjust_score_data:             equ 020f1h                        ; 020f1h 020f1    
 score_delta_lsb:               equ 020f2h                        ; 020f2h 020f2    
                                                                  ; 020f3h 020f3    ; @ pointer to score delta msb
-                                                                 ; 020f4h 020f4    ; @ hi score descriptor
+high_score_desc:               equ 020f4h                        ; 020f4h 020f4    ; @ hi score descriptor
                                                                  ; 020f5h 020f5    ; @ current hi score upper two digits
                                                                  ; 020f6h 020f6
                                                                  ; 020f7h 020f7
-p1scor_l:                      equ 020f8h                        ; 020f8h 020f8    
+player_one_score_desc:         equ 020f8h                        ; 020f8h 020f8    
                                                                  ; 020f9h 020f9
                                                                  ; 020fah 020fa
                                                                  ; 020fbh 020fb
-p2scor_l:                      equ 020fch                        ; 020fch 020fc    
+player_two_score_desc:         equ 020fch                        ; 020fch 020fc    
                                                                  ; 020fdh 020fd
                                                                  ; 020feh 020fe
                                                                  ; 020ffh 020ff
