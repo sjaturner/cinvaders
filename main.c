@@ -1694,6 +1694,7 @@ uint32_t _print_high_score(struct cpu *cpu)
 {
     return _print_high_score_impl(cpu->mem);
 }
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1751,7 +1752,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_score_head),
     MAP_CIMPL(print_player_one_score),
     MAP_CIMPL(print_player_two_score),
-    _________(print_high_score),
+    MAP_CIMPL(print_high_score),
     _________(print_credit_label),
     _________(draw_num_credits),
 
