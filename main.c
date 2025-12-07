@@ -1848,6 +1848,17 @@ uint32_t _suspend_game_tasks(struct cpu *cpu)
     return _suspend_game_tasks_impl(cpu->mem);
 }
 
+uint32_t _get_player_data_ptr_impl(uint8_t *mem, uint16_t *player_data_addr)
+{
+    *player_data_addr = (uint16_t)mem[player_data_msb] << 8;
+    return 0;
+}
+
+uint32_t _get_player_data_ptr(struct cpu *cpu)
+{
+    return _get_player_data_ptr_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1926,7 +1937,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(ini_splash_ani),
     MAP_CIMPL(print_to_mid_screen), /* Should use print_message_del but we cannot have nice things yet. */
     MAP_CIMPL(suspend_game_tasks),
-    _________(get_player_data_ptr),
+    MAP_CIMPL(get_player_data_ptr),
     _________(draw_wide_sprite),
     _________(read_inputs),
     _________(shot_sound),
