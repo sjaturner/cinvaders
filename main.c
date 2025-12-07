@@ -955,14 +955,14 @@ void set_mem_impl(uint8_t *mem, uint16_t addr, uint8_t val)
     mem[addr] = val;
 }
 
-uint32_t _draw_simp_sprite_impl(uint8_t *mem, uint16_t counter, uint16_t *char_set, uint16_t *screen_addr)
+uint32_t _draw_simp_sprite_impl(uint8_t *mem, uint16_t counter, uint16_t *sprite_addr, uint16_t *screen_addr)
 {
-    printf("%s %u *char_set:%04x *screen_addr:%04x\n", __func__, counter, *char_set, *screen_addr);
+    printf("%s %u *sprite_addr:%04x *screen_addr:%04x\n", __func__, counter, *sprite_addr, *screen_addr);
     do
     {
-        set_mem_impl(mem, *screen_addr, mem[*char_set]);
+        set_mem_impl(mem, *screen_addr, mem[*sprite_addr]);
         *screen_addr += SCREEN_BYTES_PER_PIXEL_COLUMN;
-        ++*char_set;
+        ++*sprite_addr;
         --counter;
     } while(counter);
     return 0;
@@ -1859,6 +1859,48 @@ uint32_t _get_player_data_ptr(struct cpu *cpu)
     return _get_player_data_ptr_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
 }
 
+uint32_t _draw_sprite_impl(uint8_t *mem, uint16_t *hl, uint16_t sprite_addr, uint8_t sprite_length)
+{
+    _cnvt_pix_number_impl(mem, hl);
+    uint16_t save_hl = *hl;
+
+    while (sprite_length--)
+    {
+        port_op(0, 4, mem[sprite_addr]); /* Data to shift register. */
+        mem[*hl + 0] = port_ip(0, 3);
+
+        port_op(0, 4, 0); /* Data to shift register. */
+        mem[*hl + 1] = port_ip(0, 3);
+
+        *hl += SCREEN_BYTES_PER_PIXEL_COLUMN;
+
+        ++sprite_addr;
+    }
+
+    *hl = save_hl;
+    return 0;
+}
+
+uint32_t _draw_sprite(struct cpu *cpu)
+{
+    return _draw_sprite_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs[REG_DE], get_b(cpu, 0));
+}
+
+uint32_t _draw_wide_sprite_impl(uint8_t *mem, uint16_t *hl, uint16_t sprite_addr)
+{
+    enum
+    {
+        WIDE_SPRITE_LENGTH = 0x10,
+    };
+    _draw_simp_sprite_impl(mem, WIDE_SPRITE_LENGTH, &sprite_addr, hl);
+    return 0;
+}
+
+uint32_t _draw_wide_sprite(struct cpu *cpu)
+{
+    return _draw_wide_sprite_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs[REG_DE]);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1938,7 +1980,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(print_to_mid_screen), /* Should use print_message_del but we cannot have nice things yet. */
     MAP_CIMPL(suspend_game_tasks),
     MAP_CIMPL(get_player_data_ptr),
-    _________(draw_wide_sprite),
+    MAP_CIMPL(draw_sprite),
+    MAP_CIMPL(draw_wide_sprite),
     _________(read_inputs),
     _________(shot_sound),
     _________(clear_playfield_taito_msg),
@@ -1963,7 +2006,6 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     _________(restore_shields),
     _________(score_for_alien),
     _________(player_shot_hit),
-    _________(draw_sprite),
     _________(init_rack),
     _________(sub_189eh),
     _________(time_fleet_sound),
