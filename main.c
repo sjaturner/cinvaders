@@ -1835,6 +1835,19 @@ uint32_t _print_to_mid_screen(struct cpu *cpu)
     return _print_to_mid_screen_impl(cpu->mem, cpu->cpu_state.regs[REG_DE]);
 }
 
+uint32_t _suspend_game_tasks_impl(uint8_t *mem)
+{
+    _disable_game_tasks_impl(mem);
+    _draw_num_credits_impl(mem);
+    _print_credit_label_impl(mem);
+    return 0;
+}
+
+uint32_t _suspend_game_tasks(struct cpu *cpu)
+{
+    return _suspend_game_tasks_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
