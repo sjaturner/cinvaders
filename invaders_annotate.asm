@@ -3950,6 +3950,7 @@ l1405h:
 
     nop                              ; 1422     00               ;  ** Why?
     nop                              ; 1423     00              
+
 erase_simple_sprite:                                            
     call cnvt_pix_number             ; 1424     cd 74 14         ;  Convert pixel number in HL
 l1427h:                                                         
@@ -3997,8 +3998,10 @@ draw_simp_sprite:
     nop                              ; 144f     00              
     nop                              ; 1450     00              
     nop                              ; 1451     00              
+
 erase_shifted:                                                  
     call cnvt_pix_number             ; 1452     cd 74 14         ;  Convert pixel number in HL to coorinates with shift
+                                     ;                           ;  Line up with draw_sprite
 l1455h:                                                         
     push bc                          ; 1455     c5               ;  Hold BC
     push hl                          ; 1456     e5               ;  Hold coordinate
@@ -4022,6 +4025,7 @@ l1455h:
     pop bc                           ; 146e     c1               ;  Restore BC (count)
     dec b                            ; 146f     05               ;  All rows done?
     jp nz,l1455h                     ; 1470     c2 55 14         ;  No ... erase all
+                                     ;                           ;  Line up with draw_sprite
     ret                              ; 1473     c9               ;  Done
 
 cnvt_pix_number:                                                
@@ -4269,12 +4273,16 @@ l15d7h:
     ld a,(de)                        ; 15d9     1a               ;  From sprite data
     out (004h),a                     ; 15da     d3 04            ;  Write data to shift register
     in a,(003h)                      ; 15dc     db 03            ;  Read back shifted amount
+                                                                 ;  Line up with erase_shifted
+                                                                 ;  Line up with erase_shifted
     ld (hl),a                        ; 15de     77               ;  Shifted sprite to screen
     inc hl                           ; 15df     23               ;  Adjacent cell
     inc de                           ; 15e0     13               ;  Next in sprite data
     xor a                            ; 15e1     af               ;  0
     out (004h),a                     ; 15e2     d3 04            ;  Write 0 to shift register
     in a,(003h)                      ; 15e4     db 03            ;  Read back remainder of previous
+                                                                 ;  Line up with erase_shifted
+                                                                 ;  Line up with erase_shifted
     ld (hl),a                        ; 15e6     77               ;  Write remainder to adjacent
     pop hl                           ; 15e7     e1               ;  Old screen coordinate
     ld bc,l0020h                     ; 15e8     01 20 00         ;  Offset screen ...
