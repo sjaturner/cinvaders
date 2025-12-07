@@ -1818,6 +1818,23 @@ uint32_t _ini_splash_ani(struct cpu *cpu)
     return _ini_splash_ani_impl(cpu->mem, cpu->cpu_state.regs + REG_DE);
 }
 
+uint32_t _print_to_mid_screen_impl(uint8_t *mem, uint16_t msg_addr) /* Poorly done assembler ... */
+{
+    enum
+    {
+        MID_SCREEN_ADDR = 0x2b14,
+        MSG_SPACE_INVADERS_LENGTH = 0xf,
+        
+    };
+    uint16_t screen_addr = MID_SCREEN_ADDR;
+    return _print_message_impl(mem, MSG_SPACE_INVADERS_LENGTH, &msg_addr, &screen_addr);
+}
+
+uint32_t _print_to_mid_screen(struct cpu *cpu)
+{
+    return _print_to_mid_screen_impl(cpu->mem, cpu->cpu_state.regs[REG_DE]);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1894,7 +1911,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(flag_player_hit),
     MAP_CIMPL(get_saucer_descriptor),
     MAP_CIMPL(ini_splash_ani),
-    _________(print_to_mid_screen),
+    MAP_CIMPL(print_to_mid_screen), /* Should use print_message_del but we cannot have nice things yet. */
     _________(suspend_game_tasks),
     _________(get_player_data_ptr),
     _________(draw_wide_sprite),
