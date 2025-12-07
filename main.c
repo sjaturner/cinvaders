@@ -1800,22 +1800,22 @@ uint32_t _get_saucer_descriptor(struct cpu *cpu)
     return _get_saucer_descriptor_impl(cpu->mem, cpu->cpu_state.regs + REG_DE, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + HI, cpu->cpu_state.regs + REG_HL);
 }
 
-uint32_t _ini_splash_ani_impl(uint8_t *mem, uint16_t src_addr)
+uint32_t _ini_splash_ani_impl(uint8_t *mem, uint16_t *src_addr)
 {
     enum
     {
-        SPLASH_ANI_LENGTH,
+        SPLASH_ANI_LENGTH = 0x0c,
     };
     uint16_t dst = splash_an_form;
-    uint16_t src = src_addr;
+    uint8_t length = SPLASH_ANI_LENGTH;
 
-    _block_copy_impl(mem, &dst, &src, SPLASH_ANI_LENGTH);
+    _block_copy_impl(mem, &dst, src_addr, &length);
     return 0;
 }
 
 uint32_t _ini_splash_ani(struct cpu *cpu)
 {
-    return _ini_splash_ani_impl(cpu->mem, cpu->cpu_state.regs[REG_DE]);
+    return _ini_splash_ani_impl(cpu->mem, cpu->cpu_state.regs + REG_DE);
 }
 
 #if 0
@@ -1893,7 +1893,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(copy_rom_to_ram),
     MAP_CIMPL(flag_player_hit),
     MAP_CIMPL(get_saucer_descriptor),
-    _________(ini_splash_ani),
+    MAP_CIMPL(ini_splash_ani),
     _________(print_to_mid_screen),
     _________(suspend_game_tasks),
     _________(get_player_data_ptr),
