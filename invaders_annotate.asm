@@ -1759,7 +1759,7 @@ l0b0bh:
     ld de,splash_animation_struct_1  ; 0b1e     11 95 1a         ;  Animate sprite from Y=FE to Y=9E step -1
     call ini_splash_ani              ; 0b21     cd e2 0a         ;  Copy to splash-animate structure
     call animate                     ; 0b24     cd 80 0a         ;  Wait for ISR to move sprite (small alien)
-    ld de,l1bb0h                     ; 0b27     11 b0 1b         ;  Animate sprite from Y=98 to Y=FF step 1
+    ld de,splash_animation_struct_2  ; 0b27     11 b0 1b         ;  Animate sprite from Y=98 to Y=FF step 1
     call ini_splash_ani              ; 0b2a     cd e2 0a         ;  Copy to splash-animate structure
     call animate                     ; 0b2d     cd 80 0a         ;  Wait for ISR to move sprite (alien pulling upside down Y)
     call one_sec_delay               ; 0b30     cd b1 0a         ;  One second delay
@@ -5102,18 +5102,18 @@ g_first:
                                      ; 00   Reached Y flag
                                      ; 1C20 Base iamge (small alien)
 splash_animation_struct_1:                                                         
-    defb 000h                        ; 1a95     00              
-    defb 000h                        ; 1a96     00              
-    defb 0ffh                        ; 1a97     ff              
-    defb 0b8h                        ; 1a98     b8              
-    defb 0feh                        ; 1a99     fe              
-    defb 020h                        ; 1a9a     20              
-    defb 01ch                        ; 1a9b     1c              
-    defb 010h                        ; 1a9c     10              
-    defb 09eh                        ; 1a9d     9e              
-    defb 000h                        ; 1a9e     00              
-    defb 020h                        ; 1a9f     20              
-    defb 01ch                        ; 1aa0     1c              
+    defb 000h                        ; 1a95     00 +      Image form (increments each draw)
+    defb 000h                        ; 1a96     00 |      Delta X                                     
+    defb 0ffh                        ; 1a97     ff |      Delta Y is -1                               
+    defb 0b8h                        ; 1a98     b8 |      X coordinate                                
+    defb 0feh                        ; 1a99     fe |      Y starting coordiante                       
+    defb 020h                        ; 1a9a     20 | 1c20 Base image (small alien)
+    defb 01ch                        ; 1a9b     1c |            
+    defb 010h                        ; 1a9c     10 |      Size of image (16 bytes)
+    defb 09eh                        ; 1a9d     9e |      Target Y coordiante                
+    defb 000h                        ; 1a9e     00 |      Reached Y flag                     
+    defb 020h                        ; 1a9f     20 | 1c20 Base iamge (small alien)
+    defb 01ch                        ; 1aa0     1c +            
 
                                      ; The tables at 1cb8 AND 1aa1 control how fast shots are created. The speed is based
                                      ; on the upper byte of the player's score. For a score of less than or equal 0200 then
@@ -5409,19 +5409,20 @@ data_for_saucer:
     defb 03dh                        ; 1bad     3d                                                                               
     defb 01ah                        ; 1bae     1a                                                                               
     defb 000h                        ; 1baf     00                                                                               
-l1bb0h:                                                         
-    defb 000h                        ; 1bb0     00              
-    defb 000h                        ; 1bb1     00              
-    defb 001h                        ; 1bb2     01              
-    defb 0b8h                        ; 1bb3     b8              
-    defb 098h                        ; 1bb4     98              
-    defb 0a0h                        ; 1bb5     a0              
-    defb 01bh                        ; 1bb6     1b              
-    defb 010h                        ; 1bb7     10              
-    defb 0ffh                        ; 1bb8     ff              
-    defb 000h                        ; 1bb9     00              
-    defb 0a0h                        ; 1bba     a0              
-    defb 01bh                        ; 1bbb     1b              
+splash_animation_struct_2:                                              
+    defb 000h                        ; 1bb0     00  +       Image form (increments each draw)
+    defb 000h                        ; 1bb1     00  |       Delta X                                     
+    defb 001h                        ; 1bb2     01  |       Delta Y 
+    defb 0b8h                        ; 1bb3     b8  |       X coordinate                                
+    defb 098h                        ; 1bb4     98  |       Y starting coordiante                       
+    defb 0a0h                        ; 1bb5     a0  | 1ba0  Base image (small alien)
+    defb 01bh                        ; 1bb6     1b  |             
+    defb 010h                        ; 1bb7     10  |       Size of image (16 bytes)
+    defb 0ffh                        ; 1bb8     ff  |       Target Y coordiante                
+    defb 000h                        ; 1bb9     00  |       Reached Y flag                     
+    defb 0a0h                        ; 1bba     a0  | 1ba0  Base iamge (small alien)                        
+    defb 01bh                        ; 1bbb     1b  +             
+
     defb 000h                        ; 1bbc     00              
     defb 000h                        ; 1bbd     00              
     defb 000h                        ; 1bbe     00              
@@ -6532,18 +6533,18 @@ sprite_char_query:
                                      ; 1F80 Base iamge (small alien with Y)
                                      ;
 splash_animation_struct_3:                                                         
-    defb 000h                        ; 1fc9     00              
-    defb 000h                        ; 1fca     00              
-    defb 0ffh                        ; 1fcb     ff              
-    defb 0b8h                        ; 1fcc     b8              
-    defb 0ffh                        ; 1fcd     ff              
-    defb 080h                        ; 1fce     80              
-    defb 01fh                        ; 1fcf     1f              
-    defb 010h                        ; 1fd0     10              
-    defb 097h                        ; 1fd1     97              
-    defb 000h                        ; 1fd2     00              
-    defb 080h                        ; 1fd3     80              
-    defb 01fh                        ; 1fd4     1f              
+    defb 000h                        ; 1fc9     00 +       Image form (increments each draw)
+    defb 000h                        ; 1fca     00 |       Delta X                                     
+    defb 0ffh                        ; 1fcb     ff |       Delta Y 
+    defb 0b8h                        ; 1fcc     b8 |       X coordinate                                
+    defb 0ffh                        ; 1fcd     ff |       Y starting coordiante                       
+    defb 080h                        ; 1fce     80 | 1f80  Base image (small alien)
+    defb 01fh                        ; 1fcf     1f |             
+    defb 010h                        ; 1fd0     10 |       Size of image (16 bytes)
+    defb 097h                        ; 1fd1     97 |       Target Y coordiante                
+    defb 000h                        ; 1fd2     00 |       Reached Y flag                     
+    defb 080h                        ; 1fd3     80 | 1f80  Base iamge (small alien)                        
+    defb 01fh                        ; 1fd4     1f +             
 
                                      ; Splash screen animation structure 4
                                      ; 00   Image form (increments each draw)
@@ -6558,18 +6559,18 @@ splash_animation_struct_3:
                                      ; 1C20 Base iamge (small alien)
                                      ;
 splash_animation_struct_4:                                                         
-    defb 000h                        ; 1fd5     00              
-    defb 000h                        ; 1fd6     00              
-    defb 001h                        ; 1fd7     01              
-    defb 0d0h                        ; 1fd8     d0              
-    defb 022h                        ; 1fd9     22              
-    defb 020h                        ; 1fda     20              
-    defb 01ch                        ; 1fdb     1c              
-    defb 010h                        ; 1fdc     10              
-    defb 094h                        ; 1fdd     94              
-    defb 000h                        ; 1fde     00              
-    defb 020h                        ; 1fdf     20              
-    defb 01ch                        ; 1fe0     1c              
+    defb 000h                        ; 1fd5     00 +       Image form (increments each draw)                    
+    defb 000h                        ; 1fd6     00 |       Delta X                                              
+    defb 001h                        ; 1fd7     01 |       Delta Y                                              
+    defb 0d0h                        ; 1fd8     d0 |       X coordinate                                         
+    defb 022h                        ; 1fd9     22 |       Y starting coordiante                                
+    defb 020h                        ; 1fda     20 | 1c20  Base image (small alien)
+    defb 01ch                        ; 1fdb     1c |                                                            
+    defb 010h                        ; 1fdc     10 |       Size of image (16 bytes)                             
+    defb 094h                        ; 1fdd     94 |       Target Y coordiante                                  
+    defb 000h                        ; 1fde     00 |       Reached Y flag                                       
+    defb 020h                        ; 1fdf     20 | 1c20  Base iamge (small alien)                        
+    defb 01ch                        ; 1fe0     1c +                                                            
 
 msg_two_players_two_coins:
     defb 028h                        ; 1fe1     28               
@@ -6794,7 +6795,7 @@ fleet_snd_hold:                equ 0209bh                        ; 0209bh 0209b 
                                                                  ; 020adh 020ad                                                                 defb 03dh ; 1bad 3d  
                                                                  ; 020aeh 020ae                                                                 defb 01ah ; 1bae 1a  
                                                                  ; 020afh 020af                                                                 defb 000h ; 1baf 00  
-                                                                 ; 020b0h 020b0                                                                 defb 000h ; 1bb0 00  l1bb0h:                                                     
+                                                                 ; 020b0h 020b0                                                                 defb 000h ; 1bb0 00  splash_animation_struct_2:                                                     
                                                                  ; 020b1h 020b1                                                                 defb 000h ; 1bb1 00  
                                                                  ; 020b2h 020b2                                                                 defb 001h ; 1bb2 01  
                                                                  ; 020b3h 020b3                                                                 defb 0b8h ; 1bb3 b8  
@@ -6813,18 +6814,20 @@ fleet_snd_hold:                equ 0209bh                        ; 0209bh 0209b 
 
 isr_delay:                     equ 020c0h                        ; 020c0h 020c0    
 isr_splash_task:               equ 020c1h                        ; 020c1h 020c1    
-splash_an_form:                equ 020c2h                        ; 020c2h 020c2 +   
-                                                                 ; 020c3h 020c3 |    
-                                                                 ; 020c4h 020c4 |                                 
-                                                                 ; 020c5h 020c5 |    @ xy image descriptor
-                                                                 ; 020c6h 020c6 |                                 
-splash_image_lsb:              equ 020c7h                        ; 020c7h 020c7 |                                     
-                                                                 ; 020c8h 020c8 |                                 
-                                                                 ; 020c9h 020c9 |                                 
-splash_target_y:               equ 020cah                        ; 020cah 020ca |                                     
-splash_reached:                equ 020cbh                        ; 020cbh 020cb |                                     
-splash_im_rest_lsb:            equ 020cch                        ; 020cch 020cc |                                     
-                                                                 ; 020cdh 020cd +                                 
+
+splash_an_form:                equ 020c2h                        ; 020c2h 020c2 + Image form (increments each draw)
+                                                                 ; 020c3h 020c3 | Delta X                                     
+                                                                 ; 020c4h 020c4 | Delta Y                                            
+                                                                 ; 020c5h 020c5 | X coordinate                                
+                                                                 ; 020c6h 020c6 | Y starting coordiante                              
+splash_image_lsb:              equ 020c7h                        ; 020c7h 020c7 | Base image (small alien)                               
+                                                                 ; 020c8h 020c8 |                                                    
+                                                                 ; 020c9h 020c9 | Size of image (16 bytes)                           
+splash_target_y:               equ 020cah                        ; 020cah 020ca | Target Y coordiante                                    
+splash_reached:                equ 020cbh                        ; 020cbh 020cb | Reached Y flag                                         
+splash_im_rest_lsb:            equ 020cch                        ; 020cch 020cc | Base iamge (small alien)                               
+                                                                 ; 020cdh 020cd +                                                    
+
 two_players:                   equ 020ceh                        ; 020ceh 020ce                                       
 a_shot_reload_rate:            equ 020cfh                        ; 020cfh 020cf                                       
                                                                  ; 020d0h 020d0                                   

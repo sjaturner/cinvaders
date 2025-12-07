@@ -987,7 +987,7 @@ uint32_t _block_copy_impl(uint8_t *mem, uint16_t *dst, uint16_t *src, uint8_t *l
     return 0;
 }
 
-uint32_t _block_copy(struct cpu *cpu)
+uint32_t _block_copy(struct cpu *cpu) /* From DE addr to HL addr. */
 {
     return _block_copy_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs + REG_DE, (uint8_t *)(cpu->cpu_state.regs + REG_BC) + 1);
 }
@@ -1798,6 +1798,24 @@ uint32_t _get_saucer_descriptor_impl(uint8_t *mem, uint16_t *sprite_addr, uint8_
 uint32_t _get_saucer_descriptor(struct cpu *cpu)
 {
     return _get_saucer_descriptor_impl(cpu->mem, cpu->cpu_state.regs + REG_DE, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + HI, cpu->cpu_state.regs + REG_HL);
+}
+
+uint32_t _ini_splash_ani_impl(uint8_t *mem, uint16_t src_addr)
+{
+    enum
+    {
+        SPLASH_ANI_LENGTH,
+    };
+    uint16_t dst = splash_an_form;
+    uint16_t src = src_addr;
+
+    _block_copy_impl(mem, &dst, &src, SPLASH_ANI_LENGTH);
+    return 0;
+}
+
+uint32_t _ini_splash_ani(struct cpu *cpu)
+{
+    return _ini_splash_ani_impl(cpu->mem, cpu->cpu_state.regs[REG_DE]);
 }
 
 #if 0
