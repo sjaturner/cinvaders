@@ -1139,7 +1139,7 @@ l06d6h:
     nop                              ; 06f7     00               ;  **
     nop                              ; 06f8     00               ;  **
 l06f9h:                                                         
-    call get_saucer_descriptor       ; 06f9     cd 42 07         ;  Covert pixel pos from descriptor to HL screen and shift
+    call get_saucer_descriptor       ; 06f9     cd 42 07         ;  Convert pixel pos from descriptor to HL screen and shift
     call clear_small_sprite          ; 06fc     cd cb 14         ;  Clear a one byte sprite at HL
     ld hl,saucer_start               ; 06ff     21 83 20         ;  Saucer structure
     ld b,00ah                        ; 0702     06 0a            ;  10 bytes in saucer structure

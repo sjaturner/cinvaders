@@ -1760,6 +1760,46 @@ uint32_t _copy_rom_to_ram(struct cpu *cpu)
     return _copy_rom_to_ram_impl(cpu->mem);
 }
 
+uint32_t _flag_player_hit_impl(uint8_t *mem, int *player_hit)
+{
+    *player_hit = mem[player_alive] == 0xff;
+    return 0;
+}
+
+uint32_t _flag_player_hit(struct cpu *cpu)
+{
+    int player_hit = 0;
+    uint32_t ret = _flag_player_hit_impl(cpu->mem, &player_hit);
+
+    if (player_hit)
+    {
+        set_f(cpu, 0, get_f(cpu, 0) | FLAG_BIT_Z);
+    }
+    else
+    {
+        set_f(cpu, 0, get_f(cpu, 0) & ~FLAG_BIT_Z);
+    }
+    return ret;
+}
+
+uint32_t _get_saucer_descriptor_impl(uint8_t *mem, uint16_t *sprite_addr, uint8_t *sprite_bytes, uint16_t *screen_addr)
+{
+    struct desc desc = read_desc_impl(mem, saucer_pri_loc_lsb);
+    *sprite_addr = desc.sprite_addr;
+    *sprite_bytes = desc.sprite_bytes;
+
+    uint16_t val = desc.screen_loc;
+    _conv_to_scr_impl(&val);
+    *screen_addr = val;
+
+    return 0;
+}
+
+uint32_t _get_saucer_descriptor(struct cpu *cpu)
+{
+    return _get_saucer_descriptor_impl(cpu->mem, cpu->cpu_state.regs + REG_DE, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + HI, cpu->cpu_state.regs + REG_HL);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1833,8 +1873,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     _________(two_sec_delay), /* Tricky, we want the ISR to run but we are in CIMPL ... think harder. */
 
     MAP_CIMPL(copy_rom_to_ram),
-    _________(flag_player_hit),
-    _________(get_saucer_descriptor),
+    MAP_CIMPL(flag_player_hit),
+    MAP_CIMPL(get_saucer_descriptor),
     _________(ini_splash_ani),
     _________(print_to_mid_screen),
     _________(suspend_game_tasks),
