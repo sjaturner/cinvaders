@@ -1901,6 +1901,24 @@ uint32_t _draw_wide_sprite(struct cpu *cpu)
     return _draw_wide_sprite_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs[REG_DE]);
 }
 
+uint32_t _erase_simple_sprite_impl(uint8_t *mem, uint16_t *hl, uint8_t sprite_length)
+{
+    _cnvt_pix_number_impl(mem, hl);
+    while (sprite_length--)
+    {
+        mem[*hl + 0] = 0;
+        mem[*hl + 1] = 0;
+
+        *hl += SCREEN_BYTES_PER_PIXEL_COLUMN;
+    }
+    return 0;
+}
+
+uint32_t _erase_simple_sprite(struct cpu *cpu)
+{
+    return _erase_simple_sprite_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_b(cpu, 0));
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -1982,7 +2000,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(get_player_data_ptr),
     MAP_CIMPL(draw_sprite),
     MAP_CIMPL(draw_wide_sprite),
-    _________(erase_simple_sprite),
+    MAP_CIMPL(erase_simple_sprite),
+    _________(erase_shifted),
     _________(read_inputs),
     _________(shot_sound),
     _________(clear_play_field),
@@ -2009,7 +2028,6 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     _________(init_rack),
     _________(sub_189eh),
     _________(time_fleet_sound),
-    _________(erase_shifted),
     _________(plr_fire_or_demo),
     _________(draw_spr_collision),
     _________(fleet_delay_ex_ship),
