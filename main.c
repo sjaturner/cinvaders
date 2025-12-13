@@ -1993,6 +1993,26 @@ uint32_t _clear_play_field(struct cpu *cpu)
     return _clear_play_field_impl(cpu->mem);
 }
 
+uint32_t _clear_playfield_taito_msg_impl(uint8_t *mem)
+{
+    _clear_play_field_impl(mem);
+    enum
+    {
+        SCREEN_ADDR = 0x2803,
+        MSG_LENGTH = 0x13,
+
+    };
+    uint16_t screen_addr = SCREEN_ADDR;
+    uint16_t msg_addr = msg_taito_corporation;
+    return _print_message_impl(mem, MSG_LENGTH, &msg_addr, &screen_addr);
+    return 0;
+}
+
+uint32_t _clear_playfield_taito_msg(struct cpu *cpu)
+{
+    return _clear_playfield_taito_msg_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2079,7 +2099,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(read_inputs),
     MAP_CIMPL(shot_sound),
     MAP_CIMPL(clear_play_field),
-    _________(clear_playfield_taito_msg),
+    MAP_CIMPL(clear_playfield_taito_msg),
     _________(cur_ply_alive),
     _________(get_player_score_descriptor),
     _________(speed_shots),
