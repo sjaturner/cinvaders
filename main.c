@@ -1584,6 +1584,27 @@ uint32_t _cur_ply_alive(struct cpu *cpu)
     return _cur_ply_alive_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
 }
 
+uint32_t _get_player_score_descriptor_impl(uint8_t *mem, uint16_t *addr) /* Upside down version of get_player_alive_ptr? */
+{
+    switch (mem[player_data_msb]) /* Original checks the lowest bit, that seems royally fucked up. */
+    {
+        case PLAYER_1_ADDR_MSB:
+            *addr = player_one_score_desc;
+            break;
+        case PLAYER_2_ADDR_MSB:
+            *addr = player_two_score_desc;
+            break;
+        default:
+            break;
+    };
+    return 0;
+}
+
+uint32_t _get_player_score_descriptor(struct cpu *cpu)
+{
+    return _get_player_score_descriptor_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
+}
+
 uint32_t _get_delta_x_impl(uint8_t *mem, uint8_t *delta_x)
 {
     if (mem[num_aliens] <= 1)
@@ -2101,7 +2122,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(clear_play_field),
     MAP_CIMPL(clear_playfield_taito_msg),
     MAP_CIMPL(cur_ply_alive),
-    _________(get_player_score_descriptor),
+    MAP_CIMPL(get_player_score_descriptor),
     _________(speed_shots),
     _________(draw_status),
     _________(clear_small_sprite),
