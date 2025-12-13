@@ -1824,7 +1824,7 @@ uint32_t _print_to_mid_screen_impl(uint8_t *mem, uint16_t msg_addr) /* Poorly do
     {
         MID_SCREEN_ADDR = 0x2b14,
         MSG_SPACE_INVADERS_LENGTH = 0xf,
-        
+
     };
     uint16_t screen_addr = MID_SCREEN_ADDR;
     return _print_message_impl(mem, MSG_SPACE_INVADERS_LENGTH, &msg_addr, &screen_addr);
@@ -1957,6 +1957,42 @@ uint32_t _read_inputs(struct cpu *cpu)
     return _read_inputs_impl(cpu->mem, (uint8_t *)&cpu->cpu_state.regs[REG_AF] + HI);
 }
 
+uint32_t _shot_sound_impl(struct cpu *cpu) /* Full of sound and fury. Signifying nothing. */
+{
+    return 0;
+}
+
+uint32_t _shot_sound(struct cpu *cpu) /* Full of sound and fury. Signifying nothing. */
+{
+    return 0;
+}
+
+uint32_t _clear_play_field_impl(uint8_t *mem)
+{
+    uint16_t screen_addr = 0x2402; /* Third from left, top of screen. */
+
+    for (;;)
+    {
+        mem[screen_addr++] = 0;
+        if ((screen_addr & (SCREEN_BYTES_PER_PIXEL_COLUMN - 1)) == 0x1c)
+        {
+            screen_addr += 6;
+        }
+
+        if (screen_addr >= 0x4000)
+        {
+            break;
+        }
+    }
+
+    return 0;
+}
+
+uint32_t _clear_play_field(struct cpu *cpu)
+{
+    return _clear_play_field_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2041,8 +2077,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_wide_sprite),
     MAP_CIMPL(erase_simple_sprite),
     MAP_CIMPL(read_inputs),
-    _________(shot_sound),
-    _________(clear_play_field),
+    MAP_CIMPL(shot_sound),
+    MAP_CIMPL(clear_play_field),
     _________(clear_playfield_taito_msg),
     _________(cur_ply_alive),
     _________(get_player_score_descriptor),
