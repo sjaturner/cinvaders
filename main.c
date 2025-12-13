@@ -2070,6 +2070,26 @@ uint32_t _draw_status(struct cpu *cpu)
     return _draw_status_impl(cpu->mem);
 }
 
+uint32_t _fill_screen_row_impl(uint8_t *mem, uint16_t *screen_addr, uint16_t elems, uint8_t value)
+{
+    for (uint16_t index = 0; index < elems; ++index)
+    {
+        mem[*screen_addr] = value;
+        *screen_addr += SCREEN_BYTES_PER_PIXEL_COLUMN;
+    }
+    return 0;
+}
+
+uint32_t _fill_screen_row(struct cpu *cpu)
+{
+    return _fill_screen_row_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_b(cpu, 0), get_a(cpu, 0));
+}
+
+uint32_t _clear_small_sprite(struct cpu *cpu)
+{
+    return _fill_screen_row_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_b(cpu, 0), 0);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2161,27 +2181,28 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(get_player_score_descriptor),
     MAP_CIMPL(speed_shots),
     MAP_CIMPL(draw_status),
-    _________(clear_small_sprite),
-    _________(fill_screen_row),
+    MAP_CIMPL(fill_screen_row),
+    MAP_CIMPL(clear_small_sprite),
     _________(check_column),
     _________(cnt16s),
     _________(comp_yto_beam),
     _________(draw_score),
-    _________(animate),
     _________(ctrl_saucer_sound),
     _________(control_isr_splash_from_acc),
     _________(draw_shield_pl1),
     _________(draw_shield_pl2),
-    _________(print_message_del),
     _________(restore_shields),
     _________(score_for_alien),
     _________(player_shot_hit),
     _________(init_rack),
-    _________(sub_189eh),
     _________(time_fleet_sound),
     _________(plr_fire_or_demo),
     _________(draw_spr_collision),
     _________(fleet_delay_ex_ship),
+
+    _________(animate),
+    _________(print_message_del),
+    _________(sub_189eh),
 };
 
 int interpreter_only;
