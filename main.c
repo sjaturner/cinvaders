@@ -1650,7 +1650,7 @@ uint32_t _init_aliens_player_two(struct cpu *cpu)
     return 0;
 }
 
-uint32_t _draw_score_head_impl(uint8_t *mem, uint16_t *screen_addr)
+uint32_t _draw_score_head_impl(uint8_t *mem, uint16_t *screen_addr) /* Duff? */
 {
     enum
     {
@@ -2034,6 +2034,42 @@ uint32_t _clear_playfield_taito_msg(struct cpu *cpu)
     return _clear_playfield_taito_msg_impl(cpu->mem);
 }
 
+uint32_t _speed_shots_impl(uint8_t *mem)
+{
+    if (mem[num_aliens] > 8)
+    {
+    }
+    else
+    {
+        mem[alien_shot_delta] = 0xfb;
+    }
+    return 0;
+}
+
+uint32_t _speed_shots(struct cpu *cpu)
+{
+    return _speed_shots_impl(cpu->mem);
+}
+
+uint32_t _draw_status_impl(uint8_t *mem)
+{
+    _clear_screen_impl(mem);
+    uint16_t discard = 0;
+    _draw_score_head_impl(mem, &discard);
+    _print_player_one_score_impl(mem);
+    _print_player_two_score_impl(mem);
+    _print_high_score_impl(mem);
+    _print_credit_label_impl(mem);
+    _draw_num_credits_impl(mem);
+
+    return 0;
+}
+
+uint32_t _draw_status(struct cpu *cpu)
+{
+    return _draw_status_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2123,8 +2159,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(clear_playfield_taito_msg),
     MAP_CIMPL(cur_ply_alive),
     MAP_CIMPL(get_player_score_descriptor),
-    _________(speed_shots),
-    _________(draw_status),
+    MAP_CIMPL(speed_shots),
+    MAP_CIMPL(draw_status),
     _________(clear_small_sprite),
     _________(fill_screen_row),
     _________(check_column),
