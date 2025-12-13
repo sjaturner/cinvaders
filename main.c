@@ -1886,6 +1886,33 @@ uint32_t _draw_sprite(struct cpu *cpu)
     return _draw_sprite_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs[REG_DE], get_b(cpu, 0));
 }
 
+uint32_t _erase_shifted_impl(uint8_t *mem, uint16_t *hl, uint16_t sprite_addr, uint8_t sprite_length)
+{
+    _cnvt_pix_number_impl(mem, hl);
+//  uint16_t save_hl = *hl;
+
+    while (sprite_length--)
+    {
+        port_op(0, 4, mem[sprite_addr]); /* Data to shift register. */
+        mem[*hl + 0] &= ~port_ip(0, 3);
+
+        port_op(0, 4, 0); /* Data to shift register. */
+        mem[*hl + 1] &= ~port_ip(0, 3);
+
+        *hl += SCREEN_BYTES_PER_PIXEL_COLUMN;
+
+        ++sprite_addr;
+    }
+
+//  *hl = save_hl;
+    return 0;
+}
+
+uint32_t _erase_shifted(struct cpu *cpu)
+{
+    return _erase_shifted_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs[REG_DE], get_b(cpu, 0));
+}
+
 uint32_t _draw_wide_sprite_impl(uint8_t *mem, uint16_t *hl, uint16_t sprite_addr)
 {
     enum
@@ -1999,9 +2026,9 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(suspend_game_tasks),
     MAP_CIMPL(get_player_data_ptr),
     MAP_CIMPL(draw_sprite),
+    MAP_CIMPL(erase_shifted),
     MAP_CIMPL(draw_wide_sprite),
     MAP_CIMPL(erase_simple_sprite),
-    _________(erase_shifted),
     _________(read_inputs),
     _________(shot_sound),
     _________(clear_play_field),
