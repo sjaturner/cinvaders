@@ -2100,7 +2100,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(shot_sound),
     MAP_CIMPL(clear_play_field),
     MAP_CIMPL(clear_playfield_taito_msg),
-    _________(cur_ply_alive),
+    MAP_CIMPL(cur_ply_alive),
     _________(get_player_score_descriptor),
     _________(speed_shots),
     _________(draw_status),
