@@ -1946,6 +1946,17 @@ uint32_t _erase_simple_sprite(struct cpu *cpu)
     return _erase_simple_sprite_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_b(cpu, 0));
 }
 
+uint32_t _read_inputs_impl(uint8_t *mem, uint8_t *val)
+{
+    *val = port_ip(0, mem[player_data_msb] & 0x01 ? 1 : 2);
+    return 0;
+}
+
+uint32_t _read_inputs(struct cpu *cpu)
+{
+    return _read_inputs_impl(cpu->mem, (uint8_t *)&cpu->cpu_state.regs[REG_AF] + HI);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2029,7 +2040,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(erase_shifted),
     MAP_CIMPL(draw_wide_sprite),
     MAP_CIMPL(erase_simple_sprite),
-    _________(read_inputs),
+    MAP_CIMPL(read_inputs),
     _________(shot_sound),
     _________(clear_play_field),
     _________(clear_playfield_taito_msg),
