@@ -2090,6 +2090,42 @@ uint32_t _clear_small_sprite(struct cpu *cpu)
     return _fill_screen_row_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_b(cpu, 0), 0);
 }
 
+uint32_t _check_column_impl(uint8_t *mem, uint16_t *screen_addr, int *clear)
+{
+    *clear = 1;
+    enum
+    {
+        BYTES_TO_CHECK = 0x17,
+    };
+
+    for (uint16_t index = 0; index < BYTES_TO_CHECK; ++index)
+    {
+        if (mem[*screen_addr])
+        {
+            *clear = 0;
+        }
+        ++*screen_addr;
+    }
+    return 0;
+}
+
+uint32_t _check_column(struct cpu *cpu)
+{
+    int clear = 0;
+    uint32_t ret = _check_column_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, &clear);
+
+    if (!clear)
+    {
+        set_f(cpu, 0, get_f(cpu, 0) | FLAG_BIT_C);
+    }
+    else
+    {
+        set_f(cpu, 0, get_f(cpu, 0) & ~FLAG_BIT_C);
+    }
+
+    return ret;
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2183,7 +2219,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_status),
     MAP_CIMPL(fill_screen_row),
     MAP_CIMPL(clear_small_sprite),
-    _________(check_column),
+    MAP_CIMPL(check_column),
     _________(cnt16s),
     _________(comp_yto_beam),
     _________(draw_score),
