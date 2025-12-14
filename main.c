@@ -2137,6 +2137,33 @@ uint32_t _control_isr_splash_from_acc(struct cpu *cpu)
     return _control_isr_splash_from_acc_impl(cpu->mem, get_a(cpu, 0));
 }
 
+uint32_t _cnt16s_impl(uint8_t *mem, uint8_t *a, uint16_t h, uint8_t *c)
+{
+    *c = 0;
+    if (*a >= h)
+    {
+        do {
+            *a += 16;
+            ++*c;
+        } while (*a & 0x80);
+    }
+
+    while (*a < h)
+    {
+        *a += 16;
+        ++*c;
+    }
+    return 0;
+}
+
+uint32_t _cnt16s(struct cpu *cpu)
+{
+    uint32_t ret = _cnt16s_impl(cpu->mem, (uint8_t *)&cpu->cpu_state.regs[REG_AF] + HI, get_h(cpu, 0), (uint8_t *)&cpu->cpu_state.regs[REG_BC] + LO);
+
+    set_f(cpu, 0, get_f(cpu, 0) & ~FLAG_BIT_C);
+    return ret;
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2181,7 +2208,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(alien_score_value),
     MAP_CIMPL(cnvt_pix_number),
     MAP_CIMPL(get_alien_state_ptr),
-    _________(wrap_ref),
+    _________(wrap_ref), /* Never intercept this, it is a helper for cnt16s. */
     MAP_CIMPL(sub_176dh),
     MAP_CIMPL(fleet_sound_off),
     MAP_CIMPL(check_handle_tilt),
@@ -2235,7 +2262,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(clear_small_sprite),
     MAP_CIMPL(check_column),
     MAP_CIMPL(control_isr_splash_from_acc),
-    _________(cnt16s),
+    MAP_CIMPL(cnt16s),
     _________(comp_yto_beam),
     _________(draw_score),
     _________(ctrl_saucer_sound),
