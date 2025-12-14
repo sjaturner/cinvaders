@@ -2126,6 +2126,17 @@ uint32_t _check_column(struct cpu *cpu)
     return ret;
 }
 
+uint32_t _control_isr_splash_from_acc_impl(uint8_t *mem, uint8_t val)
+{
+    mem[isr_splash_task] = val;
+    return 0;
+}
+
+uint32_t _control_isr_splash_from_acc(struct cpu *cpu)
+{
+    return _control_isr_splash_from_acc_impl(cpu->mem, get_a(cpu, 0));
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2192,12 +2203,15 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(disable_game_tasks),
     MAP_CIMPL(sound_bits3off),
 
+    /* Tricky, we want the ISR to run but we are in CIMPL ... think harder. */
+    _________(wait_on_delay),
+    _________(one_sec_delay),
+    _________(two_sec_delay),
+    _________(animate),
+    _________(print_message_del),
+    _________(sub_189eh),
+
     /* Next leaves, ordered by difficulty. */
-
-    _________(wait_on_delay), /* Tricky, we want the ISR to run but we are in CIMPL ... think harder. */
-    _________(one_sec_delay), /* Tricky, we want the ISR to run but we are in CIMPL ... think harder. */
-    _________(two_sec_delay), /* Tricky, we want the ISR to run but we are in CIMPL ... think harder. */
-
     MAP_CIMPL(copy_rom_to_ram),
     MAP_CIMPL(flag_player_hit),
     MAP_CIMPL(get_saucer_descriptor),
@@ -2220,11 +2234,11 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(fill_screen_row),
     MAP_CIMPL(clear_small_sprite),
     MAP_CIMPL(check_column),
+    MAP_CIMPL(control_isr_splash_from_acc),
     _________(cnt16s),
     _________(comp_yto_beam),
     _________(draw_score),
     _________(ctrl_saucer_sound),
-    _________(control_isr_splash_from_acc),
     _________(draw_shield_pl1),
     _________(draw_shield_pl2),
     _________(restore_shields),
@@ -2235,10 +2249,6 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     _________(plr_fire_or_demo),
     _________(draw_spr_collision),
     _________(fleet_delay_ex_ship),
-
-    _________(animate),
-    _________(print_message_del),
-    _________(sub_189eh),
 };
 
 int interpreter_only;

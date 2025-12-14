@@ -4173,6 +4173,11 @@ l154ah:
 
     nop                              ; 1553     00              
 
+                                     ; @h y coord, or perhaps x fucksake
+                                     ; @a another coord, wut
+                                     ; How many times do we need to add sixteen to something to make it bigger than another thing
+                                     ; Like division maybe
+                                     ; @c contains the number of times
 cnt16s:                                                         
     ld c,000h                        ; 1554     0e 00            ;  Count of 16s
     cp h                             ; 1556     bc               ;  Compare reference coordinate to target
