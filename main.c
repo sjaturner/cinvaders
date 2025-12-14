@@ -2181,7 +2181,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(alien_score_value),
     MAP_CIMPL(cnvt_pix_number),
     MAP_CIMPL(get_alien_state_ptr),
-    MAP_CIMPL(wrap_ref),
+    _________(wrap_ref),
     MAP_CIMPL(sub_176dh),
     MAP_CIMPL(fleet_sound_off),
     MAP_CIMPL(check_handle_tilt),
@@ -3078,36 +3078,62 @@ int main(int argc, char *argv[])
             assert(f);
         }
 
-        struct regval regval = {
-            .de = sprite_player,
-            .bc = 0x1000,
-            .hl = 0x0208,
-            .sp = 0x2400,
-            .pc = 0,
-        };
-
-        init_regs(&cpu, &regval);
-
-        printf("get_h(&cpu, 0):%02x\n", get_h(&cpu, 0));
-        printf("get_l(&cpu, 0):%02x\n", get_l(&cpu, 0));
-
-        cpu.mem[0] = 0xCD;
-        cpu.mem[1] = conv_to_scr >> 0 * 8 & 0xff;
-        cpu.mem[2] = conv_to_scr >> 1 * 8 & 0xff;
-
-        memset(cpu.mem + 0x2400, 0, 0x4000 - 0x2400);
-
-        uint32_t cycles = 0;
-        for (;;)
+        for (uint16_t a = 0; a < 0x100; ++a)
         {
-            cycles += step(&cpu);
-
-            printf("pc:%04x sp:%04x\n", get_pc(&cpu, 0), get_sp(&cpu, 0));
-            dump();
-
-            if (get_sp(&cpu, 0) == 0x2400)
+            for (uint16_t h = 0; h < 0xf1; ++h)
             {
-                break;
+                struct regval regval = {
+                    .sp = 0x2400,
+                };
+
+                init_regs(&cpu, &regval);
+
+                set_a(&cpu, 0, a);
+                set_h(&cpu, 0, h);
+
+                printf("a:0x%04x get_a(&cpu, 0):%02x\n", a, get_a(&cpu, 0));
+                printf("h:0x%04x get_h(&cpu, 0):%02x\n", h, get_h(&cpu, 0));
+
+                cpu.mem[0] = 0xcd;
+                cpu.mem[1] = cnt16s >> 0 * 8 & 0xff;
+                cpu.mem[2] = cnt16s >> 1 * 8 & 0xff;
+
+                uint32_t cycles = 0;
+                for (;;)
+                {
+                    cycles += step(&cpu);
+
+                    if (1)
+                    {
+                        printf("pc:%04x sp:%04x\n", get_pc(&cpu, 0), get_sp(&cpu, 0));
+                    }
+
+                    if (get_pc(&cpu, 0) == 0x0003)
+                    {
+                        break;
+                    }
+                }
+                dump();
+
+                if (0)
+                {
+                    uint16_t guess = 0;
+
+                    if (a & 0x80)
+                    {
+                        guess = 0xf & (((short)h + 0) - (short)a) / 16;
+                    }
+                    else
+                    {
+                        guess = 0xf & (((short)h + 15) - (short)a) / 16;
+                        if (guess == 0)
+                        {
+                            guess = 1;
+                        }
+                    }
+
+                    printf("guess:%04x\n", guess);
+                }
             }
         }
 
