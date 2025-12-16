@@ -2164,6 +2164,67 @@ uint32_t _cnt16s(struct cpu *cpu)
     return ret;
 }
 
+uint32_t _comp_yto_beam_impl(uint8_t *mem, uint16_t *hl, uint8_t *a, uint8_t *b, uint16_t task_structure_flag, int *carry_flag, int *zero_flag)
+{
+    /* ld hl, vblank_status */
+    *hl = vblank_status;
+
+    /* ld b, (hl) */
+    *b = mem[*hl];
+
+    /* ld a, (de) */
+    *a = mem[task_structure_flag];
+
+    /* and 080h */
+    *a &= 0x80;
+
+    /* xor b */
+    *a ^= *b;
+
+    /* Zero flag after XOR */
+    *zero_flag = (*a == 0);
+
+    /* ret nz  (carry already cleared by XOR) */
+    if (!*zero_flag)
+    {
+        *carry_flag = 0;
+        return 0;
+    }
+
+    /* scf */
+    *carry_flag = 1;
+
+    return 0;
+}
+
+uint32_t _comp_yto_beam(struct cpu *cpu)
+{
+    int carry_flag = 0;
+    int zero_flag = 0;
+
+    uint32_t ret = _comp_yto_beam_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, (uint8_t *)&cpu->cpu_state.regs[REG_AF] + HI, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + HI,  cpu->cpu_state.regs[REG_DE], &carry_flag, &zero_flag);
+
+    if (carry_flag)
+    {
+        set_f(cpu, 0, get_f(cpu, 0) | FLAG_BIT_C);
+    }
+    else
+    {
+        set_f(cpu, 0, get_f(cpu, 0) & ~FLAG_BIT_C);
+    }
+
+    if (zero_flag)
+    {
+        set_f(cpu, 0, get_f(cpu, 0) | FLAG_BIT_Z);
+    }
+    else
+    {
+        set_f(cpu, 0, get_f(cpu, 0) & ~FLAG_BIT_Z);
+    }
+
+    return ret;
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2263,7 +2324,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(check_column),
     MAP_CIMPL(control_isr_splash_from_acc),
     MAP_CIMPL(cnt16s),
-    _________(comp_yto_beam),
+    MAP_CIMPL(comp_yto_beam),
     _________(draw_score),
     _________(ctrl_saucer_sound),
     _________(draw_shield_pl1),
