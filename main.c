@@ -2325,7 +2325,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(control_isr_splash_from_acc),
     MAP_CIMPL(cnt16s),
     MAP_CIMPL(comp_yto_beam),
-    _________(draw_score),
+    MAP_CIMPL(draw_score),
     _________(ctrl_saucer_sound),
     _________(draw_shield_pl1),
     _________(draw_shield_pl2),
