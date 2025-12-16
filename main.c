@@ -2225,6 +2225,17 @@ uint32_t _comp_yto_beam(struct cpu *cpu)
     return ret;
 }
 
+
+uint32_t _ctrl_saucer_sound_impl(struct cpu *cpu) /* Full of sound and fury. Signifying nothing. */
+{
+    return 0;
+}
+
+uint32_t _ctrl_saucer_sound(struct cpu *cpu) /* Full of sound and fury. Signifying nothing. */
+{
+    return 0;
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2326,7 +2337,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(cnt16s),
     MAP_CIMPL(comp_yto_beam),
     MAP_CIMPL(draw_score),
-    _________(ctrl_saucer_sound),
+    MAP_CIMPL(ctrl_saucer_sound),
     _________(draw_shield_pl1),
     _________(draw_shield_pl2),
     _________(restore_shields),
