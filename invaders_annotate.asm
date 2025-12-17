@@ -1653,14 +1653,14 @@ score_for_alien:
     ld a,b                           ; 0a6d     78               ;  Into A
     call alien_score_value           ; 0a6e     cd 7c 09         ;  Look up the score for the alien
     ld a,(hl)                        ; 0a71     7e               ;  Get the score value
-    ld hl,020f3h                     ; 0a72     21 f3 20         ;  Pointer to score delta
+    ld hl,score_delta_msb            ; 0a72     21 f3 20         ;  HL points at score_delta_msb
     ld (hl),000h                     ; 0a75     36 00            ;  Upper byte of score delta is "00"
-    dec hl                           ; 0a77     2b               ;  Point to score delta LSB
+    dec hl                           ; 0a77     2b               ;  HL points at score_delta_lsb
     ld (hl),a                        ; 0a78     77               ;  Set score for hitting alien
     dec hl                           ; 0a79     2b               ;  Point to adjust-score-flag
-    ld (hl),001h                     ; 0a7a     36 01            ;  The score will get changed elsewhere
+    ld (hl),001h                     ; 0a7a     36 01            ;  HL points at adjust_score_data
 l0a7ch:                                                         
-    ld hl,02062h                     ; 0a7c     21 62 20         ;  Return exploding-alien descriptor
+    ld hl,exploding_alien_desc       ; 0a7c     21 62 20         ;  Return exploding-alien descriptor
     ret                              ; 0a7f     c9               ;  Out
 
 animate:                                                        
@@ -6730,7 +6730,7 @@ squ_shot_cfir_lsb:             equ 02058h                        ; 02058h 02058 
                                                                  ; 02060h 02060                                                                 defb 0ffh ; 1b60 ff  
 
 collision:                     equ 02061h                        ; 02061h 02061                                                                 defb 000h ; 1b61 00  
-                                                                 ; 02062h 02062    ; e ; descriptor ; exploding alien                           defb 0c0h ; 1b62 c0  alien_explode
+exploding_alien_desc:          equ 02062h                        ; 02062h 02062    ; e ; descriptor ; exploding alien                           defb 0c0h ; 1b62 c0  alien_explode
                                                                  ; 02063h 02063    ; d                                                          defb 01ch ; 1b63 1c  
 exp_alien_yr:                  equ 02064h                        ; 02064h 02064    ; l                                                          defb 000h ; 1b64 00  
                                                                  ; 02065h 02065    ; h                                                          defb 000h ; 1b65 00  
@@ -6880,7 +6880,7 @@ game_mode:                     equ 020efh                        ; 020efh 020ef
                                                                  ; 020f0h 020f0
 adjust_score_data:             equ 020f1h                        ; 020f1h 020f1    
 score_delta_lsb:               equ 020f2h                        ; 020f2h 020f2    
-                                                                 ; 020f3h 020f3    ; @ pointer to score delta msb
+score_delta_msb:               equ 020f3h                        ; 020f3h 020f3    ; @ pointer to score delta msb
 high_score_desc:               equ 020f4h                        ; 020f4h 020f4    ; @ hi score descriptor
                                                                  ; 020f5h 020f5    ; @ current hi score upper two digits
                                                                  ; 020f6h 020f6

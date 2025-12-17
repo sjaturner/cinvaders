@@ -2289,6 +2289,30 @@ uint32_t _restore_shields(struct cpu *cpu)
     return _restore_shields_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs + REG_DE);
 }
 
+uint32_t _score_for_alien_impl(uint8_t *mem, uint16_t *exploding_alien_desc_addr, uint8_t row)
+{
+    uint32_t ret = 0;
+    if (mem[game_mode])
+    {
+        /* Sound stuff would go here ... */
+
+        uint16_t value_addr = 0;
+        ret += _alien_score_value_impl(mem, row, &value_addr);
+        mem[score_delta_msb] = 0;
+        mem[score_delta_lsb] = mem[value_addr];
+        mem[adjust_score_data] = 1;
+
+    }
+
+    *exploding_alien_desc_addr = exploding_alien_desc;
+    return ret;
+}
+
+uint32_t _score_for_alien(struct cpu *cpu)
+{
+    return _score_for_alien_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_b(cpu, 0));
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2394,7 +2418,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_shield_player_one),
     MAP_CIMPL(draw_shield_player_two),
     MAP_CIMPL(restore_shields),
-    _________(score_for_alien),
+    MAP_CIMPL(score_for_alien),
     _________(player_shot_hit),
     _________(init_rack),
     _________(time_fleet_sound),

@@ -1,11 +1,7 @@
 #pragma once
 enum
 {
-    /*
-        z80asm invaders_annotate.asm -L 2>&1 | awk '{print $1 " " $3;}' | sed 's/: \$/ = 0x/' | sed 's/$/,/' | sort -t ' ' -k3 | column -t | sed 's/^/    /'
-    */
     a_first                      =  0x0000,
-    l0006h                       =  0x0006,
     isr_008h                     =  0x0008,
     l000ch                       =  0x000c,
     isr_010h                     =  0x0010,
@@ -46,7 +42,7 @@ enum
     copy_rom_to_ram              =  0x01e6,
     draw_shield_player_one       =  0x01ef,
     draw_shield_player_two       =  0x01f5,
-    l01f8h                       =  0x01f8,
+    draw_shield                  =  0x01f8,
     l01fdh                       =  0x01fd,
     remember_shields1            =  0x0209,
     remember_shields2            =  0x020e,
@@ -55,7 +51,6 @@ enum
     restore_shields1             =  0x021a,
     l021bh                       =  0x021b,
     copy_shields                 =  0x021e,
-    l021eh                       =  0x021e,
     l0229h                       =  0x0229,
     l0235h                       =  0x0235,
     l0242h                       =  0x0242,
@@ -367,7 +362,7 @@ enum
     l1b58h                       =  0x1b58,
     msg_play_player_one          =  0x1b70,
     data_for_saucer              =  0x1b83,
-    l1bb0h                       =  0x1bb0,
+    splash_animation_struct_2    =  0x1bb0,
     l1bc0h                       =  0x1bc0,
     sprite_aliens_start_a        =  0x1c00,
     sprite_alien_c_0             =  0x1c20,
@@ -455,6 +450,7 @@ enum
     squ_shot_step_cnt            =  0x2056,
     squ_shot_cfir_lsb            =  0x2058,
     collision                    =  0x2061,
+    exploding_alien_desc         =  0x2062,
     exp_alien_yr                 =  0x2064,
     player_data_msb              =  0x2067,
     player_ok                    =  0x2068,
@@ -514,6 +510,7 @@ enum
     game_mode                    =  0x20ef,
     adjust_score_data            =  0x20f1,
     score_delta_lsb              =  0x20f2,
+    score_delta_msb              =  0x20f3,
     high_score_desc              =  0x20f4,
     player_one_score_desc        =  0x20f8,
     player_two_score_desc        =  0x20fc,
