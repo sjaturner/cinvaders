@@ -2419,11 +2419,11 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_shield_player_two),
     MAP_CIMPL(restore_shields),
     MAP_CIMPL(score_for_alien),
-    _________(player_shot_hit),
     _________(init_rack),
     _________(time_fleet_sound),
     _________(plr_fire_or_demo),
     _________(draw_spr_collision),
+    _________(player_shot_hit),
     _________(fleet_delay_ex_ship),
 };
 
