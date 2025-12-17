@@ -2202,7 +2202,7 @@ uint32_t _comp_yto_beam(struct cpu *cpu)
     int carry_flag = 0;
     int zero_flag = 0;
 
-    uint32_t ret = _comp_yto_beam_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, (uint8_t *)&cpu->cpu_state.regs[REG_AF] + HI, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + HI,  cpu->cpu_state.regs[REG_DE], &carry_flag, &zero_flag);
+    uint32_t ret = _comp_yto_beam_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, (uint8_t *)&cpu->cpu_state.regs[REG_AF] + HI, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + HI, cpu->cpu_state.regs[REG_DE], &carry_flag, &zero_flag);
 
     if (carry_flag)
     {
@@ -2261,6 +2261,32 @@ uint32_t _draw_shield_player_one(struct cpu *cpu)
 uint32_t _draw_shield_player_two(struct cpu *cpu)
 {
     return _draw_shield_impl(cpu->mem, player_two_shield_buf);
+}
+
+uint32_t _restore_shields_impl(uint8_t *mem, uint16_t *screen_addr, uint16_t *player_shield_buf)
+{
+    enum
+    {
+        SHIELD_ROWS = 0x16,
+        SHIELD_BYTES_PER_ROW = 2,
+    };
+
+    for (uint32_t row = 0; row < SHIELD_ROWS; ++row)
+    {
+        for (uint32_t byte_in_row = 0; byte_in_row < SHIELD_BYTES_PER_ROW; ++byte_in_row)
+        {
+            mem[*screen_addr + byte_in_row] |= mem[*player_shield_buf];
+            ++*player_shield_buf;
+        }
+        *screen_addr += SCREEN_BYTES_PER_PIXEL_COLUMN;
+    }
+
+    return 0;
+}
+
+uint32_t _restore_shields(struct cpu *cpu)
+{
+    return _restore_shields_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs + REG_DE);
 }
 
 #if 0
@@ -2367,7 +2393,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(ctrl_saucer_sound),
     MAP_CIMPL(draw_shield_player_one),
     MAP_CIMPL(draw_shield_player_two),
-    _________(restore_shields),
+    MAP_CIMPL(restore_shields),
     _________(score_for_alien),
     _________(player_shot_hit),
     _________(init_rack),

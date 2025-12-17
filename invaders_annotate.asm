@@ -383,9 +383,10 @@ l0214h:
 
 restore_shields1:                                               
     xor a                            ; 021a     af               ;  Zero means restore
+
 l021bh:                                                         
     ld de,player_one_shield_buf      ; 021b     11 42 21         ;  Player 1 shield buffer (remember between games in multi-player)
-l021eh:                                                         
+
 copy_shields:                                                   
     ld (tmp2081),a                   ; 021e     32 81 20         ;  Remember copy/restore flag
     ld bc,01602h                     ; 0221     01 02 16         ;  22 rows, 2 bytes/row (for 1 shield pattern)
