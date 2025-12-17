@@ -2236,6 +2236,33 @@ uint32_t _ctrl_saucer_sound(struct cpu *cpu) /* Full of sound and fury. Signifyi
     return 0;
 }
 
+uint32_t _draw_shield_impl(uint8_t *mem, uint16_t player_shield_buf_addr)
+{
+    enum
+    {
+        NUM_SHIELDS = 4,
+        SHIELD_SIZE = 0x2c,
+    };
+
+    for (uint32_t shield = 0; shield < NUM_SHIELDS; ++shield)
+    {
+        memcpy(mem + player_shield_buf_addr, mem + image_shield, SHIELD_SIZE);
+        player_shield_buf_addr += SHIELD_SIZE;
+    }
+
+    return 0;
+}
+
+uint32_t _draw_shield_player_one(struct cpu *cpu)
+{
+    return _draw_shield_impl(cpu->mem, player_one_shield_buf);
+}
+
+uint32_t _draw_shield_player_two(struct cpu *cpu)
+{
+    return _draw_shield_impl(cpu->mem, player_two_shield_buf);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2338,8 +2365,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(comp_yto_beam),
     MAP_CIMPL(draw_score),
     MAP_CIMPL(ctrl_saucer_sound),
-    _________(draw_shield_pl1),
-    _________(draw_shield_pl2),
+    MAP_CIMPL(draw_shield_player_one),
+    MAP_CIMPL(draw_shield_player_two),
     _________(restore_shields),
     _________(score_for_alien),
     _________(player_shot_hit),

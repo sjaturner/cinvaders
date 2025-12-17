@@ -348,13 +348,14 @@ copy_rom_to_ram:
     ld hl,ram_start                  ; 01e9     21 00 20         ;  Start of RAM
     jp block_copy                    ; 01ec     c3 32 1a         ;  Copy [DE]->[HL] and return
 
-draw_shield_pl1:                                                
+draw_shield_player_one:                                                
     ld hl,player_one_shield_buf      ; 01ef     21 42 21         ;  Player 1 shield buffer (remember between games in multi-player)
-    jp l01f8h                        ; 01f2     c3 f8 01         ;  Common draw point
+    jp draw_shield                   ; 01f2     c3 f8 01         ;  Common draw point
 
-draw_shield_pl2:                                                
+draw_shield_player_two:                                                
     ld hl,player_two_shield_buf      ; 01f5     21 42 22         ;  Player 2 shield buffer (remember between games in multi-player)
-l01f8h:                                                         
+
+draw_shield:                                                         
     ld c,004h                        ; 01f8     0e 04            ;  Going to draw 4 shields
     ld de,image_shield               ; 01fa     11 20 1d         ;  Shield pixel pattern
 l01fdh:                                                         
@@ -1245,8 +1246,8 @@ new_game:
     ld (player1alive),hl             ; 07c2     22 e7 20         ;  20E7 and 20E8 both one ... players 1 and 2 are alive
     ld (player1ex),hl                ; 07c5     22 e5 20         ;  Extra-ship is available for player-1 and player-2
     call draw_status                 ; 07c8     cd 56 19         ;  Print scores and credits
-    call draw_shield_pl1             ; 07cb     cd ef 01         ;  Draw shields for player-1
-    call draw_shield_pl2             ; 07ce     cd f5 01         ;  Draw shields for player-2
+    call draw_shield_player_one      ; 07cb     cd ef 01         ;  Draw shields for player-1
+    call draw_shield_player_two      ; 07ce     cd f5 01         ;  Draw shields for player-2
     call get_ships_per_cred          ; 07d1     cd d1 08         ;  Get number of ships from DIP settings
     ld (p1ships_rem),a               ; 07d4     32 ff 21         ;  Player-1 ships
     ld (p2ships_rem),a               ; 07d7     32 ff 22         ;  Player-2 ships
@@ -1610,12 +1611,12 @@ l0a13h:
     jp c,l0a33h                      ; 0a22     da 33 0a         ;  2nd player stuff
     ld a,021h                        ; 0a25     3e 21            ;  Start fleet with ...
     ld (sound_port5),a               ; 0a27     32 98 20         ;  ... first sound
-    call draw_shield_pl2             ; 0a2a     cd f5 01         ;  Draw shields for player 2
+    call draw_shield_player_two      ; 0a2a     cd f5 01         ;  Draw shields for player 2
     call init_aliens_player_two      ; 0a2d     cd 04 19         ;  Initalize aliens for player 2
     jp top_of_game_loop              ; 0a30     c3 04 08         ;  Continue at top of game loop
 
 l0a33h:                                                         
-    call draw_shield_pl1             ; 0a33     cd ef 01         ;  Draw shields for player 1
+    call draw_shield_player_one      ; 0a33     cd ef 01         ;  Draw shields for player 1
     call init_aliens_player_one      ; 0a36     cd c0 01         ;  Initialize aliens for player 1
     jp top_of_game_loop              ; 0a39     c3 04 08         ;  Continue at top of game loop
 
@@ -1782,7 +1783,7 @@ l0b4ah:
 l0b5dh:                                                         
     call copy_ram_mirror             ; 0b5d     cd e4 01         ;  Block copy ROM mirror to initialize RAM
     call init_aliens_player_one      ; 0b60     cd c0 01         ;  Initialize all player 1 aliens
-    call draw_shield_pl1             ; 0b63     cd ef 01         ;  Draw shields for player 1 (to buffer)
+    call draw_shield_player_one      ; 0b63     cd ef 01         ;  Draw shields for player 1 (to buffer)
     call restore_shields1            ; 0b66     cd 1a 02         ;  Restore shields for player 1 (to screen)
     ld a,001h                        ; 0b69     3e 01            ;  ISR splash-task ...
     ld (isr_splash_task),a           ; 0b6b     32 c1 20         ;  ... playing demo
