@@ -890,6 +890,11 @@ void set_flags(struct cpu *cpu, const struct opcode *opcode, uint32_t res_val, i
     set_f(cpu, 0, (get_f(cpu, 0) & ~flag_mask) | (flags & flag_mask));
 }
 
+enum
+{
+    FIRE_BUTTON_SHIFT = 4,
+};
+
 static uint8_t dip0 = 0x0f;
 static uint8_t dip1 = 0x08;
 static uint8_t dip2 = 0x01;
@@ -2362,6 +2367,85 @@ uint32_t _time_fleet_sound(struct cpu *cpu)
     return _time_fleet_sound_impl(cpu->mem);
 }
 
+uint32_t _plr_fire_or_demo_impl(uint8_t *mem)
+{
+    uint32_t ret = 0;
+    if (mem[player_alive] != 0xff)
+    {
+        return 0; /* There is no active player. */
+    }
+    else if (*(uint16_t *)(mem + game_object_0))
+    {
+        return 0; /* The timer has not expired. */
+    }
+    else if (mem[plyr_shot_status])
+    {
+        return 0; /* The player has a shot on the screen. */
+    }
+    else if (mem[game_mode])
+    {
+        /* Game mode, not demo mode. */
+        uint8_t inputs = 0;
+        ret += _read_inputs_impl(mem, &inputs);
+        uint8_t fire_button = inputs & 1 << FIRE_BUTTON_SHIFT;
+
+        if (mem[fire_bounce]) /* l1648h */
+        {
+            if (fire_button)
+            {
+                return ret;
+            }
+            else
+            {
+                mem[fire_bounce] = 0;
+
+                return ret; /* Fire key handling. */
+            }
+        }
+        else
+        {
+            if (!fire_button)
+            {
+                return ret;
+            }
+            else
+            {
+                mem[plyr_shot_status] = 1; /* Fire button just pressed. */
+                mem[fire_bounce] = 1;
+                return ret;
+            }
+        }
+    }
+    else /* l1652h */                     
+    {
+        /* In demo mode, not game mode. */
+        
+        mem[plyr_shot_status] = 1; /* Fire all the time in demo mode. */
+        uint16_t demo_cmd_ptr_addr = *(uint16_t *)(mem + demo_cmd_ptr_lsb);
+        ++demo_cmd_ptr_addr;
+
+        /* Keep the demo command pointer in the range of the command array. */
+        /* Do better. */
+        if ((demo_cmd_ptr_addr & 0xff) > 0x7e) /* Grotesque. */
+        {
+            demo_cmd_ptr_addr &= 0xff00;
+            demo_cmd_ptr_addr |= 0x74;
+        }
+        *(uint16_t *)(mem + demo_cmd_ptr_lsb) = demo_cmd_ptr_addr;
+
+        mem[next_demo_cmd] = mem[demo_cmd_ptr_addr];
+
+        return 0;
+    }
+
+    return 0;
+}
+
+uint32_t _plr_fire_or_demo(struct cpu *cpu)
+{
+    return _plr_fire_or_demo_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2470,7 +2554,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(score_for_alien),
     MAP_CIMPL(init_rack),
     MAP_CIMPL(time_fleet_sound),
-    _________(plr_fire_or_demo),
+    MAP_CIMPL(plr_fire_or_demo),
     _________(draw_spr_collision),
     _________(player_shot_hit),
     _________(fleet_delay_ex_ship),
@@ -3176,7 +3260,7 @@ void get_input()
                         dip1 |= (1 << 2);
                         break;
                     case SDLK_z:
-                        dip1 |= (1 << 4);
+                        dip1 |= (1 << FIRE_BUTTON_SHIFT);
                         break;
                     case SDLK_q:
                         printf("\n");

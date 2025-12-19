@@ -4330,7 +4330,7 @@ plr_fire_or_demo:
     ld a,(player_alive)              ; 1618     3a 15 20         ;  Is there an active player?
     cp 0ffh                          ; 161b     fe ff            ;  FF = alive
     ret nz                           ; 161d     c0               ;  Player has been shot - no firing
-    ld hl,02010h                     ; 161e     21 10 20         ;  Get player ...
+    ld hl,game_object_0              ; 161e     21 10 20         ;  Get player ...
     ld a,(hl)                        ; 1621     7e               ;  ... task ...
     inc hl                           ; 1622     23               ;  ... timer ...
     ld b,(hl)                        ; 1623     46               ;  ... value
@@ -4360,7 +4360,7 @@ l1648h:
     ld (fire_bounce),a               ; 164e     32 2d 20         ;  Else ... clear flag
     ret                              ; 1651     c9               ;  Out
 
-l1652h:                                                         
+l1652h:                              ;                           ;  This is demo mode                                                       
     ld hl,plyr_shot_status           ; 1652     21 25 20         ;  Demo fires ...
     ld (hl),001h                     ; 1655     36 01            ;  ... constantly
     ld hl,(demo_cmd_ptr_lsb)         ; 1657     2a ed 20         ;  Demo command buffer
