@@ -2313,6 +2313,45 @@ uint32_t _score_for_alien(struct cpu *cpu)
     return _score_for_alien_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, get_b(cpu, 0));
 }
 
+uint32_t _init_rack_impl(uint8_t *mem)
+{
+    enum
+    {
+        ALIEN_MOVE_RIGHT_FAST = 0x03,
+        ALIEN_MOVE_RIGHT_SLOW = 0x02,
+        ALIEN_MOVE_LEFT = 0xfe,
+    };
+    uint16_t alien_reference_ptr = 0;
+    uint32_t ret = _get_alien_reference_ptr_impl(mem, &alien_reference_ptr);
+    uint16_t ref_alien = *(uint16_t *)(mem + alien_reference_ptr);
+    *(uint16_t *)(mem + ref_alien_yr) = ref_alien;
+    *(uint16_t *)(mem + alien_pos_lsb) = ref_alien;
+    uint8_t ref_alien_dx = mem[alien_reference_ptr - 1]; /* Yuck ... */
+
+    if (ref_alien_dx == ALIEN_MOVE_RIGHT_FAST) /* Because this can be three when there is only one alien remaining. */
+    {
+        ref_alien_dx = ALIEN_MOVE_RIGHT_SLOW;
+    }
+
+    mem[ref_alien_dxr] = ref_alien_dx;
+
+    if (ref_alien_dx == ALIEN_MOVE_LEFT) /* Moving left. */
+    {
+        mem[rack_direction] = 1;
+    }
+    else
+    {
+        mem[rack_direction] = 0;
+    }
+
+    return ret;
+}
+
+uint32_t _init_rack(struct cpu *cpu)
+{
+    return _init_rack_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2419,7 +2458,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_shield_player_two),
     MAP_CIMPL(restore_shields),
     MAP_CIMPL(score_for_alien),
-    _________(init_rack),
+    MAP_CIMPL(init_rack),
     _________(time_fleet_sound),
     _________(plr_fire_or_demo),
     _________(draw_spr_collision),
