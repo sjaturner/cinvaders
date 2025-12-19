@@ -2352,6 +2352,16 @@ uint32_t _init_rack(struct cpu *cpu)
     return _init_rack_impl(cpu->mem);
 }
 
+uint32_t _time_fleet_sound_impl(uint8_t *mem) /* No sound. */
+{
+    return 0;
+}
+
+uint32_t _time_fleet_sound(struct cpu *cpu)
+{
+    return _time_fleet_sound_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2459,7 +2469,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(restore_shields),
     MAP_CIMPL(score_for_alien),
     MAP_CIMPL(init_rack),
-    _________(time_fleet_sound),
+    MAP_CIMPL(time_fleet_sound),
     _________(plr_fire_or_demo),
     _________(draw_spr_collision),
     _________(player_shot_hit),
