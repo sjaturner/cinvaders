@@ -2456,27 +2456,21 @@ uint32_t _draw_spr_collision_impl(uint8_t *mem, uint16_t sprite_addr, uint8_t sp
     do
     {
         uint16_t scan_screen_addr = line_screen_addr;
-        uint8_t shifted = 0;
+        uint8_t sprite_byte = mem[sprite_addr++];
 
-        port_op(0, 4, mem[sprite_addr++]);
-        shifted = port_ip(0, 3);
-
-        if (shifted & mem[scan_screen_addr])
+        for (uint8_t loop = 0; loop < 2; ++loop)
         {
-            mem[collision] = 1;
+            port_op(0, 4, sprite_byte);
+            uint8_t shifted = port_ip(0, 3);
+
+            if (shifted & mem[scan_screen_addr])
+            {
+                mem[collision] = 1;
+            }
+
+            mem[scan_screen_addr++] |= shifted;
+            sprite_byte = 0;
         }
-
-        mem[scan_screen_addr++] |= shifted;
-
-        port_op(0, 4, 0);
-        shifted = port_ip(0, 3);
-
-        if (shifted & mem[scan_screen_addr])
-        {
-            mem[collision] = 1;
-        }
-
-        mem[scan_screen_addr++] |= shifted; /* Increment not needed but symmetrical. */
 
         line_screen_addr += SCREEN_BYTES_PER_PIXEL_COLUMN;
 
@@ -2598,7 +2592,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(score_for_alien),
     MAP_CIMPL(init_rack),
     MAP_CIMPL(time_fleet_sound),
-    MAP_CIMPL(plr_fire_or_demo),
+    _________(plr_fire_or_demo),
     MAP_CIMPL(draw_spr_collision),
     _________(player_shot_hit),
     _________(fleet_delay_ex_ship),
