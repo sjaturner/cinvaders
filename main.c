@@ -2416,10 +2416,10 @@ uint32_t _plr_fire_or_demo_impl(uint8_t *mem)
             }
         }
     }
-    else /* l1652h */                     
+    else /* l1652h */
     {
         /* In demo mode, not game mode. */
-        
+
         mem[plyr_shot_status] = 1; /* Fire all the time in demo mode. */
         uint16_t demo_cmd_ptr_addr = *(uint16_t *)(mem + demo_cmd_ptr_lsb);
         ++demo_cmd_ptr_addr;
@@ -2444,6 +2444,50 @@ uint32_t _plr_fire_or_demo_impl(uint8_t *mem)
 uint32_t _plr_fire_or_demo(struct cpu *cpu)
 {
     return _plr_fire_or_demo_impl(cpu->mem);
+}
+
+uint32_t _draw_spr_collision_impl(uint8_t *mem, uint16_t sprite_addr, uint8_t sprite_bytes, uint16_t screen_addr)
+{
+    _cnvt_pix_number_impl(mem, &screen_addr);
+    mem[collision] = 0;
+
+    uint16_t line_screen_addr = screen_addr;
+
+    do
+    {
+        uint16_t scan_screen_addr = line_screen_addr;
+        uint8_t shifted = 0;
+
+        port_op(0, 4, mem[sprite_addr++]);
+        shifted = port_ip(0, 3);
+
+        if (shifted & mem[scan_screen_addr])
+        {
+            mem[collision] = 1;
+        }
+
+        mem[scan_screen_addr++] |= shifted;
+
+        port_op(0, 4, 0);
+        shifted = port_ip(0, 3);
+
+        if (shifted & mem[scan_screen_addr])
+        {
+            mem[collision] = 1;
+        }
+
+        mem[scan_screen_addr++] |= shifted; /* Increment not needed but symmetrical. */
+
+        line_screen_addr += SCREEN_BYTES_PER_PIXEL_COLUMN;
+
+    } while(--sprite_bytes);
+
+    return 0;
+}
+
+uint32_t _draw_spr_collision(struct cpu *cpu)
+{
+    return _draw_spr_collision_impl(cpu->mem, cpu->cpu_state.regs[REG_DE], get_b(cpu, 0), cpu->cpu_state.regs[REG_HL]);
 }
 
 #if 0
@@ -2555,7 +2599,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(init_rack),
     MAP_CIMPL(time_fleet_sound),
     MAP_CIMPL(plr_fire_or_demo),
-    _________(draw_spr_collision),
+    MAP_CIMPL(draw_spr_collision),
     _________(player_shot_hit),
     _________(fleet_delay_ex_ship),
 };
