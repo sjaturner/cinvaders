@@ -2592,7 +2592,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(score_for_alien),
     MAP_CIMPL(init_rack),
     MAP_CIMPL(time_fleet_sound),
-    _________(plr_fire_or_demo),
+    MAP_CIMPL(plr_fire_or_demo),
     MAP_CIMPL(draw_spr_collision),
     _________(player_shot_hit),
     _________(fleet_delay_ex_ship),
