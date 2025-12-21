@@ -2484,6 +2484,83 @@ uint32_t _draw_spr_collision(struct cpu *cpu)
     return _draw_spr_collision_impl(cpu->mem, cpu->cpu_state.regs[REG_DE], get_b(cpu, 0), cpu->cpu_state.regs[REG_HL]);
 }
 
+uint32_t do_miss_explosion(uint8_t *mem)
+{
+    return 0;
+}
+
+uint32_t saucer_is_hit(uint8_t *mem)
+{
+    return 0;
+}
+
+uint32_t code_bug1_impl(uint8_t *mem, uint8_t obj1coor_yr_local)
+{
+    return 0;
+}
+
+uint32_t _player_shot_hit_impl(uint8_t *mem)
+{
+    enum
+    {
+        NORMAL_MOVEMENT = 0x002,
+        PLAYER_SHOT_SOMETHING_ELSE = 0x003,
+        ALIEN_HAS_EXPLODED = 0x004,
+        ALIEN_EXPLOSION_IN_PROGRESS = 0x005,
+    };
+
+    enum
+    {
+        TOP_COORD_FOR_MISS_EXPLOSION = 0xd8,
+        SHIELDS_BELOW_HERE = 0x90,
+        SAUCER_ABOVE_HERE = 0xce
+    };
+
+    uint8_t shot_status = mem[plyr_shot_status];
+    if (shot_status == ALIEN_EXPLOSION_IN_PROGRESS)
+    {
+        return 0;
+    }
+    else if (shot_status != NORMAL_MOVEMENT)
+    {
+        return 0;
+    }
+
+    uint8_t obj1coor_yr_local = mem[obj1coor_yr];
+    if (obj1coor_yr_local >= TOP_COORD_FOR_MISS_EXPLOSION)
+    {
+        return do_miss_explosion(mem);
+    }
+    else if (!mem[alien_is_exploding])
+    {
+        return 0;
+    }
+    else if (obj1coor_yr_local >= SAUCER_ABOVE_HERE)
+    {
+        return saucer_is_hit(mem);
+    }
+
+    obj1coor_yr_local += 0x06;
+
+    if (mem[ref_alien_yr] >= SHIELDS_BELOW_HERE)
+    {
+        return code_bug1_impl(mem, obj1coor_yr_local);
+    }
+    else if (mem[ref_alien_yr] >= obj1coor_yr_local)
+    {
+        return do_miss_explosion(mem);
+    }
+    else
+    {
+        return code_bug1_impl(mem, obj1coor_yr_local);
+    }
+}
+
+uint32_t _player_shot_hit(struct cpu *cpu)
+{
+    return _player_shot_hit_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2594,6 +2671,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(time_fleet_sound),
     MAP_CIMPL(plr_fire_or_demo),
     MAP_CIMPL(draw_spr_collision),
+    _________(find_row),
+    _________(find_column),
     _________(player_shot_hit),
     _________(fleet_delay_ex_ship),
 };
