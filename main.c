@@ -2520,36 +2520,77 @@ uint32_t _find_row(struct cpu *cpu)
     return ret;
 }
 
+enum
+{
+    NORMAL_MOVEMENT = 0x002,
+    PLAYER_SHOT_SOMETHING_ELSE = 0x003,
+    ALIEN_HAS_EXPLODED = 0x004,
+    ALIEN_EXPLOSION_IN_PROGRESS = 0x005,
+};
+
 uint32_t _draw_spr_collision(struct cpu *cpu)
 {
     return _draw_spr_collision_impl(cpu->mem, cpu->cpu_state.regs[REG_DE], get_b(cpu, 0), cpu->cpu_state.regs[REG_HL]);
 }
 
+uint32_t finish_up(uint8_t *mem)
+{
+    mem[alien_is_exploding] = 0;
+    return 0;
+}
+
 uint32_t do_miss_explosion(uint8_t *mem)
 {
+    mem[plyr_shot_status] = PLAYER_SHOT_SOMETHING_ELSE;
+    finish_up(mem);
     return 0;
 }
 
 uint32_t saucer_is_hit(uint8_t *mem)
 {
+    mem[saucer_hit] = 1;
+    mem[plyr_shot_status] = ALIEN_HAS_EXPLODED;
+    finish_up(mem);
     return 0;
 }
 
 uint32_t code_bug1_impl(uint8_t *mem, uint8_t obj1coor_yr_local)
 {
+    uint8_t l = obj1coor_yr_local;
+    uint8_t c = 0;
+    uint8_t b = 0;
+
+    _find_row_impl(mem, &l, &c, &b);
+
+    uint8_t h = mem[obj1coor_xr];
+    _find_column_impl(mem, &h, &c);
+    uint16_t hl = ((uint16_t)h << 8) | ((uint16_t)l << 0);
+    *(uint16_t *)(mem + exp_alien_yr) = hl;
+
+    mem[plyr_shot_status] = ALIEN_EXPLOSION_IN_PROGRESS;
+
+    _get_alien_state_ptr_impl(mem, b, c, &hl);
+    uint8_t a = mem[hl];
+
+    if (a == 0)
+    {
+        do_miss_explosion(mem);
+    }
+    else
+    {
+        mem[hl] = 0;
+        uint16_t exploding_alien_desc_addr = 0;
+        _score_for_alien_impl(mem, &exploding_alien_desc_addr, b);
+        struct desc desc = read_desc_impl(mem, exploding_alien_desc_addr);
+        uint16_t screen_loc = desc.screen_loc;
+        _draw_sprite_impl(mem, &screen_loc, desc.sprite_addr, desc.sprite_bytes);
+    }
+
     return 0;
 }
 
 uint32_t _player_shot_hit_impl(uint8_t *mem)
 {
-    enum
-    {
-        NORMAL_MOVEMENT = 0x002,
-        PLAYER_SHOT_SOMETHING_ELSE = 0x003,
-        ALIEN_HAS_EXPLODED = 0x004,
-        ALIEN_EXPLOSION_IN_PROGRESS = 0x005,
-    };
-
     enum
     {
         TOP_COORD_FOR_MISS_EXPLOSION = 0xd8,
