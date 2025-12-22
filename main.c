@@ -2479,6 +2479,47 @@ uint32_t _draw_spr_collision_impl(uint8_t *mem, uint16_t sprite_addr, uint8_t sp
     return 0;
 }
 
+uint32_t _find_column_impl(uint8_t *mem, uint8_t *inout, uint8_t *c)
+{
+    uint32_t ret = 0;
+    uint8_t ref_alien_xr_local = mem[ref_alien_xr];
+
+    ret += _cnt16s_impl(mem, &ref_alien_xr_local, *inout, c);
+    ref_alien_xr_local -= 0x10;
+    *inout = ref_alien_xr_local;
+
+    return 0;
+}
+
+uint32_t _find_column(struct cpu *cpu)
+{
+    uint32_t ret = _find_column_impl(cpu->mem, (uint8_t *)&cpu->cpu_state.regs[REG_HL] + HI, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + LO);
+
+    set_f(cpu, 0, get_f(cpu, 0) & ~FLAG_BIT_C);
+    return ret;
+}
+
+uint32_t _find_row_impl(uint8_t *mem, uint8_t *inout, uint8_t *c, uint8_t *b)
+{
+    uint32_t ret = 0;
+    uint8_t ref_alien_yr_local = mem[ref_alien_yr];
+
+    ret += _cnt16s_impl(mem, &ref_alien_yr_local, *inout, c);
+    *b = *c - 1;
+    ref_alien_yr_local -= 0x10;
+    *inout = ref_alien_yr_local;
+
+    return 0;
+}
+
+uint32_t _find_row(struct cpu *cpu)
+{
+    uint32_t ret = _find_row_impl(cpu->mem, (uint8_t *)&cpu->cpu_state.regs[REG_HL] + LO, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + LO, (uint8_t *)&cpu->cpu_state.regs[REG_BC] + HI);
+
+    set_f(cpu, 0, get_f(cpu, 0) & ~FLAG_BIT_C);
+    return ret;
+}
+
 uint32_t _draw_spr_collision(struct cpu *cpu)
 {
     return _draw_spr_collision_impl(cpu->mem, cpu->cpu_state.regs[REG_DE], get_b(cpu, 0), cpu->cpu_state.regs[REG_HL]);
@@ -2671,8 +2712,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(time_fleet_sound),
     MAP_CIMPL(plr_fire_or_demo),
     MAP_CIMPL(draw_spr_collision),
-    _________(find_row),
-    _________(find_column),
+    MAP_CIMPL(find_column),
+    MAP_CIMPL(find_row),
     _________(player_shot_hit),
     _________(fleet_delay_ex_ship),
 };

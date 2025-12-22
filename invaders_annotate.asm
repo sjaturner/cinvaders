@@ -4191,6 +4191,12 @@ l155ah:
     inc c                            ; 155e     0c               ;  Bump 16s count
     jp l155ah                        ; 155f     c3 5a 15         ;  Keep testing
 
+                                     ; @l in target yr coord
+                                     ; @a used
+                                     ; @c used
+                                     ; @h alien row
+                                     ; @l out
+                                     ; @b out unused
 find_row:                                                       
     ld a,(ref_alien_yr)              ; 1562     3a 09 20         ;  Reference alien Yr coordinate
     ld h,l                           ; 1565     65               ;  Target Yr coordinate to H
@@ -4201,6 +4207,10 @@ find_row:
     ld l,a                           ; 156d     6f               ;  To coordinate
     ret                              ; 156e     c9               ;  Done
 
+                                     ; @h in target xr coord
+                                     ; @a used
+                                     ; @c used
+                                     ; @h alien column
 find_column:                                                    
     ld a,(ref_alien_xr)              ; 156f     3a 0a 20         ;  Reference alien Yn coordinate
     call cnt16s                      ; 1572     cd 54 15         ;  Count 16s to bring Y to target Y
