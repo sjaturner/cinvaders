@@ -2675,7 +2675,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_char),
     MAP_CIMPL(print_message),
     MAP_CIMPL(draw_digit_in_acc),
-    MAP_CIMPL(draw_hex_byte),
+    MAP_CIMPL(draw_hex_byte), // 4
     MAP_CIMPL(draw_hex_word),
     MAP_CIMPL(conv_to_scr),
     MAP_CIMPL(read_desc),
@@ -2727,6 +2727,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     _________(animate),
     _________(print_message_del),
     _________(sub_189eh),
+    _________(prompt_player),
 
     /* Next leaves, ordered by difficulty. */
     MAP_CIMPL(copy_rom_to_ram),
@@ -2768,6 +2769,25 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(find_row),
     MAP_CIMPL(player_shot_hit),
     MAP_CIMPL(fleet_delay_ex_ship),
+
+    /* Next leaves. End of line comment is approximate line count for difficulty metric. */
+    _________(draw_saucer),                  //  2
+    _________(plyr_shot_and_bump),           //  3
+    _________(draw_alien_shot),              //  4
+    _________(draw_bottom_line),             //  4
+    _________(erase_alien_shot_explosion),   //  4
+    _________(get_num_ships_active_player),  //  4
+    _________(print_num_ships_in_acc),       //  5
+    _________(draw_num_ships),               //  17
+    _________(count_aliens),                 //  18
+    _________(ashot_reload_rate),            //  19
+    _________(adjust_score_code),            //  27
+    _________(move_ref_alien),               //  28
+    _________(do_extra_ship_awards),         //  41
+    _________(draw_alien),                   //  52
+    _________(keep_processing_game_objs),    //  53
+    _________(run_game_objs),                //  55
+    _________(restore_shields1),             //  80
 };
 
 int interpreter_only;
