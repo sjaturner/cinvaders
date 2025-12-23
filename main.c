@@ -2654,6 +2654,22 @@ uint32_t _fleet_delay_ex_ship(struct cpu *cpu)
     return _fleet_delay_ex_ship_impl(cpu->mem);
 }
 
+uint32_t _draw_saucer_impl(uint8_t *mem, uint16_t screen_addr)
+{
+    uint32_t ret = 0;
+    uint16_t sprite_addr = 0;
+    uint8_t sprite_bytes = 0;
+
+    ret += _get_saucer_descriptor_impl(mem, &sprite_addr, &sprite_bytes, &screen_addr);
+    ret += _draw_simp_sprite_impl(mem, sprite_bytes, &sprite_addr, &screen_addr);
+    return 0;
+}
+
+uint32_t _draw_saucer(struct cpu *cpu)
+{
+    return _draw_saucer_impl(cpu->mem, cpu->cpu_state.regs[REG_HL]);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2771,7 +2787,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(fleet_delay_ex_ship),
 
     /* Next leaves. End of line comment is approximate line count for difficulty metric. */
-    _________(draw_saucer),                  //  2
+    MAP_CIMPL(draw_saucer),                  //  2
     _________(plyr_shot_and_bump),           //  3
     _________(draw_alien_shot),              //  4
     _________(draw_bottom_line),             //  4
