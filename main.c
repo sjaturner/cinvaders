@@ -2644,6 +2644,16 @@ uint32_t _player_shot_hit(struct cpu *cpu)
     return _player_shot_hit_impl(cpu->mem);
 }
 
+uint32_t _fleet_delay_ex_ship_impl(uint8_t *mem)
+{
+    return 0;
+}
+
+uint32_t _fleet_delay_ex_ship(struct cpu *cpu)
+{
+    return _fleet_delay_ex_ship_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2757,7 +2767,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(find_column),
     MAP_CIMPL(find_row),
     MAP_CIMPL(player_shot_hit),
-    _________(fleet_delay_ex_ship),
+    MAP_CIMPL(fleet_delay_ex_ship),
 };
 
 int interpreter_only;

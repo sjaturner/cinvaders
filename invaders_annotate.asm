@@ -4543,7 +4543,7 @@ fleet_sound_off:
     out (005h),a                     ; 1772     d3 05            ;  Set sounds
     ret                              ; 1774     c9               ;  Out
 
-fleet_delay_ex_ship:                                            
+fleet_delay_ex_ship:                                             ;  Sound related? Can omit? Hope so.
     ld a,(change_fleet_snd)          ; 1775     3a 95 20         ;  Time for new ...
     and a                            ; 1778     a7               ;  ... fleet movement sound?
     jp z,l17aah                      ; 1779     ca aa 17         ;  No ... skip to extra-man timing
@@ -4582,6 +4582,7 @@ l17aah:
     ld b,0efh                        ; 17af     06 ef            ;  Turn off bit set with #$10 (award extra ship)
     jp sound_bits3off                ; 17b1     c3 dc 19         ;  Stop sound and out
 
+unused_perhaps:                                                  ;  Cannot see where this was called
     ld b,0efh                        ; 17b4     06 ef            ;  Mask off sound bit 4 (Extended play)
     ld hl,sound_port5                ; 17b6     21 98 20         ;  Current sound content
     ld a,(hl)                        ; 17b9     7e               ;  Get current sound bits
