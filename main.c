@@ -2584,6 +2584,7 @@ uint32_t code_bug1_impl(uint8_t *mem, uint8_t obj1coor_yr_local)
         struct desc desc = read_desc_impl(mem, exploding_alien_desc_addr);
         uint16_t screen_loc = desc.screen_loc;
         _draw_sprite_impl(mem, &screen_loc, desc.sprite_addr, desc.sprite_bytes);
+        mem[exp_alien_timer] = 0x10;
     }
 
     return 0;
@@ -2755,7 +2756,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_spr_collision),
     MAP_CIMPL(find_column),
     MAP_CIMPL(find_row),
-    _________(player_shot_hit),
+    MAP_CIMPL(player_shot_hit),
     _________(fleet_delay_ex_ship),
 };
 
