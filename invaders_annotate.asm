@@ -4326,7 +4326,7 @@ l15ffh:
     ld (num_aliens),a                ; 1605     32 82 20         ;  Hold it
     cp 001h                          ; 1608     fe 01            ;  Just one?
     ret nz                           ; 160a     c0               ;  No keep going
-    ld hl,0206bh                     ; 160b     21 6b 20         ;  Set flag if ...
+    ld hl,only_one_alien_left        ; 160b     21 6b 20         ;  Set flag if ...
     ld (hl),001h                     ; 160e     36 01            ;  ... only one alien left
     ret                              ; 1610     c9               ;  Out
 
@@ -6751,7 +6751,7 @@ player_data_msb:               equ 02067h                        ; 02067h 02067 
 player_ok:                     equ 02068h                        ; 02068h 02068                                                                 defb 001h ; 1b68 01  
 enable_alien_fire:             equ 02069h                        ; 02069h 02069                                                                 defb 000h ; 1b69 00  
 alien_fire_delay:              equ 0206ah                        ; 0206ah 0206a                                                                 defb 030h ; 1b6a 30  
-                                                                 ; 0206bh 0206b    ; flag if only one alien left                                defb 000h ; 1b6b 00  
+only_one_alien_left:           equ 0206bh                        ; 0206bh 0206b    ; flag if only one alien left                                defb 000h ; 1b6b 00  
 temp206c:                      equ 0206ch                        ; 0206ch 0206c                                                                 defb 012h ; 1b6c 12  
 invaded:                       equ 0206dh                        ; 0206dh 0206d                                                                 defb 000h ; 1b6d 00  
 skip_plunger:                  equ 0206eh                        ; 0206eh 0206e                                                                 defb 000h ; 1b6e 00  

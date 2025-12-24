@@ -1,4 +1,7 @@
 #pragma once
+/*
+    z80asm invaders_annotate.asm -L 2>&1 | awk '{print $1 " " $3;}' | sed 's/: \$/ = 0x/' | sed 's/$/,/' | sort -t ' ' -k3 | column -t | sed 's/^/    /'
+*/
 enum
 {
     a_first                      =  0x0000,
@@ -272,6 +275,7 @@ enum
     l178eh                       =  0x178e,
     l17a4h                       =  0x17a4,
     l17aah                       =  0x17aa,
+    unused_perhaps               =  0x17b4,
     read_inputs                  =  0x17c0,
     l17cah                       =  0x17ca,
     check_handle_tilt            =  0x17cd,
@@ -456,6 +460,7 @@ enum
     player_ok                    =  0x2068,
     enable_alien_fire            =  0x2069,
     alien_fire_delay             =  0x206a,
+    only_one_alien_left          =  0x206b,
     temp206c                     =  0x206c,
     invaded                      =  0x206d,
     skip_plunger                 =  0x206e,

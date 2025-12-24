@@ -2775,6 +2775,28 @@ uint32_t _draw_num_ships(struct cpu *cpu)
     return _draw_num_ships_impl(cpu->mem, get_a(cpu, 0));
 }
 
+uint32_t _count_aliens_impl(uint8_t *mem)
+{
+    uint16_t alien_array = 0;
+    uint32_t ret = _get_player_data_ptr_impl(mem, &alien_array);
+    uint8_t total = 0;
+
+    for (uint8_t alien = 0; alien < ALIENS; ++alien)
+    {
+        total += mem[alien_array++] != 0;
+    }
+
+    mem[num_aliens] = total;
+    mem[only_one_alien_left] = total == 1;
+
+    return ret;
+}
+
+uint32_t _count_aliens(struct cpu *cpu)
+{
+    return _count_aliens_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2900,7 +2922,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(print_num_ships_in_acc),       //  5
     MAP_CIMPL(draw_num_ships),               //  17
     MAP_CIMPL(erase_ship_stash),             //  17
-    _________(count_aliens),                 //  18
+    MAP_CIMPL(count_aliens),                 //  18
     _________(ashot_reload_rate),            //  19
     _________(plyr_shot_and_bump),           //  25
     _________(adjust_score_code),            //  27
