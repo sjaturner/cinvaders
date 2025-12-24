@@ -2726,6 +2726,19 @@ uint32_t _get_num_ships_active_player(struct cpu *cpu)
     return _get_num_ships_active_player_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, (uint8_t *)&cpu->cpu_state.regs[REG_AF] + HI);
 }
 
+uint32_t _print_num_ships_in_acc_impl(uint8_t *mem, uint8_t number_of_ships)
+{
+    uint16_t screen_addr = 0x2501;
+
+    number_of_ships &= 0x0f; /* Keep the last digit of the BCD number only. */
+    return _draw_digit_in_acc_impl(mem, &screen_addr, number_of_ships);
+}
+
+uint32_t _print_num_ships_in_acc(struct cpu *cpu)
+{
+    return _print_num_ships_in_acc_impl(cpu->mem, get_a(cpu, 0));
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2848,7 +2861,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(erase_alien_shot_explosion),   //  4
     MAP_CIMPL(draw_bottom_line),             //  4
     MAP_CIMPL(get_num_ships_active_player),  //  4
-    _________(print_num_ships_in_acc),       //  5
+    MAP_CIMPL(print_num_ships_in_acc),       //  5
     _________(draw_num_ships),               //  17
     _________(count_aliens),                 //  18
     _________(ashot_reload_rate),            //  19

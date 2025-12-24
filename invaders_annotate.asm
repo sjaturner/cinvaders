@@ -5105,6 +5105,7 @@ remove_ship:
     ld (hl),a                        ; 1a86     77               ;  New number of ships
     call draw_num_ships              ; 1a87     cd e6 19         ;  Draw the line of ships
     pop af                           ; 1a8a     f1               ;  Restore number
+
 print_num_ships_in_acc:                                                      
     ld hl,02501h                     ; 1a8b     21 01 25         ;  Screen coordinates
     and 00fh                         ; 1a8e     e6 0f            ;  Make sure it is a digit
