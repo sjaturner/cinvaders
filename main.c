@@ -2681,6 +2681,21 @@ uint32_t _draw_alien_shot(struct cpu *cpu)
     return _draw_alien_shot_impl(cpu->mem);
 }
 
+uint32_t _draw_bottom_line_impl(uint8_t *mem)
+{
+    enum
+    {
+       VALUE = 0x01, /* Single bit set for a line all the way down left side (bottom of screen when rotated). */
+    };
+    uint16_t screen_addr = 0x2402;
+    return _fill_screen_row_impl(mem, &screen_addr, SCREEN_COLUMNS, VALUE);
+}
+
+uint32_t _draw_bottom_line(struct cpu *cpu)
+{
+    return _draw_bottom_line_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2800,7 +2815,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     /* Next leaves. End of line comment is approximate line count for difficulty metric. */
     MAP_CIMPL(draw_saucer),                  //  2
     MAP_CIMPL(draw_alien_shot),              //  4
-    _________(draw_bottom_line),             //  4
+    MAP_CIMPL(draw_bottom_line),             //  4
     _________(erase_alien_shot_explosion),   //  4
     _________(get_num_ships_active_player),  //  4
     _________(print_num_ships_in_acc),       //  5
