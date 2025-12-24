@@ -2739,6 +2739,42 @@ uint32_t _print_num_ships_in_acc(struct cpu *cpu)
     return _print_num_ships_in_acc_impl(cpu->mem, get_a(cpu, 0));
 }
 
+uint32_t _erase_ship_stash_impl(uint8_t *mem, uint16_t *screen_addr)
+{
+    uint32_t ret = 0;
+    do
+    {
+        ret += _fill_screen_row_impl(mem, screen_addr, 0x10, 0);
+    } while ((*screen_addr >> 8) != 0x35);
+    return ret;
+}
+
+uint32_t _erase_ship_stash(struct cpu *cpu)
+{
+    return _erase_ship_stash_impl(cpu->mem, cpu->cpu_state.regs + REG_HL);
+}
+
+uint32_t _draw_num_ships_impl(uint8_t *mem, uint8_t number_of_ships)
+{
+    uint32_t ret = 0;
+    uint16_t screen_addr = 0x2701;
+    if (number_of_ships)
+    {
+        for (uint8_t ship = 0; ship < number_of_ships; ++ship)
+        {
+            uint16_t sprite_addr = sprite_player;
+            ret += _draw_simp_sprite_impl(mem, 0x10, &sprite_addr, &screen_addr);
+        }
+    }
+    ret += _erase_ship_stash_impl(mem, &screen_addr);
+    return ret;
+}
+
+uint32_t _draw_num_ships(struct cpu *cpu)
+{
+    return _draw_num_ships_impl(cpu->mem, get_a(cpu, 0));
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2862,7 +2898,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_bottom_line),             //  4
     MAP_CIMPL(get_num_ships_active_player),  //  4
     MAP_CIMPL(print_num_ships_in_acc),       //  5
-    _________(draw_num_ships),               //  17
+    MAP_CIMPL(draw_num_ships),               //  17
+    MAP_CIMPL(erase_ship_stash),             //  17
     _________(count_aliens),                 //  18
     _________(ashot_reload_rate),            //  19
     _________(plyr_shot_and_bump),           //  25
