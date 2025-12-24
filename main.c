@@ -2708,6 +2708,24 @@ uint32_t _draw_bottom_line(struct cpu *cpu)
     return _draw_bottom_line_impl(cpu->mem);
 }
 
+uint32_t _get_num_ships_active_player_impl(uint8_t *mem, uint16_t *number_of_ships_addr, uint8_t *number_of_ships)
+{
+    uint16_t player_data_addr = 0;
+    uint32_t ret = _get_player_data_ptr_impl(mem, &player_data_addr);
+    enum
+    {
+        OFFSET_TO_NUMBER_OF_SHIPS = 0xff, /* Cheapo struct access in assembler, align structs then this. Sucks. See p1ships_rem, p2ships_rem. */
+    };
+    *number_of_ships_addr = player_data_addr + OFFSET_TO_NUMBER_OF_SHIPS;
+    *number_of_ships = mem[*number_of_ships_addr];
+    return ret;
+}
+
+uint32_t _get_num_ships_active_player(struct cpu *cpu)
+{
+    return _get_num_ships_active_player_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, (uint8_t *)&cpu->cpu_state.regs[REG_AF] + HI);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2829,7 +2847,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_alien_shot),              //  4
     MAP_CIMPL(erase_alien_shot_explosion),   //  4
     MAP_CIMPL(draw_bottom_line),             //  4
-    _________(get_num_ships_active_player),  //  4
+    MAP_CIMPL(get_num_ships_active_player),  //  4
     _________(print_num_ships_in_acc),       //  5
     _________(draw_num_ships),               //  17
     _________(count_aliens),                 //  18

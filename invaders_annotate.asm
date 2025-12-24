@@ -1444,7 +1444,7 @@ l0929h:
 
 get_num_ships_active_player:                                                      
     call get_player_data_ptr         ; 092e     cd 11 16         ;  HL points to player data
-    ld l,0ffh                        ; 0931     2e ff            ;  Last byte = numbe of ships
+    ld l,0ffh                        ; 0931     2e ff            ;  Last byte = number of ships
     ld a,(hl)                        ; 0933     7e               ;  Get number of ships
     ret                              ; 0934     c9               ;  Done
 
