@@ -2670,6 +2670,17 @@ uint32_t _draw_saucer(struct cpu *cpu)
     return _draw_saucer_impl(cpu->mem, cpu->cpu_state.regs[REG_HL]);
 }
 
+uint32_t _draw_alien_shot_impl(uint8_t *mem)
+{
+    struct desc desc = read_desc_impl(mem, a_shot_image_lsb);
+    return _draw_spr_collision_impl(mem, desc.sprite_addr, desc.sprite_bytes, desc.screen_loc);
+}
+
+uint32_t _draw_alien_shot(struct cpu *cpu)
+{
+    return _draw_alien_shot_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2788,8 +2799,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
 
     /* Next leaves. End of line comment is approximate line count for difficulty metric. */
     MAP_CIMPL(draw_saucer),                  //  2
-    _________(plyr_shot_and_bump),           //  3
-    _________(draw_alien_shot),              //  4
+    MAP_CIMPL(draw_alien_shot),              //  4
     _________(draw_bottom_line),             //  4
     _________(erase_alien_shot_explosion),   //  4
     _________(get_num_ships_active_player),  //  4
@@ -2797,6 +2807,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     _________(draw_num_ships),               //  17
     _________(count_aliens),                 //  18
     _________(ashot_reload_rate),            //  19
+    _________(plyr_shot_and_bump),           //  25
     _________(adjust_score_code),            //  27
     _________(move_ref_alien),               //  28
     _________(do_extra_ship_awards),         //  41
