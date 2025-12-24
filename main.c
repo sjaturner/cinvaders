@@ -2681,6 +2681,18 @@ uint32_t _draw_alien_shot(struct cpu *cpu)
     return _draw_alien_shot_impl(cpu->mem);
 }
 
+uint32_t _erase_alien_shot_explosion_impl(uint8_t *mem)
+{
+    struct desc desc = read_desc_impl(mem, a_shot_image_lsb);
+    uint16_t screen_loc = desc.screen_loc;
+    return _erase_shifted_impl(mem, &screen_loc, desc.sprite_addr, desc.sprite_bytes);
+}
+
+uint32_t _erase_alien_shot_explosion(struct cpu *cpu)
+{
+    return _erase_alien_shot_explosion_impl(cpu->mem);
+}
+
 uint32_t _draw_bottom_line_impl(uint8_t *mem)
 {
     enum
@@ -2815,8 +2827,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     /* Next leaves. End of line comment is approximate line count for difficulty metric. */
     MAP_CIMPL(draw_saucer),                  //  2
     MAP_CIMPL(draw_alien_shot),              //  4
+    MAP_CIMPL(erase_alien_shot_explosion),   //  4
     MAP_CIMPL(draw_bottom_line),             //  4
-    _________(erase_alien_shot_explosion),   //  4
     _________(get_num_ships_active_player),  //  4
     _________(print_num_ships_in_acc),       //  5
     _________(draw_num_ships),               //  17
