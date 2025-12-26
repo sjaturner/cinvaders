@@ -2797,6 +2797,43 @@ uint32_t _count_aliens(struct cpu *cpu)
     return _count_aliens_impl(cpu->mem);
 }
 
+uint32_t _ashot_reload_rate_impl(uint8_t *mem)
+{
+    uint16_t score_descriptor_addr = 0;
+    uint32_t ret = _get_player_score_descriptor_impl(mem, &score_descriptor_addr);
+    ++score_descriptor_addr;
+    uint8_t score_msb = mem[score_descriptor_addr];
+    uint16_t score_msb_table_scan = score_msb_table;
+    uint16_t shot_reload_rate_scan = shot_reload_rate;
+
+    enum
+    {
+        TABLE_ENTRIES = 4,
+    };
+    for (uint8_t index = 0; index < TABLE_ENTRIES; ++index)
+    {
+        if (score_msb < mem[score_msb_table_scan])
+        {
+            break;
+        }
+        ++score_msb_table_scan;
+        ++shot_reload_rate_scan;
+    }
+    mem[a_shot_reload_rate] = mem[shot_reload_rate_scan];
+
+    if (0)
+    {
+        printf("%s score_msb:%u mem[a_shot_reload_rate]:%u \n", __func__, score_msb, mem[a_shot_reload_rate]);
+    }
+
+    return ret;
+}
+
+uint32_t _ashot_reload_rate(struct cpu *cpu)
+{
+    return _ashot_reload_rate_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2923,10 +2960,9 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_num_ships),               //  17
     MAP_CIMPL(erase_ship_stash),             //  17
     MAP_CIMPL(count_aliens),                 //  18
-    _________(ashot_reload_rate),            //  19
+    MAP_CIMPL(ashot_reload_rate),            //  19
     _________(plyr_shot_and_bump),           //  25
     _________(adjust_score_code),            //  27
-    _________(move_ref_alien),               //  28
     _________(do_extra_ship_awards),         //  41
     _________(draw_alien),                   //  52
     _________(keep_processing_game_objs),    //  53
