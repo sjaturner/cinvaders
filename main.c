@@ -2873,6 +2873,50 @@ uint32_t _plyr_shot_and_bump(struct cpu *cpu)
     return _plyr_shot_and_bump_impl(cpu->mem);
 }
 
+uint16_t bcd_add(uint16_t ina, uint16_t inb) /* Returns carry. */
+{
+    uint16_t ret = 0;
+    int carry = 0;
+
+    for (int nibble = 0; nibble < 4; ++nibble)
+    {
+        uint16_t a = ina >> (nibble * 4) & 0x0f;
+        uint16_t b = inb >> (nibble * 4) & 0x0f;
+        uint16_t sum = a + b + carry;
+
+        carry = sum >= 10;
+        sum %= 10;
+        ret |= sum << (nibble * 4);
+    }
+
+    return ret;
+}
+
+uint32_t _adjust_score_code_impl(uint8_t *mem)
+{
+    uint16_t score_descriptor_addr = 0;
+    uint32_t ret = _get_player_score_descriptor_impl(mem, &score_descriptor_addr);
+    if (!mem[adjust_score_data])
+    {
+        return ret;
+    }
+    mem[adjust_score_data] = 0;
+
+    uint16_t adjustment = *(uint16_t *)(mem + score_delta_lsb);
+    struct score_descriptor *score_descriptor = (struct score_descriptor *)(mem + score_descriptor_addr);
+    uint16_t screen_coord = score_descriptor->screen_coord;
+
+    score_descriptor->value = bcd_add(score_descriptor->value, adjustment);
+    ret += _draw_hex_word_impl(mem, &screen_coord, score_descriptor->value);
+
+    return ret;
+}
+
+uint32_t _adjust_score_code(struct cpu *cpu)
+{
+    return _adjust_score_code_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -3001,7 +3045,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(count_aliens),                 //  18
     MAP_CIMPL(ashot_reload_rate),            //  19
     MAP_CIMPL(plyr_shot_and_bump),           //  25
-    _________(adjust_score_code),            //  27
+    MAP_CIMPL(adjust_score_code),            //  27
     _________(do_extra_ship_awards),         //  41
     _________(draw_alien),                   //  52
     _________(keep_processing_game_objs),    //  53
