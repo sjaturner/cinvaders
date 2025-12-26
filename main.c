@@ -2834,6 +2834,45 @@ uint32_t _ashot_reload_rate(struct cpu *cpu)
     return _ashot_reload_rate_impl(cpu->mem);
 }
 
+uint32_t _plyr_shot_and_bump_impl(uint8_t *mem)
+{
+    uint32_t ret = 0;
+    ret += _player_shot_hit_impl(mem);
+
+    int clear = 0;
+    uint8_t rack_direction_local = 0;
+    uint8_t delta_x = 0;
+    if (!mem[rack_direction]) /* Zero is moving right? */
+    {
+        uint16_t right_hand_edge = 0x3ea4;
+        ret += _check_column_impl(mem, &right_hand_edge, &clear);
+        delta_x = 0xfe;
+        rack_direction_local = 1;
+    }
+    else
+    {
+        uint16_t left_hand_edge = 0x2524;
+        ret += _check_column_impl(mem, &left_hand_edge, &clear);
+        ret += _get_delta_x_impl(mem, &delta_x);
+        rack_direction_local = 0;
+    }
+
+    if (clear)
+    {
+        return ret;
+    }
+
+    mem[rack_direction] = rack_direction_local;
+    mem[ref_alien_dxr] = delta_x;
+    mem[ref_alien_dyr] = mem[rack_down_delta];
+    return 0;
+}
+
+uint32_t _plyr_shot_and_bump(struct cpu *cpu)
+{
+    return _plyr_shot_and_bump_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -2961,7 +3000,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(erase_ship_stash),             //  17
     MAP_CIMPL(count_aliens),                 //  18
     MAP_CIMPL(ashot_reload_rate),            //  19
-    _________(plyr_shot_and_bump),           //  25
+    MAP_CIMPL(plyr_shot_and_bump),           //  25
     _________(adjust_score_code),            //  27
     _________(do_extra_ship_awards),         //  41
     _________(draw_alien),                   //  52
