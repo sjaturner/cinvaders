@@ -3096,7 +3096,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(ashot_reload_rate),            //  19
     MAP_CIMPL(plyr_shot_and_bump),           //  25
     MAP_CIMPL(adjust_score_code),            //  27
-    _________(do_extra_ship_awards),         //  41
+    MAP_CIMPL(do_extra_ship_awards),         //  41
     _________(draw_alien),                   //  52
     _________(restore_shields1),             //  80
     _________(keep_processing_game_objs),    //  53
