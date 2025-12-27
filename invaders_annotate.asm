@@ -1832,7 +1832,7 @@ l0bc3h:
     ld de,splash_animation_struct_4  ; 0bce     11 d5 1f         ;  Animation for small alien to line up with extra "C"
     call ini_splash_ani              ; 0bd1     cd e2 0a         ;  Copy the animation block
     call animate                     ; 0bd4     cd 80 0a         ;  Wait for the animation to complete
-    call sub_189eh                   ; 0bd7     cd 9e 18         ;  Animate alien shot to extra "C"
+    call animate_shot_duplicate_c    ; 0bd7     cd 9e 18         ;  Animate alien shot to extra "C"
 l0bdah:                                                         
     ld hl,splash_animate             ; 0bda     21 ec 20         ;  Toggle ...
     ld a,(hl)                        ; 0bdd     7e               ;  ... the ...
@@ -4731,7 +4731,7 @@ l1898h:
     ld (splash_reached),a            ; 189a     32 cb 20         ;  ... reached location
     ret                              ; 189d     c9               ;  Out
 
-sub_189eh:                                                      
+animate_shot_duplicate_c:                                                      
     ld hl,game_object_4              ; 189e     21 50 20         ;  Task descriptor for game object 4 (squiggly shot)
     ld de,l1bc0h                     ; 18a1     11 c0 1b         ;  Task info for animate-shot-to-extra-C
     ld b,010h                        ; 18a4     06 10            ;  Block copy ...

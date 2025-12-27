@@ -2967,6 +2967,60 @@ uint32_t _do_extra_ship_awards(struct cpu *cpu)
     return _do_extra_ship_awards_impl(cpu->mem);
 }
 
+uint32_t _draw_alien_impl(uint8_t *mem)
+{
+    uint32_t ret = 0;
+    enum
+    {
+        ALIEN_SPRITE_LENGTH = 0x10,
+    };
+
+    if (!mem[alien_is_exploding])
+    {
+        uint8_t alien_cur_index_local = mem[alien_cur_index];
+        uint16_t alien_addr = (uint16_t)mem[player_data_msb] << 8 | alien_cur_index_local;
+        uint8_t alien_status_flag = mem[alien_addr];
+
+        if (alien_status_flag)
+        {
+            uint8_t *alien_row_local = mem + alien_row;
+            uint8_t *alien_ani_frame_number_local = mem + alien_ani_frame_number;
+
+            /* A table might be better here. */
+            uint16_t sprite_offset = ((*alien_row_local) & 0xfe) << 3;
+            sprite_offset |= sprite_offset >> 8;
+
+            uint16_t sprite_addr = sprite_aliens_start_a + sprite_offset;
+            uint16_t alien_position = *(uint16_t *)(mem + alien_pos_lsb);
+            if (*alien_ani_frame_number_local)
+            {
+                sprite_addr += 0x30; /* Offset to position 1 alien sprites? */
+            }
+            ret += _draw_sprite_impl(mem, &alien_position, sprite_addr, ALIEN_SPRITE_LENGTH);
+        }
+        mem[wait_on_draw] = 0;
+    }
+    else
+    {
+        /* aexplode_time */
+        if (--mem[exp_alien_timer])
+        {
+            return ret;
+        }
+
+        uint16_t exp_alien_yr_local = *(uint16_t *)(mem + exp_alien_yr);
+        ret += _erase_simple_sprite_impl(mem, &exp_alien_yr_local, ALIEN_SPRITE_LENGTH);
+        mem[plyr_shot_status] = ALIEN_HAS_EXPLODED;
+        mem[alien_is_exploding] = 0;
+    }
+    return ret;
+}
+
+uint32_t _draw_alien(struct cpu *cpu)
+{
+    return _draw_alien_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -3039,8 +3093,9 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     _________(two_sec_delay),
     _________(animate),
     _________(print_message_del),
-    _________(sub_189eh),
+    _________(animate_shot_duplicate_c),
     _________(prompt_player),
+    _________(check_player_collision),
 
     /* Next leaves, ordered by difficulty. */
     MAP_CIMPL(copy_rom_to_ram),
@@ -3097,10 +3152,14 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(plyr_shot_and_bump),           //  25
     MAP_CIMPL(adjust_score_code),            //  27
     MAP_CIMPL(do_extra_ship_awards),         //  41
-    _________(draw_alien),                   //  52
+    MAP_CIMPL(draw_alien),                   //  52
     _________(restore_shields1),             //  80
     _________(keep_processing_game_objs),    //  53
     _________(run_game_objs),                //  55
+
+    _________(remove_ship),
+    _________(check_player_shot_bump_hid),
+    _________(handle_alien_shot),
 };
 
 int interpreter_only;

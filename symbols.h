@@ -291,7 +291,7 @@ enum
     splash_sprite                =  0x1868,
     l1888h                       =  0x1888,
     l1898h                       =  0x1898,
-    sub_189eh                    =  0x189e,
+    animate_shot_duplicate_c     =  0x189e,
     l18b8h                       =  0x18b8,
     l18c0h                       =  0x18c0,
     _init                        =  0x18d4,
