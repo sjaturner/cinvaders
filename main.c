@@ -2917,6 +2917,56 @@ uint32_t _adjust_score_code(struct cpu *cpu)
     return _adjust_score_code_impl(cpu->mem);
 }
 
+uint32_t _do_extra_ship_awards_impl(uint8_t *mem)
+{
+    uint32_t ret = 0;
+    uint16_t player_alive_addr = 0;
+
+    ret += _cur_ply_alive_impl(mem, &player_alive_addr);
+    uint16_t do_extra_ship_available_addr = player_alive_addr - 2; /* The sort of address map fuckery up with which we should not put. */
+
+    if (!mem[do_extra_ship_available_addr])
+    {
+        return ret;
+    }
+
+    uint8_t extra_ship_msb = 0x15; /* In practice this can be set by the DIP switches, maybe add a command line arg? */
+
+    uint16_t score_descriptor_addr = 0;
+    ret += _get_player_score_descriptor_impl(mem, &score_descriptor_addr);
+    ++score_descriptor_addr;
+    uint8_t score_msb = mem[score_descriptor_addr];
+
+    if (score_msb < extra_ship_msb)
+    {
+        return ret;
+    }
+
+    uint16_t number_of_ships_addr = 0;
+    uint8_t number_of_ships = 0;
+    ret += _get_num_ships_active_player_impl(mem, &number_of_ships_addr, &number_of_ships);
+    mem[number_of_ships_addr] = ++number_of_ships;
+
+    uint16_t screen_addr = 0x2501;
+
+    for (uint8_t loop = 0; loop < number_of_ships; ++loop)
+    {
+        screen_addr += 0x200;
+    }
+    uint16_t sprite_addr = sprite_player;
+
+    ret += _draw_simp_sprite_impl(mem, 0x10, &sprite_addr, &screen_addr);
+    ret += _print_num_ships_in_acc_impl(mem, number_of_ships + 1);
+
+    mem[do_extra_ship_available_addr] = 0;
+    return 0;
+}
+
+uint32_t _do_extra_ship_awards(struct cpu *cpu)
+{
+    return _do_extra_ship_awards_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -3048,9 +3098,9 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(adjust_score_code),            //  27
     _________(do_extra_ship_awards),         //  41
     _________(draw_alien),                   //  52
+    _________(restore_shields1),             //  80
     _________(keep_processing_game_objs),    //  53
     _________(run_game_objs),                //  55
-    _________(restore_shields1),             //  80
 };
 
 int interpreter_only;
@@ -3980,7 +4030,6 @@ int main(int argc, char *argv[])
             intr(&cpu, 16);
             get_input();
             SDL_Delay(15);
-
         }
     }
 

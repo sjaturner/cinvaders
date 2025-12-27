@@ -6876,12 +6876,12 @@ a_shot_reload_rate:            equ 020cfh                        ; 020cfh 020cf
                                                                  ; 020e0h 020e0
                                                                  ; 020e1h 020e1
                                                                  ; 020e2h 020e2
-                                                                 ; 620e3h 020e3
+                                                                 ; 020e3h 020e3
                                                                  ; 020e4h 020e4
-player1ex:                     equ 020e5h                        ; 020e5h 020e5    
-player2ex:                     equ 020e6h                        ; 020e6h 020e6
-player1alive:                  equ 020e7h                        ; 020e7h 020e7    
-player2alive:                  equ 020e8h                        ; 020e8h 020e8
+player1ex:                     equ 020e5h                        ; 020e5h 020e5    +    Well, that's a bit fucked up
+player2ex:                     equ 020e6h                        ; 020e6h 020e6    | +
+player1alive:                  equ 020e7h                        ; 020e7h 020e7    + |
+player2alive:                  equ 020e8h                        ; 020e8h 020e8      +
 suspend_play:                  equ 020e9h                        ; 020e9h 020e9    
 coin_switch:                   equ 020eah                        ; 020eah 020ea    
 num_coins:                     equ 020ebh                        ; 020ebh 020eb    
