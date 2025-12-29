@@ -3153,13 +3153,12 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(adjust_score_code),            //  27
     MAP_CIMPL(do_extra_ship_awards),         //  41
     MAP_CIMPL(draw_alien),                   //  52
-    _________(restore_shields1),             //  80
-    _________(keep_processing_game_objs),    //  53
-    _________(run_game_objs),                //  55
-
-    _________(remove_ship),
     _________(check_player_shot_bump_hid),
+    _________(remove_ship),
     _________(handle_alien_shot),
+    _________(restore_shields1),             //  80
+    _________(keep_processing_game_objs),
+    _________(run_game_objs),                //  55
 };
 
 int interpreter_only;
@@ -4080,12 +4079,13 @@ int main(int argc, char *argv[])
 
         cpu.mem[0] = 0xc3;
 
+        int factor = 1;
         for (;;)
         {
-            run(&cpu, 17066);
+            run(&cpu, factor * 17066);
             intr(&cpu, 8);
             render(cpu.mem);
-            run(&cpu, 17066);
+            run(&cpu, factor * 17066);
             intr(&cpu, 16);
             get_input();
             SDL_Delay(15);
