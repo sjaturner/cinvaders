@@ -3154,11 +3154,41 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(do_extra_ship_awards),         //  41
     MAP_CIMPL(draw_alien),                   //  52
     _________(check_player_shot_bump_hid),
-    _________(remove_ship),
     _________(handle_alien_shot),
     _________(restore_shields1),             //  80
+
+    /* These are in the interrupts. */
+
+    _________(cursor_next_alien),
+    _________(draw_player_and_out),
+    _________(draw_player_die),
+    _________(draw_shifted_sprite),
+    _________(end_of_blowup),
+    _________(from_shot_struct),
+    _________(game_object_0_handler),
+    _________(game_object_1_handler),
+    _________(game_object_2_handler),
+    _________(game_object_3_handler),
+    _________(game_object_4_handler),
+    _________(init_ply_shot),
+    _________(isr_08_continues),
+    _________(isr_restore_regs_exit),
+    _________(isrspl_tasks),
     _________(keep_processing_game_objs),
-    _________(run_game_objs),                //  55
+    _________(move_alien_shot),
+    _________(move_player_left),
+    _________(move_player_right),
+    _________(move_ply_shot),
+    _________(move_ref_alien),
+    _________(remove_ship),
+    _________(restore_shields2),
+    _________(return_two),
+    _________(run_game_objs),
+    _________(shot_blowing_up),
+    _________(splash_demo),
+    _________(splash_sprite),
+    _________(splash_squiggly),
+    _________(wait_for_start),
 };
 
 int interpreter_only;
