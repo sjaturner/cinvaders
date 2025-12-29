@@ -33,7 +33,6 @@ isr_010h:
     ld hl,isr_delay                  ; 0019     21 c0 20         ;  Decrement ...
     dec (hl)                         ; 001c     35               ;  ... the general countdown (used for pauses)
     call check_handle_tilt           ; 001d     cd cd 17         ;  Check and handle TILT
-l0020h:                                                         
     in a,(001h)                      ; 0020     db 01            ;  Read coin switch
     rrca                             ; 0022     0f               ;  Has a coin been deposited (bit 0)?
     jp c,l0067h                      ; 0023     da 67 00         ;  Yes ... note that switch is closed and continue at 3F with A=1
@@ -41,7 +40,6 @@ l0020h:
     and a                            ; 0029     a7               ;  ... closed last time?
     jp z,l0042h                      ; 002a     ca 42 00         ;  No ... skip registering the credit
     ld a,(num_coins)                 ; 002d     3a eb 20         ;  Number of credits in BCD
-l0030h:                                                         
     cp 099h                          ; 0030     fe 99            ;  99 credits already?
     jp z,l003eh                      ; 0032     ca 3e 00         ;  Yes ... ignore this (better than rolling over to 00)
     add a,001h                       ; 0035     c6 01            ;  Bump number of credits
@@ -216,7 +214,7 @@ l0136h:
     ret                              ; 013a     c9               ;  Out
 
 alt_alien_sprites:                                                      
-    ld hl,l0030h                     ; 013b     21 30 00         ;  Offset sprite pointer ...
+    ld hl,00030h                     ; 013b     21 30 00         ;  Offset sprite pointer ...
     add hl,de                        ; 013e     19               ;  ... to animation frame 1 sprites
     ex de,hl                         ; 013f     eb               ;  Back to DE
     ret                              ; 0140     c9               ;  Out
@@ -3943,7 +3941,7 @@ l1405h:
     or (hl)                          ; 1415     b6               ;  OR them onto the screen
     ld (hl),a                        ; 1416     77               ;  Store them back to screen
     pop hl                           ; 1417     e1               ;  Restore starting coordinate
-    ld bc,l0020h                     ; 1418     01 20 00         ;  Add 32 ...
+    ld bc,00020h                     ; 1418     01 20 00         ;  Add 32 ...
     add hl,bc                        ; 141b     09               ;  ... to coordinate (move to next row)
     pop bc                           ; 141c     c1               ;  Restore count
     dec b                            ; 141d     05               ;  All done?
@@ -3964,7 +3962,7 @@ l1427h:
     ld (hl),a                        ; 142c     77               ;  Clear byte
     inc hl                           ; 142d     23               ;  ** Is this to mimic timing? We increment then pop
     pop hl                           ; 142e     e1               ;  Restore screen coordinate
-    ld bc,l0020h                     ; 142f     01 20 00         ;  Add 1 row ...
+    ld bc,00020h                     ; 142f     01 20 00         ;  Add 1 row ...
     add hl,bc                        ; 1432     09               ;  ... to screen coordinate
     pop bc                           ; 1433     c1               ;  Restore counter
     dec b                            ; 1434     05               ;  All rows done?
@@ -3982,7 +3980,7 @@ draw_simp_sprite:
     ld a,(de)                        ; 143a     1a               ;  From character set ...
     ld (hl),a                        ; 143b     77               ;  ... to screen
     inc de                           ; 143c     13               ;  Next in character set
-    ld bc,l0020h                     ; 143d     01 20 00         ;  Next row ...
+    ld bc,00020h                     ; 143d     01 20 00         ;  Next row ...
     add hl,bc                        ; 1440     09               ;  ... on screen
     pop bc                           ; 1441     c1               ;  Restore counter
     dec b                            ; 1442     05               ;  Decrement counter
@@ -4022,7 +4020,7 @@ l1455h:
     and (hl)                         ; 1467     a6               ;  Erase the bits from the screen
     ld (hl),a                        ; 1468     77               ;  Store the erased pattern back
     pop hl                           ; 1469     e1               ;  Restore starting coordinate
-    ld bc,l0020h                     ; 146a     01 20 00         ;  Add 32 ...
+    ld bc,00020h                     ; 146a     01 20 00         ;  Add 32 ...
     add hl,bc                        ; 146d     09               ;  ... to next row
     pop bc                           ; 146e     c1               ;  Restore BC (count)
     dec b                            ; 146f     05               ;  All rows done?
@@ -4047,7 +4045,7 @@ l147eh:
     dec c                            ; 1482     0d               ;  All columns done?
     jp nz,l147eh                     ; 1483     c2 7e 14         ;  No ... do multi columns
     pop hl                           ; 1486     e1               ;  Restore screen start
-    ld bc,l0020h                     ; 1487     01 20 00         ;  Add 32 ...
+    ld bc,00020h                     ; 1487     01 20 00         ;  Add 32 ...
     add hl,bc                        ; 148a     09               ;  ... to get to next row
     pop bc                           ; 148b     c1               ;  Pop the counters
     dec b                            ; 148c     05               ;  All rows done?
@@ -4088,7 +4086,7 @@ l14bdh:
     or (hl)                          ; 14be     b6               ;  OR it onto the screen
     ld (hl),a                        ; 14bf     77               ;  Store new screen pattern
     pop hl                           ; 14c0     e1               ;  Starting screen coordinate
-    ld bc,l0020h                     ; 14c1     01 20 00         ;  Add 32 ...
+    ld bc,00020h                     ; 14c1     01 20 00         ;  Add 32 ...
     add hl,bc                        ; 14c4     09               ;  ... to get to next row
     pop bc                           ; 14c5     c1               ;  Restore count
     dec b                            ; 14c6     05               ;  All done?
@@ -4100,7 +4098,7 @@ clear_small_sprite:
 fill_screen_row:                     
     push bc                          ; 14cc     c5               ;  Preserve BC
     ld (hl),a                        ; 14cd     77               ;  Clear screen byte
-    ld bc,l0020h                     ; 14ce     01 20 00         ;  Bump HL ...
+    ld bc,00020h                     ; 14ce     01 20 00         ;  Bump HL ...
     add hl,bc                        ; 14d1     09               ;  ... one screen row
     pop bc                           ; 14d2     c1               ;  Restore
     dec b                            ; 14d3     05               ;  All done?
@@ -4302,7 +4300,7 @@ l15d7h:
                                                                  ;  Line up with erase_shifted
     ld (hl),a                        ; 15e6     77               ;  Write remainder to adjacent
     pop hl                           ; 15e7     e1               ;  Old screen coordinate
-    ld bc,l0020h                     ; 15e8     01 20 00         ;  Offset screen ...
+    ld bc,00020h                     ; 15e8     01 20 00         ;  Offset screen ...
     add hl,bc                        ; 15eb     09               ;  ... to next row
     pop bc                           ; 15ec     c1               ;  Restore count
     dec b                            ; 15ed     05               ;  All done?
@@ -4405,7 +4403,7 @@ l1671h:
     ld a,(de)                        ; 1681     1a               ;  Go ahead and fetch high score lower two digits
     jp z,l168bh                      ; 1682     ca 8b 16         ;  Upper two are the same ... have to check lower two
     jp nc,l1698h                     ; 1685     d2 98 16         ;  Player score is lower than high ... nothing to do
-    jp l168fh                        ; 1688     c3 8f 16         ;  Player socre is higher ... go copy the new high score
+    jp l168fh                        ; 1688     c3 8f 16         ;  Player score is higher ... go copy the new high score
 
 l168bh:                                                         
     cp (hl)                          ; 168b     be               ;  Is lower digit higher? (upper was the same)
@@ -4714,7 +4712,7 @@ splash_sprite:
     and 004h                         ; 187c     e6 04            ;  Watching bit 3 for flip delay
     ld hl,(splash_im_rest_lsb)       ; 187e     2a cc 20         ;  Image
     jp nz,l1888h                     ; 1881     c2 88 18         ;  Did bit 3 go to 0? No ... keep current image
-    ld de,l0030h                     ; 1884     11 30 00         ;  16*3 ...
+    ld de,00030h                     ; 1884     11 30 00         ;  16*3 ...
     add hl,de                        ; 1887     19               ;  ...  use other image form
 l1888h:                                                         
     ld (splash_image_lsb),hl         ; 1888     22 c7 20         ;  Image to descriptor structure
@@ -5089,7 +5087,7 @@ l1a6bh:
     dec c                            ; 1a70     0d               ;  Row done?
     jp nz,l1a6bh                     ; 1a71     c2 6b 1a         ;  No ... do entire row
     pop hl                           ; 1a74     e1               ;  Original start
-    ld bc,l0020h                     ; 1a75     01 20 00         ;  Bump HL by ...
+    ld bc,00020h                     ; 1a75     01 20 00         ;  Bump HL by ...
     add hl,bc                        ; 1a78     09               ;  ... one screen row
     pop bc                           ; 1a79     c1               ;  Restore
     dec b                            ; 1a7a     05               ;  Row counter
