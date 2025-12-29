@@ -3065,7 +3065,6 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(alien_score_value),
     MAP_CIMPL(cnvt_pix_number),
     MAP_CIMPL(get_alien_state_ptr),
-    _________(wrap_ref), /* Never intercept this, it is a helper for cnt16s. */
     MAP_CIMPL(sub_176dh),
     MAP_CIMPL(fleet_sound_off),
     MAP_CIMPL(check_handle_tilt),
@@ -3087,7 +3086,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(disable_game_tasks),
     MAP_CIMPL(sound_bits3off),
 
-    /* Tricky, we want the ISR to run but we are in CIMPL ... think harder. */
+    /* Tricky, we want the ISR to run but we are in CIMPL ... Try calling ISR with a special CPU struct inside the loops, and delay, and toggle the ISR entry? Yuck. */
     _________(wait_on_delay),
     _________(one_sec_delay),
     _________(two_sec_delay),
@@ -3139,56 +3138,58 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(fleet_delay_ex_ship),
 
     /* Next leaves. End of line comment is approximate line count for difficulty metric. */
-    MAP_CIMPL(draw_saucer),                  //  2
-    MAP_CIMPL(draw_alien_shot),              //  4
-    MAP_CIMPL(erase_alien_shot_explosion),   //  4
-    MAP_CIMPL(draw_bottom_line),             //  4
-    MAP_CIMPL(get_num_ships_active_player),  //  4
-    MAP_CIMPL(print_num_ships_in_acc),       //  5
-    MAP_CIMPL(draw_num_ships),               //  17
-    MAP_CIMPL(erase_ship_stash),             //  17
-    MAP_CIMPL(count_aliens),                 //  18
-    MAP_CIMPL(ashot_reload_rate),            //  19
-    MAP_CIMPL(plyr_shot_and_bump),           //  25
-    MAP_CIMPL(adjust_score_code),            //  27
-    MAP_CIMPL(do_extra_ship_awards),         //  41
-    MAP_CIMPL(draw_alien),                   //  52
-    _________(check_player_shot_bump_hid),
-    _________(handle_alien_shot),
-    _________(restore_shields1),             //  80
+    MAP_CIMPL(draw_saucer),                  // 2
+    MAP_CIMPL(draw_alien_shot),              // 4
+    MAP_CIMPL(erase_alien_shot_explosion),   // 4
+    MAP_CIMPL(draw_bottom_line),             // 4
+    MAP_CIMPL(get_num_ships_active_player),  // 4
+    MAP_CIMPL(print_num_ships_in_acc),       // 5
+    MAP_CIMPL(draw_num_ships),               // 17
+    MAP_CIMPL(erase_ship_stash),             // 17
+    MAP_CIMPL(count_aliens),                 // 18
+    MAP_CIMPL(ashot_reload_rate),            // 19
+    MAP_CIMPL(plyr_shot_and_bump),           // 25
+    MAP_CIMPL(adjust_score_code),            // 27
+    MAP_CIMPL(do_extra_ship_awards),         // 41
+    MAP_CIMPL(draw_alien),                   // 52
+   _________(draw_shifted_sprite),           // 25 - like draw_sprite
+   _________(restore_shields1),              // 10
+   _________(restore_shields2),              // 10
+   _________(move_ref_alien),                // 17
+   _________(check_player_shot_bump_hid),    // 20
+   _________(copy_shields),                  // 20
+   _________(handle_alien_shot),             // 120
 
     /* These are in the interrupts. */
 
-    _________(cursor_next_alien),
-    _________(draw_player_and_out),
-    _________(draw_player_die),
-    _________(draw_shifted_sprite),
-    _________(end_of_blowup),
-    _________(from_shot_struct),
+    _________(from_shot_struct),             // 4
+    _________(draw_player_and_out),          // 7
+    _________(move_player_left),             // 6
+    _________(move_player_right),            // 6
+    _________(init_ply_shot),                // 7
+    _________(isrspl_tasks),                 // 8
+    _________(remove_ship),                  // 8
+    _________(draw_player_die),              // 12
+    _________(shot_blowing_up),              // 17
+    _________(move_ply_shot),                // 18
+    _________(splash_sprite),                // 21
+    _________(end_of_blowup),                // 32
+    _________(move_alien_shot),              // 100
+
+    _________(splash_demo),                  
+    _________(isr_08_continues),
+    _________(isr_restore_regs_exit),
+
     _________(game_object_0_handler),
     _________(game_object_1_handler),
     _________(game_object_2_handler),
     _________(game_object_3_handler),
     _________(game_object_4_handler),
-    _________(init_ply_shot),
-    _________(isr_08_continues),
-    _________(isr_restore_regs_exit),
-    _________(isrspl_tasks),
     _________(keep_processing_game_objs),
-    _________(move_alien_shot),
-    _________(move_player_left),
-    _________(move_player_right),
-    _________(move_ply_shot),
-    _________(move_ref_alien),
-    _________(remove_ship),
-    _________(restore_shields2),
-    _________(return_two),
-    _________(run_game_objs),
-    _________(shot_blowing_up),
-    _________(splash_demo),
-    _________(splash_sprite),
     _________(splash_squiggly),
-    _________(wait_for_start),
+    _________(run_game_objs),
+    _________(wait_for_start),               // Leads into game loop
+    _________(cursor_next_alien),            // Resets stack
 };
 
 int interpreter_only;
