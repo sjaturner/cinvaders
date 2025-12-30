@@ -1912,6 +1912,33 @@ uint32_t _draw_sprite(struct cpu *cpu)
     return _draw_sprite_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs[REG_DE], get_b(cpu, 0));
 }
 
+uint32_t _draw_shifted_sprite_impl(uint8_t *mem, uint16_t *hl, uint16_t sprite_addr, uint8_t sprite_length)
+{
+    _cnvt_pix_number_impl(mem, hl);
+    uint16_t save_hl = *hl;
+
+    while (sprite_length--)
+    {
+        port_op(0, 4, mem[sprite_addr]); /* Data to shift register. */
+        mem[*hl + 0] |= port_ip(0, 3);
+
+        port_op(0, 4, 0); /* Data to shift register. */
+        mem[*hl + 1] |= port_ip(0, 3);
+
+        *hl += SCREEN_BYTES_PER_PIXEL_COLUMN;
+
+        ++sprite_addr;
+    }
+
+    *hl = save_hl;
+    return 0;
+}
+
+uint32_t _draw_shifted_sprite(struct cpu *cpu)
+{
+    return _draw_shifted_sprite_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs[REG_DE], get_b(cpu, 0));
+}
+
 uint32_t _erase_shifted_impl(uint8_t *mem, uint16_t *hl, uint16_t sprite_addr, uint8_t sprite_length)
 {
     _cnvt_pix_number_impl(mem, hl);
@@ -3152,13 +3179,13 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(adjust_score_code),            // 27
     MAP_CIMPL(do_extra_ship_awards),         // 41
     MAP_CIMPL(draw_alien),                   // 52
-   _________(draw_shifted_sprite),           // 25 - like draw_sprite
-   _________(restore_shields1),              // 10
-   _________(restore_shields2),              // 10
-   _________(move_ref_alien),                // 17
-   _________(check_player_shot_bump_hid),    // 20
-   _________(copy_shields),                  // 20
-   _________(handle_alien_shot),             // 120
+    MAP_CIMPL(draw_shifted_sprite),          // 25 - like draw_sprite
+    _________(restore_shields1),             // 10
+    _________(restore_shields2),             // 10
+    _________(move_ref_alien),               // 17
+    _________(check_player_shot_bump_hid),   // 20
+    _________(copy_shields),                 // 20
+    _________(handle_alien_shot),            // 120
 
     /* These are in the interrupts. */
 
