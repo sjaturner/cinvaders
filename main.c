@@ -2382,19 +2382,6 @@ uint32_t _restore_shields2(struct cpu *cpu)
     return _restore_shields2_impl(cpu->mem);
 }
 
-#if 0
-uint32_t _template_impl(uint8_t *mem)
-{
-    return 0;
-}
-
-uint32_t _template(struct cpu *cpu)
-{
-    return _template_impl(cpu->mem);
-}
-
-#endif
-
 uint32_t _score_for_alien_impl(uint8_t *mem, uint16_t *exploding_alien_desc_addr, uint8_t row)
 {
     uint32_t ret = 0;
