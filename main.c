@@ -2301,14 +2301,14 @@ enum
     SHIELD_BYTES_PER_ROW = 2,
 };
 
-uint32_t _restore_shields_impl(uint8_t *mem, uint16_t *screen_addr, uint16_t *player_shield_buf)
+uint32_t _restore_shields_impl(uint8_t *mem, uint16_t *screen_addr, uint16_t *player_shield_buf_addr)
 {
     for (uint32_t row = 0; row < SHIELD_ROWS; ++row)
     {
         for (uint32_t byte_in_row = 0; byte_in_row < SHIELD_BYTES_PER_ROW; ++byte_in_row)
         {
-            mem[*screen_addr + byte_in_row] |= mem[*player_shield_buf];
-            ++*player_shield_buf;
+            mem[*screen_addr + byte_in_row] |= mem[*player_shield_buf_addr];
+            ++*player_shield_buf_addr;
         }
         *screen_addr += SCREEN_BYTES_PER_PIXEL_COLUMN;
     }
@@ -2321,14 +2321,14 @@ uint32_t _restore_shields(struct cpu *cpu)
     return _restore_shields_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs + REG_DE);
 }
 
-uint32_t _remember_shields_impl(uint8_t *mem, uint16_t *screen_addr, uint16_t *player_shield_buf)
+uint32_t _remember_shields_impl(uint8_t *mem, uint16_t *screen_addr, uint16_t *player_shield_buf_addr)
 {
     for (uint32_t row = 0; row < SHIELD_ROWS; ++row)
     {
         for (uint32_t byte_in_row = 0; byte_in_row < SHIELD_BYTES_PER_ROW; ++byte_in_row)
         {
-            mem[*player_shield_buf] = mem[*screen_addr + byte_in_row];
-            ++*player_shield_buf;
+            mem[*player_shield_buf_addr] = mem[*screen_addr + byte_in_row];
+            ++*player_shield_buf_addr;
         }
         *screen_addr += SCREEN_BYTES_PER_PIXEL_COLUMN;
     }
@@ -2341,7 +2341,7 @@ uint32_t _remember_shields(struct cpu *cpu)
     return _remember_shields_impl(cpu->mem, cpu->cpu_state.regs + REG_HL, cpu->cpu_state.regs + REG_DE);
 }
 
-uint32_t _copy_shields_impl(uint8_t *mem, int remember, uint16_t shields_buf_addr)
+uint32_t _copy_shields_impl(uint8_t *mem, int remember, uint16_t player_shields_buf_addr)
 {
     uint16_t screen_addr = 0x2806;
 
@@ -2349,13 +2349,7 @@ uint32_t _copy_shields_impl(uint8_t *mem, int remember, uint16_t shields_buf_add
 
     for (uint8_t shield = 0; shield < NUM_SHIELDS; ++shield)
     {
-        for (uint8_t row = 0; row < SHIELD_ROWS; ++row)
-        {
-            for (uint8_t byte = 0; byte < SHIELD_BYTES_PER_ROW; ++byte)
-            {
-                (remember ? _remember_shields_impl : _restore_shields_impl)(mem, &screen_addr, &shields_buf_addr);
-            }
-        }
+        (remember ? _remember_shields_impl : _restore_shields_impl)(mem, &screen_addr, &player_shields_buf_addr);
 
         screen_addr += 23 * SCREEN_BYTES_PER_PIXEL_COLUMN;
     }
@@ -2366,6 +2360,26 @@ uint32_t _copy_shields_impl(uint8_t *mem, int remember, uint16_t shields_buf_add
 uint32_t _copy_shields(struct cpu *cpu)
 {
     return _copy_shields_impl(cpu->mem, get_a(cpu, 0), cpu->cpu_state.regs[REG_DE]);
+}
+
+uint32_t _restore_shields1_impl(uint8_t *mem)
+{
+    return _copy_shields_impl(mem, 0, player_one_shield_buf);
+}
+
+uint32_t _restore_shields1(struct cpu *cpu)
+{
+    return _restore_shields1_impl(cpu->mem);
+}
+
+uint32_t _restore_shields2_impl(uint8_t *mem)
+{
+    return _copy_shields_impl(mem, 0, player_two_shield_buf);
+}
+
+uint32_t _restore_shields2(struct cpu *cpu)
+{
+    return _restore_shields2_impl(cpu->mem);
 }
 
 #if 0
@@ -3241,8 +3255,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_alien),                   // 52
     MAP_CIMPL(draw_shifted_sprite),          // 25 - like draw_sprite
     MAP_CIMPL(copy_shields),                 // 20
-    _________(restore_shields1),             // 10
-    _________(restore_shields2),             // 10
+    MAP_CIMPL(restore_shields1),             // 10
+    MAP_CIMPL(restore_shields2),             // 10
     _________(move_ref_alien),               // 17
     _________(check_player_shot_bump_hid),   // 20
     _________(handle_alien_shot),            // 120
