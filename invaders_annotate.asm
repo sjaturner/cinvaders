@@ -4038,8 +4038,8 @@ remember_shields:
     push bc                          ; 147c     c5               ;  Hold counter
     push hl                          ; 147d     e5               ;  Hold start
 l147eh:                                                         
-    ld a,(hl)                        ; 147e     7e               ;  From sprite ... (should be DE)
-    ld (de),a                        ; 147f     12               ;  ... to screen ... (should be HL)
+    ld a,(hl)                        ; 147e     7e               ;  From screen ... 
+    ld (de),a                        ; 147f     12               ;  ... to store
     inc de                           ; 1480     13               ;  Next in sprite
     inc hl                           ; 1481     23               ;  Next on screen
     dec c                            ; 1482     0d               ;  All columns done?
