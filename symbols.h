@@ -476,7 +476,7 @@ enum
     alien_shot_delta             =  0x207e,
     shot_pic_end                 =  0x207f,
     shot_sync                    =  0x2080,
-    tmp2081                      =  0x2081,
+    shields_copy_restore_flag    =  0x2081,
     num_aliens                   =  0x2082,
     saucer_start                 =  0x2083,
     saucer_active                =  0x2084,

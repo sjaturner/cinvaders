@@ -386,14 +386,14 @@ l021bh:
     ld de,player_one_shield_buf      ; 021b     11 42 21         ;  Player 1 shield buffer (remember between games in multi-player)
 
 copy_shields:                                                   
-    ld (tmp2081),a                   ; 021e     32 81 20         ;  Remember copy/restore flag
+    ld (shields_copy_restore_flag),a ; 021e     32 81 20         ;  Remember copy/restore flag
     ld bc,01602h                     ; 0221     01 02 16         ;  22 rows, 2 bytes/row (for 1 shield pattern)
     ld hl,02806h                     ; 0224     21 06 28         ;  Screen coordinates
     ld a,004h                        ; 0227     3e 04            ;  Four shields to move
 l0229h:                                                         
     push af                          ; 0229     f5               ;  Hold shield count
     push bc                          ; 022a     c5               ;  Hold sprite-size
-    ld a,(tmp2081)                   ; 022b     3a 81 20         ;  Get back copy/restore flag
+    ld a,(shields_copy_restore_flag) ; 022b     3a 81 20         ;  Get back copy/restore flag
     and a                            ; 022e     a7               ;  Not zero ...
     jp nz,l0242h                     ; 022f     c2 42 02         ;  ... means remember shields
     call restore_shields             ; 0232     cd 69 1a         ;  Restore player's shields
@@ -6773,7 +6773,7 @@ alien_shot_size:               equ 0207dh                        ; 0207dh 0207d 
 alien_shot_delta:              equ 0207eh                        ; 0207eh 0207e                                                                 defb 0fch ; 1b7e fc  
 shot_pic_end:                  equ 0207fh                        ; 0207fh 0207f                                                                 defb 000h ; 1b7f 00  
 shot_sync:                     equ 02080h                        ; 02080h 02080                                                                 defb 001h ; 1b80 01  
-tmp2081:                       equ 02081h                        ; 02081h 02081                                                                 defb 0ffh ; 1b81 ff  
+shields_copy_restore_flag:     equ 02081h                        ; 02081h 02081                                                                 defb 0ffh ; 1b81 ff  
 num_aliens:                    equ 02082h                        ; 02082h 02082                                                                 defb 0ffh ; 1b82 ff  
 saucer_start:                  equ 02083h                        ; 02083h 02083                                                                 defb 000h ; 1b83 00  data_for_saucer: +                                          
 saucer_active:                 equ 02084h                        ; 02084h 02084                                                                 defb 000h ; 1b84 00                   |                 

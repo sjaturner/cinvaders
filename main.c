@@ -3180,11 +3180,11 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(do_extra_ship_awards),         // 41
     MAP_CIMPL(draw_alien),                   // 52
     MAP_CIMPL(draw_shifted_sprite),          // 25 - like draw_sprite
+    _________(copy_shields),                 // 20
     _________(restore_shields1),             // 10
     _________(restore_shields2),             // 10
     _________(move_ref_alien),               // 17
     _________(check_player_shot_bump_hid),   // 20
-    _________(copy_shields),                 // 20
     _________(handle_alien_shot),            // 120
 
     /* These are in the interrupts. */
