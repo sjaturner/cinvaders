@@ -3119,6 +3119,21 @@ uint32_t _check_player_shot_bump_hid(struct cpu *cpu)
     return _check_player_shot_bump_hid_impl(cpu->mem);
 }
 
+uint32_t _from_shot_struct_impl(uint8_t *mem, uint16_t dst_addr)
+{
+    enum
+    {
+        A_SHOT_STATUS_LENGTH = 0x0b,
+    };
+    memcpy(mem + dst_addr, mem + a_shot_status, A_SHOT_STATUS_LENGTH);
+    return 0;
+}
+
+uint32_t _from_shot_struct(struct cpu *cpu)
+{
+    return _from_shot_struct_impl(cpu->mem, cpu->cpu_state.regs[REG_HL]);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -3259,7 +3274,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
 
     /* These are in the interrupts. */
 
-    _________(from_shot_struct),             // 4
+    MAP_CIMPL(from_shot_struct),             // 4
     _________(draw_player_and_out),          // 7
     _________(move_player_left),             // 6
     _________(move_player_right),            // 6
