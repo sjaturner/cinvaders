@@ -3109,6 +3109,16 @@ uint32_t _draw_alien(struct cpu *cpu)
     return _draw_alien_impl(cpu->mem);
 }
 
+uint32_t _check_player_shot_bump_hid_impl(uint8_t *mem)
+{
+    return _plyr_shot_and_bump_impl(mem); /* Avoid the complicated hidden message thing. */
+}
+
+uint32_t _check_player_shot_bump_hid(struct cpu *cpu)
+{
+    return _check_player_shot_bump_hid_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -3244,8 +3254,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(copy_shields),                 // 20
     MAP_CIMPL(restore_shields1),             // 10
     MAP_CIMPL(restore_shields2),             // 10
-    _________(move_ref_alien),               // 17
-    _________(check_player_shot_bump_hid),   // 20
+    MAP_CIMPL(check_player_shot_bump_hid),   // 20
     _________(handle_alien_shot),            // 120
 
     /* These are in the interrupts. */
@@ -3277,6 +3286,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     _________(splash_squiggly),
     _________(run_game_objs),
     _________(wait_for_start),               // Leads into game loop
+    _________(move_ref_alien),               // Part of cursor_next_alien, hard
     _________(cursor_next_alien),            // Resets stack
 };
 
