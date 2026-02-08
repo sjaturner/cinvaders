@@ -3134,6 +3134,174 @@ uint32_t _from_shot_struct(struct cpu *cpu)
     return _from_shot_struct_impl(cpu->mem, cpu->cpu_state.regs[REG_HL]);
 }
 
+enum
+{
+    A_SHOT_BLOWING_UP_EXP = 0,
+    A_SHOT_BLOWING_UP_BIT = 1 << A_SHOT_BLOWING_UP_EXP,
+    A_SHOT_ACTIVE_EXP = 7,
+    A_SHOT_ACTIVE_BIT = 1 << A_SHOT_ACTIVE_EXP,
+
+    PLAY_AREA_FLOOR = 0x15,
+    PLAYER_LOWER_Y = 0x1e,
+    PLAYER_UPPER_Y = 0x27,
+};
+
+uint32_t _handle_alien_shot_impl(uint8_t *mem)
+{
+    uint32_t ret = 0;
+    if (mem[a_shot_status] & A_SHOT_ACTIVE_BIT)
+    {
+        /* See move_alien_shot: */
+        /* Shot is active so move shot. */
+
+        uint16_t unused_reg_hl = 0;
+        uint8_t unused_reg_a = 0;
+        uint8_t unused_reg_b = 0;
+        int carry_flag = 0;
+        int zero_flag = 0;
+
+        ret += _comp_yto_beam_impl(mem, &unused_reg_hl, &unused_reg_a, &unused_reg_b, alien_shot_y_coord, &carry_flag, &zero_flag);
+        if (!carry_flag) /* WRONG ... Seems to make double fire on tracking shot when enabled ... */
+        {
+            return ret;
+        }
+
+        if (mem[a_shot_status] & A_SHOT_BLOWING_UP_BIT)
+        {
+            /* Every path returns in this block. */
+            if (--mem[a_shot_blow_cnt] == 0x03)
+            {
+                ret += _erase_alien_shot_explosion_impl(mem);
+                mem[alien_shot_y_coord] -= 2;
+                mem[alien_shot_yr] -= 2;
+                mem[alien_shot_size] = 6; /* Why is this needed? Does it change? */
+                ret += _draw_alien_shot_impl(mem);
+                return ret;
+            }
+            else if (mem[a_shot_blow_cnt])
+            {
+                return ret;
+            }
+            else
+            {
+                return ret + _erase_alien_shot_explosion_impl(mem);
+            }
+        }
+        else /* Shot was not blowing up, now check to see if it should be blowing up. */
+        {
+            /* Every path returns in this block. */
+            ++mem[a_shot_step_cnt];
+            ret += _erase_alien_shot_explosion_impl(mem);
+
+            mem[a_shot_image_lsb] += 3;
+            if (mem[a_shot_image_lsb] > mem[shot_pic_end]) /* Depends on page alignment, dangerous game. */
+            {
+                mem[a_shot_image_lsb] -= 12;
+            }
+
+            mem[alien_shot_yr] += mem[alien_shot_delta];
+            ret += _draw_alien_shot_impl(mem);
+
+            if (mem[alien_shot_yr] < PLAY_AREA_FLOOR)
+            {
+                mem[a_shot_status] |= A_SHOT_BLOWING_UP_BIT;
+                return ret;
+            }
+            else if (!mem[collision])
+            {
+                return ret; /* Shot has not collided. */
+            }
+            else if (mem[alien_shot_yr] >= PLAYER_LOWER_Y && mem[alien_shot_yr] < PLAYER_UPPER_Y)
+            {
+                /* A collision in the horizontal band where the player might be kills the player. */
+                mem[player_alive] = 0;
+                mem[a_shot_status] |= A_SHOT_BLOWING_UP_BIT;
+                return ret;
+            }
+            else
+            {
+                mem[a_shot_status] |= A_SHOT_BLOWING_UP_BIT;
+                return ret;
+            }
+        }
+    }
+    else if (mem[isr_splash_task] == 0x04)
+    {
+        mem[a_shot_status] |= A_SHOT_ACTIVE_BIT; /* Mark this shot as actively running */
+        ++mem[a_shot_step_cnt]; /* Give this shot 1 step (it just started) */
+        return ret;
+    }
+    else if (mem[enable_alien_fire] == 0)
+    {
+        return ret;
+    }
+
+    mem[a_shot_step_cnt] = 0; /* Clear the step count. */
+
+    if (mem[other_shot1] && mem[a_shot_reload_rate] <= mem[other_shot1])
+    {
+        return ret;
+    }
+
+    if (mem[other_shot2] && mem[a_shot_reload_rate] <= mem[other_shot2])
+    {
+        return ret;
+    }
+
+    uint8_t column = 0;
+    if (mem[a_shot_tracking_flag]) /* WRONG ... Works better upside down. This is a shot which tracks, that is to say starts at the alien directly over the player. */
+    {
+        /* a_shot_cfir_lsb */
+        uint16_t alien_shot_column_addr = *(uint16_t *)(mem + a_shot_cfir_lsb);
+        column = mem[alien_shot_column_addr];
+        *(uint16_t *)(mem + a_shot_cfir_lsb) = alien_shot_column_addr;
+    }
+    else
+    {
+        /* l061bh */
+        uint8_t player_x_coord = mem[player_xr];
+        uint8_t player_x_center_coord = player_x_coord + 8;
+        _find_column_impl(mem, &player_x_center_coord, &column);
+
+        if (column >= 0x0c)
+        {
+            column = 0x0b;
+        }
+    }
+
+    int found = 0;
+    uint8_t alien_index = 0;
+    _find_in_column_impl(mem, column, &found, &alien_index);
+
+    if (!found)
+    {
+        return ret;
+    }
+
+    uint8_t alien_y = 0;
+    uint8_t alien_index_becomes_row = alien_index;
+    uint8_t unused = 0;
+    _get_alien_coords_impl(mem, &alien_y, &alien_index_becomes_row, &unused);
+    uint8_t row = alien_index_becomes_row;
+
+    alien_y += 7;
+    row -= 0x0a;
+
+    /* Position the shot. */
+    *(uint16_t *)(mem + alien_shot_yr) = (uint16_t)alien_y << 8 | row;
+
+    /* Mark the shot as running. */
+    mem[a_shot_status] |= A_SHOT_ACTIVE_BIT; /* Mark this shot as actively running */
+    ++mem[a_shot_step_cnt]; /* Give this shot 1 step (it just started) */
+
+    return ret;
+}
+
+uint32_t _handle_alien_shot(struct cpu *cpu)
+{
+    return _handle_alien_shot_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -3270,7 +3438,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(restore_shields1),             // 10
     MAP_CIMPL(restore_shields2),             // 10
     MAP_CIMPL(check_player_shot_bump_hid),   // 20
-    _________(handle_alien_shot),            // 120
+    MAP_CIMPL(handle_alien_shot),            // 120
 
     /* These are in the interrupts. */
 

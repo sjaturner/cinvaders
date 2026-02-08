@@ -1042,7 +1042,7 @@ shot_blowing_up:
     ld hl,0207ch                     ; 0657     21 7c 20         ;  Alien shot Y
     dec (hl)                         ; 065a     35               ;  Left two for ...
     dec (hl)                         ; 065b     35               ;  ... explosion
-    dec hl                           ; 065c     2b               ;  Point slien shot X
+    dec hl                           ; 065c     2b               ;  Point alien shot X
     dec (hl)                         ; 065d     35               ;  Up two for ...
     dec (hl)                         ; 065e     35               ;  ... explosion
     ld a,006h                        ; 065f     3e 06            ;  Alien shot descriptor ...
@@ -5737,7 +5737,8 @@ alien_explode:
     defb 008h                        ; 1ccd     08              
     defb 000h                        ; 1cce     00              
     defb 000h                        ; 1ccf     00              
-    defb 044h                        ; 1cd0     44              
+squiggly_shot:
+    defb 044h                        ; 1cd0     44
     defb 0aah                        ; 1cd1     aa              
     defb 010h                        ; 1cd2     10              
     defb 088h                        ; 1cd3     88              
@@ -5756,6 +5757,7 @@ sprite_ashot_explode:
     defb 03fh                        ; 1cdf     3f              
     defb 05eh                        ; 1ce0     5e              
     defb 025h                        ; 1ce1     25              
+plunger_shot:
     defb 004h                        ; 1ce2     04              
     defb 0fch                        ; 1ce3     fc              
     defb 004h                        ; 1ce4     04              
@@ -5768,6 +5770,7 @@ sprite_ashot_explode:
     defb 080h                        ; 1ceb     80              
     defb 0fch                        ; 1cec     fc              
     defb 080h                        ; 1ced     80              
+rolling_shot:
     defb 000h                        ; 1cee     00              
     defb 0feh                        ; 1cef     fe              
     defb 000h                        ; 1cf0     00              
@@ -6759,15 +6762,15 @@ other_shot2:                   equ 02071h                        ; 02071h 02071 
 vblank_status:                 equ 02072h                        ; 02072h 02072                                                                 defb 000h ; 1b72 00  
 
 a_shot_status:                 equ 02073h                        ; 02073h 02073 +                                                               defb 018h ; 1b73 18  
-                                                                 ; 02074h 02074 |                                                               defb 026h ; 1b74 26  
-                                                                 ; 02075h 02075 |                                                               defb 00fh ; 1b75 0f  
+a_shot_step_cnt:               equ 02074h                        ; 02074h 02074 |                                                               defb 026h ; 1b74 26  
+a_shot_tracking_flag:          equ 02075h                        ; 02075h 02075 |                                                               defb 00fh ; 1b75 0f  
 a_shot_cfir_lsb:               equ 02076h                        ; 02076h 02076 |                                                               defb 00bh ; 1b76 0b  
                                                                  ; 02077h 02077 |                                                               defb 000h ; 1b77 00  
 a_shot_blow_cnt:               equ 02078h                        ; 02078h 02078 |                                                               defb 018h ; 1b78 18  
 a_shot_image_lsb:              equ 02079h                        ; 02079h 02079 |  ; e ; descriptor                                             defb 004h ; 1b79 04  
                                                                  ; 0207ah 0207a |  ; d                                                          defb 011h ; 1b7a 11  
 alien_shot_yr:                 equ 0207bh                        ; 0207bh 0207b |  ; l                                                          defb 024h ; 1b7b 24  
-                                                                 ; 0207ch 0207c |  ; h  ; @ alien shot y? coordinate                            defb 01bh ; 1b7c 1b  
+alien_shot_y_coord:            equ 0207ch                        ; 0207ch 0207c |  ; h  ; @ alien shot y? coordinate                            defb 01bh ; 1b7c 1b  
 alien_shot_size:               equ 0207dh                        ; 0207dh 0207d +  ; b                                                          defb 025h ; 1b7d 25  
 
 alien_shot_delta:              equ 0207eh                        ; 0207eh 0207e                                                                 defb 0fch ; 1b7e fc  
