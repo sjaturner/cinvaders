@@ -3318,6 +3318,46 @@ uint32_t _draw_player_and_out(struct cpu *cpu)
     return _draw_player_and_out_impl(cpu->mem);
 }
 
+enum
+{
+    PLAYER_X_MIN = 0x30,
+    PLAYER_X_MAX = 0xd9,
+};
+
+uint32_t _move_player_left_impl(uint8_t *mem, uint8_t xpos)
+{
+    if (xpos <= PLAYER_X_MIN)
+    {
+        return _draw_player_and_out_impl(mem);
+    }
+
+    mem[player_xr] = --xpos;
+
+    return _draw_player_and_out_impl(mem);
+}
+
+uint32_t _move_player_left(struct cpu *cpu)
+{
+    return _move_player_left_impl(cpu->mem, get_b(cpu, 0));
+}
+
+uint32_t _move_player_right_impl(uint8_t *mem, uint8_t xpos)
+{
+    if (xpos >= PLAYER_X_MAX)
+    {
+        return _draw_player_and_out_impl(mem);
+    }
+
+    mem[player_xr] = ++xpos;
+
+    return _draw_player_and_out_impl(mem);
+}
+
+uint32_t _move_player_right(struct cpu *cpu)
+{
+    return _move_player_right_impl(cpu->mem, get_b(cpu, 0));
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -3460,8 +3500,8 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
 
     MAP_CIMPL(from_shot_struct),             // 4
     MAP_CIMPL(draw_player_and_out),          // 7
-    _________(move_player_left),             // 6
-    _________(move_player_right),            // 6
+    MAP_CIMPL(move_player_left),             // 6
+    MAP_CIMPL(move_player_right),            // 6
     _________(init_ply_shot),                // 7
     _________(isrspl_tasks),                 // 8
     _________(remove_ship),                  // 8
