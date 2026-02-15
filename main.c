@@ -3358,6 +3358,25 @@ uint32_t _move_player_right(struct cpu *cpu)
     return _move_player_right_impl(cpu->mem, get_b(cpu, 0));
 }
 
+enum
+{
+    PLAYER_SHOT_IN_PROGRESS = 0x02,
+    OFFSET_TO_PLAYER_CENTER = 0x08,
+};
+uint32_t _init_ply_shot_impl(uint8_t *mem, uint16_t shot_addr)
+{
+    mem[shot_addr] = PLAYER_SHOT_IN_PROGRESS;
+    mem[obj1coor_xr] = mem[player_xr] + OFFSET_TO_PLAYER_CENTER;
+    struct desc desc = read_desc_impl(mem, shot_addr);
+    uint16_t screen_addr = desc.screen_loc;
+    return _draw_shifted_sprite_impl(mem, &screen_addr, desc.sprite_addr, desc.sprite_bytes);
+}
+
+uint32_t _init_ply_shot(struct cpu *cpu)
+{
+    return _init_ply_shot_impl(cpu->mem, cpu->cpu_state.regs[REG_HL]);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -3502,7 +3521,7 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(draw_player_and_out),          // 7
     MAP_CIMPL(move_player_left),             // 6
     MAP_CIMPL(move_player_right),            // 6
-    _________(init_ply_shot),                // 7
+    MAP_CIMPL(init_ply_shot),                // 7
     _________(isrspl_tasks),                 // 8
     _________(remove_ship),                  // 8
     _________(draw_player_die),              // 12
