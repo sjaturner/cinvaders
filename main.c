@@ -3302,6 +3302,22 @@ uint32_t _handle_alien_shot(struct cpu *cpu)
     return _handle_alien_shot_impl(cpu->mem);
 }
 
+uint32_t _draw_player_and_out_impl(uint8_t *mem)
+{
+    struct desc desc = read_desc_impl(mem, plyr_spr_pic_l);
+    uint16_t screen_coords = desc.screen_loc;
+    _conv_to_scr_impl(&screen_coords);
+    uint16_t sprite_addr = desc.sprite_addr;
+    _draw_simp_sprite_impl(mem, desc.sprite_bytes, &sprite_addr, &screen_coords);
+
+    return 0;
+}
+
+uint32_t _draw_player_and_out(struct cpu *cpu)
+{
+    return _draw_player_and_out_impl(cpu->mem);
+}
+
 #if 0
 uint32_t _template_impl(uint8_t *mem)
 {
@@ -3438,12 +3454,12 @@ uint32_t (*cimpl[0x10000])(struct cpu *cpu) = {
     MAP_CIMPL(restore_shields1),             // 10
     MAP_CIMPL(restore_shields2),             // 10
     MAP_CIMPL(check_player_shot_bump_hid),   // 20
-    MAP_CIMPL(handle_alien_shot),            // 120
+    _________(handle_alien_shot),            // 120
 
     /* These are in the interrupts. */
 
     MAP_CIMPL(from_shot_struct),             // 4
-    _________(draw_player_and_out),          // 7
+    MAP_CIMPL(draw_player_and_out),          // 7
     _________(move_player_left),             // 6
     _________(move_player_right),            // 6
     _________(init_ply_shot),                // 7
